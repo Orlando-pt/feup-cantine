@@ -4,10 +4,11 @@ before_script:
   - apt-get update -qy
   - apt-get install -y ruby-dev
   - gem install dpl
-  - cp $MAVEN_SETTINGS_FILE /builds/feup-tbs/gitlabquestforsofteng/les2122_team_b/feup-cantine/.m2/settings.xml
+  # - cp $MAVEN_SETTINGS_FILE /builds/feup-tbs/gitlabquestforsofteng/les2122_team_b/feup-cantine/.m2/settings.xml
 
 variables:
-  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  # MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_CLI_OPTS: "--batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
 cache:
