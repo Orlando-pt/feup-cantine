@@ -1,9 +1,8 @@
 image: maven:3.8.3-jdk-11
 
-before_script:
-  - apt-get update -qy
-  - apt-get install -y ruby-dev
-  - gem install dpl
+# before_script:
+  # - apt-get update -qy
+  # - apt-get install -y ruby-dev
   # - cp $MAVEN_SETTINGS_FILE /builds/feup-tbs/gitlabquestforsofteng/les2122_team_b/feup-cantine/.m2/settings.xml
   # Just Another irrelevant change
 
@@ -39,6 +38,7 @@ deploy:
   stage: deploy
   image: ruby:latest
   script:
+      - gem install dpl
       - dpl --provider=heroku --app=$HEROKU_APP_DEPLOY --api-key=$HEROKU_API_KEY
   only:
       - feature/ci_cd
