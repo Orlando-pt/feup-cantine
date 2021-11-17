@@ -26,16 +26,19 @@ build:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
-
+  only:
+    - master
 test:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS test
+  only:
+    - master
 
 deploy:
-    stage: deploy
-    image: ruby:latest
-    script:
-        - dpl --provider=heroku --app=$HEROKU_APP_DEPLOY --api-key=$HEROKU_API_KEY
-    only:
-        - feature/ci_cd
+  stage: deploy
+  image: ruby:latest
+  script:
+      - dpl --provider=heroku --app=$HEROKU_APP_DEPLOY --api-key=$HEROKU_API_KEY
+  only:
+      - feature/ci_cd
