@@ -39,6 +39,6 @@ deploy:
   stage: deploy
   image: ruby:latest
   script:
-      - dpl --provider=heroku --app=feup-food --api-key=$HEROKU_API_KEY
+      - dpl --provider=heroku --app=feup-food --api-key=a798dd94-a1fb-4285-b520-bf0268ec517c
   only:
       - feature/ci_cd
