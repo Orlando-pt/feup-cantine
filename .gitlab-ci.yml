@@ -1,10 +1,7 @@
 image: maven:3.8.3-jdk-11
 
 # before_script:
-  # - apt-get update -qy
-  # - apt-get install -y ruby-dev
   # - cp $MAVEN_SETTINGS_FILE /builds/feup-tbs/gitlabquestforsofteng/les2122_team_b/feup-cantine/.m2/settings.xml
-  # Just Another irrelevant change
 
 variables:
   # MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
@@ -25,14 +22,12 @@ build:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
-  only:
-    - master
+
 test:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS test
   only:
-    - master
 
 deploy:
   stage: deploy
@@ -41,4 +36,4 @@ deploy:
       - gem install dpl
       - dpl --provider=heroku --app=$HEROKU_APP_DEPLOY --api-key=$HEROKU_API_KEY
   only:
-      - feature/ci_cd
+      - main
