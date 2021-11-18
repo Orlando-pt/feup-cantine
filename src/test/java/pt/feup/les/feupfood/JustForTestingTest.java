@@ -1,5 +1,6 @@
 package pt.feup.les.feupfood;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,13 @@ public class JustForTestingTest {
     void testPositive() {
         assertTrue(
             this.test.isPositive(1)
+        );
+    }
+
+    @Test
+    void testNegative() {
+        assertFalse(
+            this.test.isPositive(-1)
         );
     }
 }
