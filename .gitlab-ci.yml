@@ -19,7 +19,7 @@ cache:
 
 stages:
   - build
-  - test
+  # - test
   - verify
   - deploy
 
@@ -28,10 +28,10 @@ build:
   script:
     - mvn $MAVEN_CLI_OPTS compile
 
-test:
-  stage: test
-  script:
-    - mvn $MAVEN_CLI_OPTS test
+# test:
+#   stage: test
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test
  
 verify:
   stage: verify
