@@ -15,6 +15,8 @@
 	<description>Backend application to support Feup Food service</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.projectKey>feup-tbs_gitlabquestforsofteng_les2122_team_b_feup-cantine_AX0wXUcZ1enOtQLOnKOC</sonar.projectKey>
+		<sonar.qualitygate.wait>true</sonar.qualitygate.wait>
 	</properties>
 	<dependencies>
 		<dependency>
