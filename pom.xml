@@ -17,40 +17,7 @@
 		<java.version>11</java.version>
 		<sonar.projectKey>feup-tbs_gitlabquestforsofteng_les2122_team_b_feup-cantine_AX0wXUcZ1enOtQLOnKOC</sonar.projectKey>
 		<sonar.qualitygate.wait>true</sonar.qualitygate.wait>
-
-		<jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
-		<jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
-		<build.profile.id>dev</build.profile.id>
-
-		<!-- Only unit tests are run by default. -->
-		<skip.integration.tests>true</skip.integration.tests>
-		<skip.unit.tests>false</skip.unit.tests>
 	</properties>
-
-	<profiles>
-		<profile>
-			<id>all-tests</id>
-			<properties>
-				<build.profile.id>all-tests</build.profile.id>
-				<!-- All tests are run. -->
-				<skip.integration.tests>false</skip.integration.tests>
-				<skip.unit.tests>false</skip.unit.tests>
-			</properties>
-		</profile>
-		<profile>
-			<id>dev</id>
-		</profile>
-		<profile>
-			<id>integration-test</id>
-			<properties>
-				<!-- Used to locate the profile specific configuration file. -->
-				<build.profile.id>integration-test</build.profile.id>
-				<!-- Only integration tests are run. -->
-				<skip.integration.tests>false</skip.integration.tests>
-				<skip.unit.tests>true</skip.unit.tests>
-			</properties>
-		</profile>
-	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -110,129 +77,38 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${maven-surefire-plugin.version}</version>
-				<configuration>
-					<!-- Sets the VM argument line used when unit tests are run. -->
-					<argLine>${surefireArgLine}</argLine>
-					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
-					<skipTests>${skip.unit.tests}</skipTests>
-					<!-- Excludes integration tests when unit tests are run.
-					<parallelOptimized>false</parallelOptimized>-->
-					<excludes>
-						<exclude>**/*IT*.java</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
 			<plugin>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<executions>
-					<!--
-                        Ensures that both integration-test and verify goals of the Failsafe Maven
-                        plugin are executed.
-                    -->
-					<execution>
-						<id>integration-tests</id>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the VM argument line used when integration tests are run. -->
-							<argLine>${failsafeArgLine}</argLine>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <executions>    
+                    <execution>
+                        <goals>  
+                            <goal>prepare-agent</goal>
+                            <goal>prepare-agent-integration</goal>
+                            <goal>report</goal>
+                            <goal>report-integration</goal>
+                        </goals>  
+                    </execution>
+                </executions>  
+            </plugin>
 
-							<!--
-                                Skips integration tests if the value of skip.integration.tests property
-                                is true
-                            -->
-							<skipTests>${skip.integration.tests}</skipTests>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
-				<executions>
-					<!--
-                        Prepares the property pointing to the JaCoCo runtime agent which
-                        is passed as VM argument when Maven the Surefire plugin is executed.
-                    -->
-					<execution>
-						<id>pre-unit-test</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<destFile>${jacoco.ut.execution.data.file}</destFile>
-							<!--
-                                Sets the name of the property containing the settings
-                                for JaCoCo runtime agent.
-                            -->
-							<propertyName>surefireArgLine</propertyName>
-						</configuration>
-					</execution>
-					<!--
-                        Ensures that the code coverage report for unit tests is created after
-                        unit tests have been run.
-                    -->
-					<execution>
-						<id>post-unit-test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<dataFile>${jacoco.ut.execution.data.file}</dataFile>
-							<!-- Sets the output directory for the code coverage report. -->
-							<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-						</configuration>
-					</execution>
-					<!--
-                        Prepares the property pointing to the JaCoCo runtime agent which
-                        is passed as VM argument when Maven the Failsafe plugin is executed.
-                    -->
-					<execution>
-						<id>pre-integration-test</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<destFile>${jacoco.it.execution.data.file}</destFile>
-							<!--
-                                Sets the name of the property containing the settings
-                                for JaCoCo runtime agent.
-                            -->
-							<propertyName>failsafeArgLine</propertyName>
-						</configuration>
-					</execution>
-					<!--
-                        Ensures that the code coverage report for integration tests after
-                        integration tests have been run.
-                    -->
-					<execution>
-						<id>post-integration-test</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<dataFile>${jacoco.it.execution.data.file}</dataFile>
-							<!-- Sets the output directory for the code coverage report. -->
-							<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 

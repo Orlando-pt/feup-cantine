@@ -37,7 +37,6 @@ verify:
   stage: verify
   script:
     - mvn $MAVEN_CLI_OPTS -P all-tests verify sonar:sonar
-  allow_failure: true
 
 deploy:
   stage: deploy
