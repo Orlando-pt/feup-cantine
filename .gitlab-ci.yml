@@ -38,8 +38,6 @@ verify:
   script:
     - mvn verify sonar:sonar
   allow_failure: true
-  only:
-    - feature/ci_cd
 
 deploy:
   stage: deploy
