@@ -18,25 +18,25 @@ cache:
     - target/
 
 stages:
-  - build
-  - test
-  - verify
+  # - build
+  # - test
+  # - verify
   - deploy
 
-build:
-  stage: build
-  script:
-    - mvn $MAVEN_CLI_OPTS compile
+# build:
+#   stage: build
+#   script:
+#     - mvn $MAVEN_CLI_OPTS compile
 
-test:
-  stage: test
-  script:
-    - mvn $MAVEN_CLI_OPTS test
+# test:
+#   stage: test
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test
  
-verify:
-  stage: verify
-  script:
-    - mvn $MAVEN_CLI_OPTS -P all-tests verify sonar:sonar
+# verify:
+#   stage: verify
+#   script:
+#     - mvn $MAVEN_CLI_OPTS -P all-tests verify sonar:sonar
 
 deploy:
   stage: deploy
@@ -44,5 +44,8 @@ deploy:
   script:
       - gem install dpl
       - dpl --provider=heroku --app=$HEROKU_APP_DEPLOY --api-key=$HEROKU_API_KEY
+  environment:
+    name: Heroku Staging Environment
+    url: https://feup-food.herokuapp.com/
   only:
-      - main
+      - feature/change_pom_4_jacoco
