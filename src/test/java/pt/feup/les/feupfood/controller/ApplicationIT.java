@@ -1,7 +1,4 @@
-package pt.feup.les.feupfood;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.contains;
+package pt.feup.les.feupfood.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
