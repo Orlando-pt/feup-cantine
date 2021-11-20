@@ -1,15 +1,14 @@
 package pt.feup.les.feupfood.repository;
 
-import java.util.Optional;
+import java.util.List;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import pt.feup.les.feupfood.model.Restaurant;
 
-public interface RestaurantRepository extends MongoRepository<Restaurant, String> {
+@Repository
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
-    @Query("{name:'?0'}")
-    Optional<Restaurant> findRestaurantByName(String name);
-    
+    List<Restaurant> findByName(String name);
 }
