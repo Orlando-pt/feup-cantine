@@ -1,8 +1,10 @@
 package pt.feup.les.feupfood.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,7 +33,9 @@ public class JwtUserDetailsService implements UserDetailsService{
 		);
 
 		return new User(user.getUsername(), user.getPassword(),
-				new ArrayList<>());
+				Arrays.asList(
+					new SimpleGrantedAuthority(user.getRole())
+				));
 	}
 
 	public DAOUser save(UserDto user) {
