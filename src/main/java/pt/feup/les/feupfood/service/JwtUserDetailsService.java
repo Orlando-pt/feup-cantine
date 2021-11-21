@@ -2,8 +2,8 @@ package pt.feup.les.feupfood.service;
 
 import java.util.Arrays;
 
-import org.dom4j.util.UserDataAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,15 +38,18 @@ public class JwtUserDetailsService implements UserDetailsService{
 	}
 
 	public DAOUser save(UserDto user) {
+		// verify if role was provided
+		if (user.getRole() == null || user.getRole().equals(""))
+			return null;
+
 		// check repeated usernames
 		var checkUser = this.userRepository.findByEmail(
 			user.getEmail()
 		);
 
 		if (checkUser.isPresent())
-			throw new RuntimeException("There is already a user with username: " + user.getEmail());
+			throw new AuthenticationServiceException("There is already a user with email: " + user.getEmail());
 
-		
 		var userDAO = new DAOUser();
 		userDAO.setFirstName(user.getFirstName());
 		userDAO.setLastName(user.getLastName());

@@ -7,10 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 import pt.feup.les.feupfood.config.JwtTokenUtil;
 import pt.feup.les.feupfood.dto.JwtRequest;
@@ -18,9 +15,8 @@ import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.service.JwtUserDetailsService;
 
-@RestController
-@CrossOrigin
-public class JwtAuthenticationController {
+@Service
+public class JwtAuthenticationControllerUtil {
 
     @Autowired
 	private AuthenticationManager authenticationManager;
@@ -31,8 +27,7 @@ public class JwtAuthenticationController {
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
 
-    @PostMapping("/authenticate")
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+	public ResponseEntity<?> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
 
 		this.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
@@ -44,9 +39,10 @@ public class JwtAuthenticationController {
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 
-	@PostMapping("/register")
-	public ResponseEntity<?> saveUser(@RequestBody UserDto userDto) throws Exception {
-		return ResponseEntity.ok(this.userDetailsService.save(userDto));
+	public ResponseEntity<?> saveUser(UserDto userDto) throws Exception {
+		var response = this.userDetailsService.save(userDto);
+		response.setPassword("");
+		return ResponseEntity.ok(response);
 	}
 
 	private void authenticate(String username, String password) throws Exception {
