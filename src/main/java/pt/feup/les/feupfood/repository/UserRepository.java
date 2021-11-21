@@ -10,5 +10,5 @@ import pt.feup.les.feupfood.model.DAOUser;
 @Repository
 public interface UserRepository extends JpaRepository<DAOUser, Long>{
     
-    Optional<DAOUser> findByUsername(String username);
+    Optional<DAOUser> findByEmail(String email);
 }

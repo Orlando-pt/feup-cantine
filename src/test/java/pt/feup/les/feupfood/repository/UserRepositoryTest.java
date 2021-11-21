@@ -2,8 +2,6 @@ package pt.feup.les.feupfood.repository;
 
 import java.util.Optional;
 
-import javax.persistence.PersistenceException;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,12 +26,15 @@ public class UserRepositoryTest {
 
     public UserRepositoryTest() {
         this.user1 = new DAOUser();
-        this.user1.setUsername("Orlando");
+        this.user1.setFirstName("Orlando");
+        this.user1.setLastName("Macedo");
+        this.user1.setEmail("orlando@mail.com");
         this.user1.setPassword("SecretPassword");
         this.user1.setRole("ADMIN");
         
         this.user2 = new DAOUser();
-        this.user2.setUsername("John");
+        this.user2.setFirstName("Francisco");
+        this.user2.setEmail("francisco@mail.com");
         this.user2.setPassword("AnotherSecretPassword");
         this.user2.setRole("USER_CLIENT");
     }
@@ -48,9 +49,9 @@ public class UserRepositoryTest {
     }
 
     @Test
-    void throwExceptionWhenRepeatUsername() {
+    void throwExceptionWhenRepeatEmail() {
         var repeatedUser = new DAOUser();
-        repeatedUser.setUsername(this.user1.getUsername());
+        repeatedUser.setEmail(this.user1.getEmail());
         repeatedUser.setPassword("password");
         repeatedUser.setRole("ADMIN");
 
@@ -62,9 +63,9 @@ public class UserRepositoryTest {
     }
 
     @Test
-    void throwExceptionWhenEmptyRole() {
+    void throwExceptionWhenBadRoleInserted() {
         var emptyRole = new DAOUser();
-        emptyRole.setUsername("Someone");
+        emptyRole.setEmail("Someone@mail.com");
         emptyRole.setPassword("asasdas");
         emptyRole.setRole("bla bla");
 
@@ -76,10 +77,10 @@ public class UserRepositoryTest {
     }
 
     @Test
-    void findByUsernameShouldReturnOnlyOrlandoWhenISearchForHim() {
+    void findByEmailShouldReturnOnlyOrlandoWhenISearchForHim() {
         Assertions.assertThat(
-            this.userRepository.findByUsername(
-                this.user1.getUsername()
+            this.userRepository.findByEmail(
+                this.user1.getEmail()
             )
         ).isEqualTo(
             Optional.of(

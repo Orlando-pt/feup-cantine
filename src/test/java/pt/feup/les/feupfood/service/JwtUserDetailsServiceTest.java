@@ -38,7 +38,8 @@ public class JwtUserDetailsServiceTest {
 
     public JwtUserDetailsServiceTest() {
         this.daoUser = new DAOUser();
-        daoUser.setUsername("Diogo");
+        daoUser.setFirstName("Diogo");
+        daoUser.setEmail("diogo@mail.com");
         daoUser.setPassword("Secret");
         daoUser.setRole("ADMIN");
     }
@@ -48,21 +49,21 @@ public class JwtUserDetailsServiceTest {
      */
     @Test
     void onLoadNoUserWasFoundTest() {
-        var username = "Candido";
+        var email = "Candido@mail.com";
         Mockito.when(
-            this.userRepository.findByUsername(username)
+            this.userRepository.findByEmail(email)
         ).thenReturn(
             Optional.ofNullable(null)
         );
 
         Assertions.assertThatThrownBy(
-            () -> this.jwtUserDetailsService.loadUserByUsername(username)
+            () -> this.jwtUserDetailsService.loadUserByUsername(email)
         ).isInstanceOf(UsernameNotFoundException.class);
 
         Mockito.verify(
             this.userRepository,
             Mockito.times(1)
-        ).findByUsername(username);
+        ).findByEmail(email);
     }
 
     /**
@@ -74,25 +75,24 @@ public class JwtUserDetailsServiceTest {
         roles.add(new SimpleGrantedAuthority(this.daoUser.getRole()));
 
         var expectedUserReturn = new User(
-            this.daoUser.getUsername(),
+            this.daoUser.getEmail(),
             this.daoUser.getPassword(),
             roles
         );
 
         Mockito.when(
-            this.userRepository.findByUsername(this.daoUser.getUsername())
+            this.userRepository.findByEmail(this.daoUser.getEmail())
         ).thenReturn(
             Optional.of(this.daoUser)
         );
 
         Assertions.assertThat(
             this.jwtUserDetailsService.loadUserByUsername(
-                this.daoUser.getUsername()
-            )
+                this.daoUser.getEmail())
         ).isEqualTo(expectedUserReturn);
 
         Mockito.verify(this.userRepository,
-            Mockito.times(1)).findByUsername(this.daoUser.getUsername());
+            Mockito.times(1)).findByEmail(this.daoUser.getEmail());
     }
 
     /**
@@ -101,13 +101,13 @@ public class JwtUserDetailsServiceTest {
     @Test
     void savingUserThatAlreadyExistsShouldThrowRuntimeException() {
         Mockito.when(
-            this.userRepository.findByUsername(this.daoUser.getUsername())
+            this.userRepository.findByEmail(this.daoUser.getEmail())
         ).thenReturn(
             Optional.of(this.daoUser)
         );
 
         var userDto = new UserDto();
-        userDto.setUsername(this.daoUser.getUsername());
+        userDto.setEmail(this.daoUser.getEmail());
 
         Assertions.assertThatThrownBy(
             () -> this.jwtUserDetailsService.save(
@@ -117,7 +117,7 @@ public class JwtUserDetailsServiceTest {
 
         Mockito.verify(
             this.userRepository, Mockito.times(1)
-        ).findByUsername(this.daoUser.getUsername());
+        ).findByEmail(userDto.getEmail());
     }
 
     /**
@@ -126,11 +126,11 @@ public class JwtUserDetailsServiceTest {
     @Test
     void registerSuccessfullyUser() {
         var userDto = new UserDto();
-        userDto.setUsername("Franciso");
+        userDto.setEmail("Franciso@mail.com");
         userDto.setPassword("passwordSecret");
 
         Mockito.when(
-            this.userRepository.findByUsername(userDto.getUsername())
+            this.userRepository.findByEmail(userDto.getEmail())
         ).thenReturn(
             Optional.ofNullable(null)
         );
@@ -140,7 +140,7 @@ public class JwtUserDetailsServiceTest {
         ).thenReturn(userDto.getPassword());
 
         var expectedDAOUser = new DAOUser();
-        expectedDAOUser.setUsername(userDto.getUsername());
+        expectedDAOUser.setEmail(userDto.getEmail());
         expectedDAOUser.setPassword(userDto.getPassword());
         
         Mockito.when(
@@ -154,7 +154,7 @@ public class JwtUserDetailsServiceTest {
         Mockito.verify(
             this.userRepository,
             Mockito.times(1)
-        ).findByUsername(userDto.getUsername());
+        ).findByEmail(userDto.getEmail());
 
         Mockito.verify(
             this.encoder,

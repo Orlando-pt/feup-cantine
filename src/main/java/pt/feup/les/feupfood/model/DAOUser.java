@@ -20,12 +20,14 @@ public class DAOUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+    private String firstName;
+
+    private String lastName;
 
     @Column(nullable = false)
     private String password;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(columnDefinition = "varchar(20) check (role in ('ADMIN', 'USER_CLIENT', 'USER_RESTAURANT'))")
