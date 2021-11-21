@@ -1,5 +1,7 @@
 package pt.feup.les.feupfood.repository;
 
+import java.util.Optional;
+
 import javax.persistence.PersistenceException;
 
 import org.assertj.core.api.Assertions;
@@ -71,5 +73,18 @@ public class UserRepositoryTest {
                 emptyRole
             )
         ).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void findByUsernameShouldReturnOnlyOrlandoWhenISearchForHim() {
+        Assertions.assertThat(
+            this.userRepository.findByUsername(
+                this.user1.getUsername()
+            )
+        ).isEqualTo(
+            Optional.of(
+                this.user1
+            )
+        );
     }
 }
