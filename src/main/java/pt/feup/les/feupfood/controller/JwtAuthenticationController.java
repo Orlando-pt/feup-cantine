@@ -1,5 +1,6 @@
 package pt.feup.les.feupfood.controller;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pt.feup.les.feupfood.config.JwtTokenUtil;
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
+import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.service.JwtUserDetailsService;
 
 @RestController
@@ -41,6 +43,11 @@ public class JwtAuthenticationController {
 		final String token = jwtTokenUtil.generateToken(userDetails);
 
 		return ResponseEntity.ok(new JwtResponse(token));
+	}
+
+	@PostMapping("/register")
+	public ResponseEntity<?> saveUser(@RequestBody UserDto userDto) throws Exception {
+		return ResponseEntity.ok(this.userDetailsService.save(userDto));
 	}
 
 	private void authenticate(String username, String password) throws Exception {
