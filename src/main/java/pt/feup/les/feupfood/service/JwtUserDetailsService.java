@@ -1,6 +1,5 @@
 package pt.feup.les.feupfood.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +43,10 @@ public class JwtUserDetailsService implements UserDetailsService{
 		);
 
 		if (checkUser.isPresent())
-			throw new RuntimeException("There is already a user with username" + user.getUsername());
+			throw new RuntimeException("There is already a user with username: " + user.getUsername());
 
+		
+		// TODO put the rest of the attributes
 		var userDAO = new DAOUser();
 		userDAO.setUsername(user.getUsername());
 		userDAO.setPassword(this.bcryptEncoder.encode(
