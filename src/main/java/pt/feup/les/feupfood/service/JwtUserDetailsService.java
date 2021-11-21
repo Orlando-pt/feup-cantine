@@ -27,7 +27,6 @@ public class JwtUserDetailsService implements UserDetailsService{
 
     @Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // TODO add roles
 		var user = this.userRepository.findByUsername(username).orElseThrow(
 			() -> new UsernameNotFoundException("User not found with username: " + username)
 		);
@@ -39,7 +38,13 @@ public class JwtUserDetailsService implements UserDetailsService{
 	}
 
 	public DAOUser save(UserDto user) {
-		// TODO check repeated usernames
+		// check repeated usernames
+		var checkUser = this.userRepository.findByUsername(
+			user.getUsername()
+		);
+
+		if (checkUser.isPresent())
+			throw new RuntimeException("There is already a user with username" + user.getUsername());
 
 		var userDAO = new DAOUser();
 		userDAO.setUsername(user.getUsername());
