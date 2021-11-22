@@ -1,8 +1,0 @@
-
-ConnectionString connectionString = new ConnectionString("mongodb+srv://feupfood:<password>@cluster0.vwrl8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority");
-MongoClientSettings settings = MongoClientSettings.builder()
-        .applyConnectionString(connectionString)
-        .build();
-MongoClient mongoClient = MongoClients.create(settings);
-MongoDatabase database = mongoClient.getDatabase("test");
-
