@@ -1,5 +1,6 @@
 package pt.feup.les.feupfood.controller;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -11,6 +12,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
@@ -54,6 +56,14 @@ public class AdminController_RestTemplateIT {
             new HttpEntity<>(headers),
             String.class
         );
+
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            response.getBody()
+        ).isEqualTo("Hello admin!");
     }
 
     private void registerAdmin() {
