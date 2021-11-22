@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -108,12 +108,13 @@ public class JwtUserDetailsServiceTest {
 
         var userDto = new UserDto();
         userDto.setEmail(this.daoUser.getEmail());
+        userDto.setRole("ADMIN");
 
         Assertions.assertThatThrownBy(
             () -> this.jwtUserDetailsService.save(
                 userDto
             )
-        ).isInstanceOf(RuntimeException.class);
+        ).isInstanceOf(AuthenticationServiceException.class);
 
         Mockito.verify(
             this.userRepository, Mockito.times(1)
@@ -128,6 +129,7 @@ public class JwtUserDetailsServiceTest {
         var userDto = new UserDto();
         userDto.setEmail("Franciso@mail.com");
         userDto.setPassword("passwordSecret");
+        userDto.setRole("ADMIN");
 
         Mockito.when(
             this.userRepository.findByEmail(userDto.getEmail())
@@ -142,6 +144,7 @@ public class JwtUserDetailsServiceTest {
         var expectedDAOUser = new DAOUser();
         expectedDAOUser.setEmail(userDto.getEmail());
         expectedDAOUser.setPassword(userDto.getPassword());
+        expectedDAOUser.setRole(userDto.getRole());
         
         Mockito.when(
             this.userRepository.save(expectedDAOUser)
