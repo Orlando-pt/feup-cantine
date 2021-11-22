@@ -26,9 +26,8 @@ public class JwtAuthenticationControllerUtil {
 
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
-
+	
 	public ResponseEntity<?> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
-
 		this.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
 		final UserDetails userDetails = userDetailsService
