@@ -13,6 +13,7 @@ import pt.feup.les.feupfood.config.JwtTokenUtil;
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.UserDto;
+import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.service.JwtUserDetailsService;
 
 @Service
@@ -27,7 +28,7 @@ public class JwtAuthenticationControllerUtil {
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
 	
-	public ResponseEntity<?> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
+	public ResponseEntity<JwtResponse> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
 		this.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
 		final UserDetails userDetails = userDetailsService
@@ -38,7 +39,7 @@ public class JwtAuthenticationControllerUtil {
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 
-	public ResponseEntity<?> saveUser(UserDto userDto) throws Exception {
+	public ResponseEntity<DAOUser> saveUser(UserDto userDto) throws Exception {
 		var response = this.userDetailsService.save(userDto);
 		response.setPassword("");
 		return ResponseEntity.ok(response);
