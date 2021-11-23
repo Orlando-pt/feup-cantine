@@ -169,4 +169,24 @@ public class JwtUserDetailsServiceTest {
             Mockito.times(1)
         ).save(expectedDAOUser);
     }
+
+    /**
+     * check behaviour of empty role
+     */
+    @Test
+    void onEmptyRoleThenReturnNull() {
+        var userDto = new UserDto();
+        userDto.setEmail("something@mail.com");
+        
+        Assertions.assertThat(
+            this.jwtUserDetailsService.save(userDto)
+        ).isNull();
+
+        // now lets verify with a empty string
+        userDto.setRole("");
+
+        Assertions.assertThat(
+            this.jwtUserDetailsService.save(userDto)
+        ).isNull();
+    }
 }
