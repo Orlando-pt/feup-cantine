@@ -3,10 +3,12 @@ package pt.feup.les.feupfood.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import pt.feup.les.feupfood.config.JwtTokenUtil;
@@ -28,7 +30,7 @@ public class JwtAuthenticationControllerUtil {
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
 	
-	public ResponseEntity<JwtResponse> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
+	public ResponseEntity<JwtResponse> createAuthenticationToken(JwtRequest authenticationRequest) throws UsernameNotFoundException, DisabledException, BadCredentialsException {
 		this.authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
 		final UserDetails userDetails = userDetailsService
@@ -39,19 +41,19 @@ public class JwtAuthenticationControllerUtil {
 		return ResponseEntity.ok(new JwtResponse(token));
 	}
 
-	public ResponseEntity<DAOUser> saveUser(UserDto userDto) throws Exception {
+	public ResponseEntity<DAOUser> saveUser(UserDto userDto) throws AuthenticationServiceException {
 		var response = this.userDetailsService.save(userDto);
 		response.setPassword("");
 		return ResponseEntity.ok(response);
 	}
 
-	private void authenticate(String username, String password) throws Exception {
+	private void authenticate(String username, String password) throws DisabledException, BadCredentialsException {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		} catch (DisabledException e) {
-			throw new Exception("USER_DISABLED", e);
+			throw new DisabledException("USER_DISABLED", e);
 		} catch (BadCredentialsException e) {
-			throw new Exception("INVALID_CREDENTIALS", e);
+			throw new BadCredentialsException("INVALID_CREDENTIALS", e);
 		}
 	}
     

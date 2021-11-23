@@ -2,6 +2,10 @@ package pt.feup.les.feupfood.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,14 +29,14 @@ public class ClientController {
     private JwtAuthenticationControllerUtil jwtAuthenticationUtil;
     
     @PostMapping("authenticate")
-	public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+	public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws UsernameNotFoundException, DisabledException, BadCredentialsException {
 		log.info("Authenticating: " + authenticationRequest);
 
 		return this.jwtAuthenticationUtil.createAuthenticationToken(authenticationRequest);
 	}
 
 	@PostMapping("register")
-	public ResponseEntity<DAOUser> saveUser(@RequestBody UserDto userDto) throws Exception {
+	public ResponseEntity<DAOUser> saveUser(@RequestBody UserDto userDto) throws AuthenticationServiceException {
 		log.info("Saving new user: " + userDto);
 
         userDto.setRole("USER_CLIENT");
