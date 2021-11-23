@@ -16,8 +16,9 @@ import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.model.DAOUser;
 
 @RestController
-@CrossOrigin("trustedSite.com")
-@RequestMapping("/admin/")
+// @CrossOrigin(originPatterns = "http://localhost:[*]")
+@CrossOrigin
+@RequestMapping("/api/admin/")
 @Log4j2
 public class AdminController {
 

@@ -51,13 +51,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		// We don't need CSRF for this example
-		// httpSecurity.csrf().disable()
-		httpSecurity
+		httpSecurity.csrf().disable()
+		// httpSecurity
 				.authorizeRequests()
-				.antMatchers("/**/authenticate", "/", "/**/register").permitAll()
-				.antMatchers("/admin/**").hasRole("ADMIN")
-				.antMatchers("/restaurant/**").hasRole("USER_RESTAURANT")
-				.antMatchers("/client/**").hasRole("USER_CLIENT")
+				.antMatchers("/api/**/authenticate", "/", "/api/**/register").permitAll()
+				.antMatchers("/api/admin/**").hasRole("ADMIN")
+				.antMatchers("/api/restaurant/**").hasRole("USER_RESTAURANT")
+				.antMatchers("/api/client/**").hasRole("USER_CLIENT")
 				// all other requests need to be authenticated
 				.anyRequest().authenticated().and().
 				// make sure we use stateless session; session won't be used to

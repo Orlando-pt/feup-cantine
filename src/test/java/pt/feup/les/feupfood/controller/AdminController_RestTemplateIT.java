@@ -51,7 +51,7 @@ public class AdminController_RestTemplateIT {
         headers.set("Authorization", "Bearer " + this.token);
 
         var response = this.restTemplate.exchange(
-            "/admin/home",
+            "/api/admin/home",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class
@@ -67,7 +67,7 @@ public class AdminController_RestTemplateIT {
     }
 
     private void registerAdmin() {
-        this.restTemplate.postForEntity("/admin/register",
+        this.restTemplate.postForEntity("/api/admin/register",
                 this.adminUser,
                 DAOUser.class);
     }
@@ -78,7 +78,7 @@ public class AdminController_RestTemplateIT {
         jwtRequest.setPassword(this.adminUser.getPassword());
 
         return this.restTemplate.postForEntity(
-            "/admin/authenticate",
+            "/api/admin/authenticate",
             jwtRequest,
             JwtResponse.class
         ).getBody();

@@ -51,7 +51,7 @@ private UserDto restaurantUser;
         headers.set("Authorization", "Bearer " + this.token);
 
         var response = this.restTemplate.exchange(
-            "/restaurant/home",
+            "/api/restaurant/home",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class
@@ -67,7 +67,7 @@ private UserDto restaurantUser;
     }
 
     private void registerRestaurant() {
-        this.restTemplate.postForEntity("/restaurant/register",
+        this.restTemplate.postForEntity("/api/restaurant/register",
                 this.restaurantUser,
                 DAOUser.class);
     }
@@ -78,7 +78,7 @@ private UserDto restaurantUser;
         jwtRequest.setPassword(this.restaurantUser.getPassword());
 
         return this.restTemplate.postForEntity(
-            "/restaurant/authenticate",
+            "/api/restaurant/authenticate",
             jwtRequest,
             JwtResponse.class
         ).getBody();

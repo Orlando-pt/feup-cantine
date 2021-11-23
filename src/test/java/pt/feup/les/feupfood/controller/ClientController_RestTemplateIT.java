@@ -51,7 +51,7 @@ public class ClientController_RestTemplateIT {
         headers.set("Authorization", "Bearer " + this.token);
 
         var response = this.restTemplate.exchange(
-            "/client/home",
+            "/api/client/home",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class
@@ -67,7 +67,7 @@ public class ClientController_RestTemplateIT {
     }
 
     private void registerClient() {
-        this.restTemplate.postForEntity("/client/register",
+        this.restTemplate.postForEntity("/api/client/register",
                 this.clientUser,
                 DAOUser.class);
     }
@@ -78,7 +78,7 @@ public class ClientController_RestTemplateIT {
         jwtRequest.setPassword(this.clientUser.getPassword());
 
         return this.restTemplate.postForEntity(
-            "/client/authenticate",
+            "/api/client/authenticate",
             jwtRequest,
             JwtResponse.class
         ).getBody();

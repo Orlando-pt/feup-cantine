@@ -16,8 +16,8 @@ import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.model.DAOUser;
 
 @RestController
-@CrossOrigin("trustedSite.com")
-@RequestMapping("/restaurant/")
+@CrossOrigin
+@RequestMapping("/api/restaurant/")
 @Log4j2
 public class RestaurantController {
     
