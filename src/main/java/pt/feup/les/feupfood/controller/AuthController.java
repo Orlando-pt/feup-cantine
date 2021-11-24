@@ -56,7 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("sign-out")
-    public ResponseEntity<?> signout(Principal principal) {
+    public ResponseEntity<String> signout(Principal principal) {
         log.info("User signing out. Email: " + principal.getName());
         this.userDetailsService.deactivateUser(principal.getName());
         return ResponseEntity.ok("Logged out.");
