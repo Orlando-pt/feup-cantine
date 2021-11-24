@@ -1,6 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -45,10 +46,14 @@ public class AdminController_RestTemplateIT {
         this.token = this.authenticateAdmin().getJwttoken();
     }
 
+    @AfterAll
+    public void teardown() {
+        this.signOutAdmin();
+    }
+
     @Test
     void callAdminHome() {
-        var headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + this.token);
+        var headers = this.getStandardHeaders();
 
         var response = this.restTemplate.exchange(
             "/api/admin/home",
@@ -78,9 +83,30 @@ public class AdminController_RestTemplateIT {
         jwtRequest.setPassword(this.adminUser.getPassword());
 
         return this.restTemplate.postForEntity(
-            "/api/admin/authenticate",
+            "/api/auth/sign-in",
             jwtRequest,
             JwtResponse.class
         ).getBody();
+    }
+
+    private void signOutAdmin() {
+        var headers = this.getStandardHeaders();
+
+        var response = this.restTemplate.exchange(
+            "/api/auth/sign-out",
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+    }
+
+    private HttpHeaders getStandardHeaders() {
+        var headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + this.token);
+        return headers;
     }
 }

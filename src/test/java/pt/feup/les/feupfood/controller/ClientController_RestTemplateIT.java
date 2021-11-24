@@ -47,8 +47,7 @@ public class ClientController_RestTemplateIT {
 
     @Test
     void callClientHome() {
-        var headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + this.token);
+        var headers = this.getStandardHeaders();
 
         var response = this.restTemplate.exchange(
             "/api/client/home",
@@ -78,9 +77,15 @@ public class ClientController_RestTemplateIT {
         jwtRequest.setPassword(this.clientUser.getPassword());
 
         return this.restTemplate.postForEntity(
-            "/api/client/authenticate",
+            "/api/auth/sign-in",
             jwtRequest,
             JwtResponse.class
         ).getBody();
+    }
+    
+    private HttpHeaders getStandardHeaders() {
+        var headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + this.token);
+        return headers;
     }
 }

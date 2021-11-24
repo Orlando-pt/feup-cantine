@@ -47,8 +47,7 @@ private UserDto restaurantUser;
 
     @Test
     void callRestaurantHome() {
-        var headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + this.token);
+        var headers = this.getStandardHeaders();
 
         var response = this.restTemplate.exchange(
             "/api/restaurant/home",
@@ -78,9 +77,15 @@ private UserDto restaurantUser;
         jwtRequest.setPassword(this.restaurantUser.getPassword());
 
         return this.restTemplate.postForEntity(
-            "/api/restaurant/authenticate",
+            "/api/auth/sign-in",
             jwtRequest,
             JwtResponse.class
         ).getBody();
+    }
+    
+    private HttpHeaders getStandardHeaders() {
+        var headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + this.token);
+        return headers;
     }
 }
