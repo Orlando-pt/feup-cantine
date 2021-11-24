@@ -50,6 +50,8 @@ public class AuthController {
 
         final String token = this.jwtTokenUtil.generateToken(userDetails);
 
+        this.userDetailsService.activateUser(jwtRequest.getEmail());
+
         return ResponseEntity.ok(new JwtResponse(token, userDetails.getAuthorities().iterator().next().getAuthority()));
     }
 

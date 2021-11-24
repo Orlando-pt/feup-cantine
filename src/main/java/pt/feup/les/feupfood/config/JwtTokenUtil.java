@@ -18,10 +18,10 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 public class JwtTokenUtil implements Serializable{
-    
+
     private static final long serialVersionUID = -2550185165626007488L;
 
-	public static final long JWT_TOKEN_VALIDITY = 5L * 60L * 60L;
+	public static final long JWT_TOKEN_VALIDITY = 60L * 60L;	// 1 hour validity
 
 	@Value("${jwt.secret}")
 	private String secret;

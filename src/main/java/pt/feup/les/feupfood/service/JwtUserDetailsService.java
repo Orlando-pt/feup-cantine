@@ -35,6 +35,9 @@ public class JwtUserDetailsService implements UserDetailsService{
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		var user = this.loadUserFromDb(email);
 
+		// store user on sign in cache
+		this.activateUser(email);
+
 		return new User(user.getEmail(), user.getPassword(),
 				Arrays.asList(
 					new SimpleGrantedAuthority("ROLE_" + user.getRole())

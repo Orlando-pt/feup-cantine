@@ -3,11 +3,8 @@ package pt.feup.les.feupfood.config;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.redis.LettuceClientConfigurationBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -19,15 +16,6 @@ import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
 public class RedisConfig {
-
-    @Value("${redis.hostname}")
-    private String hostname;
-
-    @Value("${redis.password}")
-    private String password;
-
-    @Value("${redis.port}")
-    private int port;
 
     @Bean
     JedisPoolConfig jedisPoolConfig() {
@@ -55,7 +43,7 @@ public class RedisConfig {
     @Bean
 
     public JedisConnectionFactory jedisConnectionFactory(JedisPoolConfig jedisPoolConfig) throws URISyntaxException {
-        String envRedisUrl = System.getenv("REDIS_URI");
+        String envRedisUrl = System.getenv("REDIS_URL");
 
         URI redisUri = new URI(envRedisUrl);
 
@@ -110,38 +98,5 @@ public class RedisConfig {
         return redisTemplate;
 
     }
-
-    // @Bean
-    // JedisConnectionFactory jedisConnectionFactory() {
-    //     var redisConfiguration = new RedisStandaloneConfiguration(this.hostname, this.port);
-    //     redisConfiguration.setPassword(RedisPassword.of(this.password));
-
-    //     var jedisConnectionFactory = new JedisConnectionFactory(redisConfiguration);
-    //     jedisConnectionFactory.getPoolConfig().setMaxTotal(10);
-    //     jedisConnectionFactory.getPoolConfig().setMaxIdle(5);
-    //     jedisConnectionFactory.getPoolConfig().setMinIdle(1);
-    //     jedisConnectionFactory.getPoolConfig().setTestOnBorrow(true);
-    //     jedisConnectionFactory.getPoolConfig().setTestOnReturn(true);
-    //     jedisConnectionFactory.getPoolConfig().setTestWhileIdle(true);
-    //     return jedisConnectionFactory;
-    // }
-
-    // @Bean
-    // public RedisTemplate<String, String> redisTemplate() {
-    //     RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-    //     redisTemplate.setConnectionFactory(jedisConnectionFactory());
-    //     // redisTemplate.setEnableTransactionSupport(true);
-    //     // redisTemplate.setExposeConnection(true);
-    //     return redisTemplate;
-    // }
-
-    // @Bean
-    // public LettuceClientConfigurationBuilderCustomizer lettuceClientConfigurationBuilderCustomizer() {
-    //     return clientConfigurationBuilder -> {
-    //         if (clientConfigurationBuilder.build().isUseSsl()) {
-    //             clientConfigurationBuilder.useSsl().disablePeerVerification();
-    //         }
-    //     };
-    // }
     
 }

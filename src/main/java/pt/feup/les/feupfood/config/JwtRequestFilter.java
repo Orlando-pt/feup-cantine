@@ -57,7 +57,7 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 		// Verify if the user already logged out
 		if (username != null && !this.jwtUserDetailsService.userIsActive(username)) {
 			log.info("Deactivated user trying to access api. User email: " + username);
-			throw new AuthenticationException("LOGGED_OUT_USER trying to access resources on api.");
+			username = null;
 		}
 
 		// Once we get the token validate it.
@@ -77,10 +77,6 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 				// that the current user is authenticated. So it passes the
 				// Spring Security Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-				// update activated variable
-				// because the user just authenticated and signed in
-				this.jwtUserDetailsService.activateUser(username);
 			}
 		}
 		chain.doFilter(request, response);
