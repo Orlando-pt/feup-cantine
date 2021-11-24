@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.repository.RedisSessionRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +31,9 @@ public class JwtUserDetailsServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private RedisSessionRepository redisSessionRepository;
 
     @InjectMocks
     private JwtUserDetailsService jwtUserDetailsService;
@@ -188,5 +192,31 @@ public class JwtUserDetailsServiceTest {
         Assertions.assertThat(
             this.jwtUserDetailsService.save(userDto)
         ).isNull();
+    }
+
+    /**
+     * test user is active
+     */
+    @Test
+    void whenUserIsOnCacheThenUserIsActiveShouldReturnTrueAndFalseOtherwise() {
+        var user = "pinkpanter@mail.com";
+        Mockito.when(
+            this.redisSessionRepository.userIsActive(
+                user
+            )
+        ).thenReturn("active");
+
+        Assertions.assertThat(
+            this.jwtUserDetailsService.userIsActive(user)
+        ).isTrue();
+
+        // now if it is not stored on cache
+        Mockito.when(
+            this.redisSessionRepository.userIsActive(user)
+        ).thenReturn(null);
+
+        Assertions.assertThat(
+            this.jwtUserDetailsService.userIsActive(user)
+        ).isFalse();
     }
 }
