@@ -1,5 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,6 +51,13 @@ public class AuthController {
         final String token = this.jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(token, userDetails.getAuthorities().iterator().next().getAuthority()));
+    }
+
+    @PostMapping("sign-out")
+    public ResponseEntity<?> signout(Principal principal) {
+        log.info("User signing out. Email: " + principal.getName());
+        this.userDetailsService.deactivateUser(principal.getName());
+        return ResponseEntity.ok("Logged out.");
     }
     
     private void authenticate(String username, String password) throws DisabledException, BadCredentialsException {

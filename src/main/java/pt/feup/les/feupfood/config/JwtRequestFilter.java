@@ -2,6 +2,7 @@ package pt.feup.les.feupfood.config;
 
 import java.io.IOException;
 
+import javax.security.sasl.AuthenticationException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +32,8 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
+			throws ServletException, IOException, AuthenticationException {
+
 
 		final String requestTokenHeader = request.getHeader("Authorization");
 
@@ -52,6 +54,12 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 			log.warn("JWT Token does not begin with Bearer String");
 		}
 
+		// Verify if the user already logged out
+		if (username != null && !this.jwtUserDetailsService.userIsActive(username)) {
+			log.info("Deactivated user trying to access api. User email: " + username);
+			throw new AuthenticationException("LOGGED_OUT_USER trying to access resources on api.");
+		}
+
 		// Once we get the token validate it.
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -69,6 +77,10 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 				// that the current user is authenticated. So it passes the
 				// Spring Security Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+				// update activated variable
+				// because the user just authenticated and signed in
+				this.jwtUserDetailsService.activateUser(username);
 			}
 		}
 		chain.doFilter(request, response);

@@ -32,4 +32,6 @@ public class DAOUser {
 
     @Column(columnDefinition = "varchar(20) check (role in ('ADMIN', 'USER_CLIENT', 'USER_RESTAURANT'))")
     private String role;
+
+    private Boolean active;
 }
