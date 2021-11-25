@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.repository.RedisSessionRepository;
@@ -149,6 +150,12 @@ public class JwtUserDetailsServiceTest {
         expectedDAOUser.setEmail(userDto.getEmail());
         expectedDAOUser.setPassword(userDto.getPassword());
         expectedDAOUser.setRole(userDto.getRole());
+
+        var expectedResponseDto = new RegisterUserResponseDto();
+        expectedResponseDto.setEmail(userDto.getEmail());
+        expectedResponseDto.setRole(
+            userDto.getRole()
+        );
         
         Mockito.when(
             this.userRepository.save(expectedDAOUser)
@@ -156,7 +163,7 @@ public class JwtUserDetailsServiceTest {
 
         Assertions.assertThat(
             this.jwtUserDetailsService.save(userDto)
-        ).isEqualTo(expectedDAOUser);
+        ).isEqualTo(expectedResponseDto);
 
         Mockito.verify(
             this.userRepository,

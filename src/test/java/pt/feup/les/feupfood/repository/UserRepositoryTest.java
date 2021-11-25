@@ -29,13 +29,13 @@ public class UserRepositoryTest {
         this.user1.setFullName("Orlando");
         this.user1.setEmail("orlando@mail.com");
         this.user1.setPassword("SecretPassword");
-        this.user1.setRole("ADMIN");
+        this.user1.setRole("ROLE_ADMIN");
         
         this.user2 = new DAOUser();
         this.user2.setFullName("Francisco");
         this.user2.setEmail("francisco@mail.com");
         this.user2.setPassword("AnotherSecretPassword");
-        this.user2.setRole("USER_CLIENT");
+        this.user2.setRole("ROLE_USER_CLIENT");
     }
 
     @BeforeEach

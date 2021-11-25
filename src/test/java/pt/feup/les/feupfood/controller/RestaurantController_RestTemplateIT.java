@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
 
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
-import pt.feup.les.feupfood.dto.UserDto;
-import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.dto.RegisterUserDto;
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -29,14 +29,17 @@ public class RestaurantController_RestTemplateIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
-private UserDto restaurantUser;
+    private RegisterUserDto restaurantUser;
     private String token;
 
     public RestaurantController_RestTemplateIT() {
-        this.restaurantUser = new UserDto();
+        this.restaurantUser = new RegisterUserDto();
 
-        this.restaurantUser.setEmail("restaurant@mail.com");
+        this.restaurantUser.setEmail("admin@mail.com");
         this.restaurantUser.setPassword("secretPassword");
+        this.restaurantUser.setConfirmPassword("secretPassword");
+        this.restaurantUser.setFullName("António");
+        this.restaurantUser.setTerms(true);
     }
 
     @BeforeAll
@@ -68,7 +71,7 @@ private UserDto restaurantUser;
     private void registerRestaurant() {
         this.restTemplate.postForEntity("/api/restaurant/register",
                 this.restaurantUser,
-                DAOUser.class);
+                RegisterUserResponseDto.class);
     }
 
     private JwtResponse authenticateRestaurant() {

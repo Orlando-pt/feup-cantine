@@ -61,7 +61,8 @@ public class AuthController {
     public ResponseEntity<String> signout(Principal principal) {
         log.info("User signing out. Email: " + principal.getName());
         this.userDetailsService.deactivateUser(principal.getName());
-        return ResponseEntity.ok("Logged out.");
+        return ResponseEntity.status(204).body("");
+
     }
     
     private void authenticate(String username, String password) throws DisabledException, BadCredentialsException {
