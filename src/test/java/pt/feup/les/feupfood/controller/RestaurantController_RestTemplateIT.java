@@ -35,10 +35,10 @@ public class RestaurantController_RestTemplateIT {
     public RestaurantController_RestTemplateIT() {
         this.restaurantUser = new RegisterUserDto();
 
-        this.restaurantUser.setEmail("admin@mail.com");
+        this.restaurantUser.setEmail("restaurant@mail.com");
         this.restaurantUser.setPassword("secretPassword");
         this.restaurantUser.setConfirmPassword("secretPassword");
-        this.restaurantUser.setFullName("António");
+        this.restaurantUser.setFullName("ajsbfasjbfas");
         this.restaurantUser.setTerms(true);
     }
 

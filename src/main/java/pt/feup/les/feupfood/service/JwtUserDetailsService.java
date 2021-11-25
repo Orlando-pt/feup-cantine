@@ -59,12 +59,13 @@ public class JwtUserDetailsService implements UserDetailsService{
 		if (checkUser.isPresent())
 			throw new AuthenticationServiceException("There is already a user with email: " + user.getEmail());
 
-		var userDAO = UserParser.registerUsertoDaoUser(user);
+		var parser = new UserParser();
+		var userDAO = parser.registerUsertoDaoUser(user);
 		userDAO.setPassword(this.bcryptEncoder.encode(
 			user.getPassword()
 		));
 
-		return UserParser.daoUserToRegisterUserResponse(
+		return parser.daoUserToRegisterUserResponse(
 			this.userRepository.save(userDAO)
 		);
 	}

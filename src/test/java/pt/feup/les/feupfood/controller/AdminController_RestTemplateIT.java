@@ -49,10 +49,36 @@ public class AdminController_RestTemplateIT {
         this.token = this.authenticateAdmin().getJwttoken();
     }
 
-    // @AfterAll
-    // public void teardown() {
-    //     this.signOutAdmin();
-    // }
+    @AfterAll
+    public void teardown() {
+        this.signOutAdmin();
+    }
+
+    @Test
+    void registerWithBadParametersTest() {
+        var badUser = new RegisterUserDto();
+        badUser.setEmail("new@mail.com");
+        badUser.setFullName("fullName");
+        badUser.setPassword("");
+
+        var response = this.restTemplate.postForEntity("/api/admin/register",
+                badUser,
+                RegisterUserResponseDto.class);
+        
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // different passwords
+        badUser.setPassword("manel");
+        badUser.setConfirmPassword("maria");
+
+        Assertions.assertThat(
+            this.restTemplate.postForEntity("/api/admin/register",
+                badUser,
+                RegisterUserResponseDto.class).getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
 
     @Test
     void callAdminHome() {

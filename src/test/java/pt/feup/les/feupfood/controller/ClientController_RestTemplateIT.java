@@ -35,10 +35,10 @@ public class ClientController_RestTemplateIT {
     public ClientController_RestTemplateIT() {
         this.clientUser = new RegisterUserDto();
 
-        this.clientUser.setEmail("admin@mail.com");
+        this.clientUser.setEmail("alzira@mail.com");
         this.clientUser.setPassword("secretPassword");
         this.clientUser.setConfirmPassword("secretPassword");
-        this.clientUser.setFullName("António");
+        this.clientUser.setFullName("Alzira");
         this.clientUser.setTerms(true);
     }
 

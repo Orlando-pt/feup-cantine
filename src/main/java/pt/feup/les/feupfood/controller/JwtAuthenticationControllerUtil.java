@@ -1,6 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,9 +21,10 @@ public class JwtAuthenticationControllerUtil {
 	public ResponseEntity<RegisterUserResponseDto> saveUser(RegisterUserDto userDto, String role) throws AuthenticationServiceException, BadCredentialsException {
 		// confirm passwords
 		if ("".equals(userDto.getPassword()) || !userDto.getPassword().equals(userDto.getConfirmPassword()))
-			throw new BadCredentialsException("Provided empty password or password different from it confirmation.");
+			return ResponseEntity.badRequest().build();
 
-		var response = this.userDetailsService.save(UserParser.registerUsertoUserDto(userDto, role));
+		var parser = new UserParser();
+		var response = this.userDetailsService.save(parser.registerUsertoUserDto(userDto, role));
 		return ResponseEntity.ok(response);
 	}
 }
