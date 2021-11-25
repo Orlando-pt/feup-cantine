@@ -58,13 +58,13 @@ public class JwtUserDetailsService implements UserDetailsService{
 			throw new AuthenticationServiceException("There is already a user with email: " + user.getEmail());
 
 		var userDAO = new DAOUser();
-		userDAO.setFirstName(user.getFirstName());
-		userDAO.setLastName(user.getLastName());
+		userDAO.setFullName(user.getFullName());
 		userDAO.setPassword(this.bcryptEncoder.encode(
 			user.getPassword()
 		));
 		userDAO.setEmail(user.getEmail());
 		userDAO.setRole(user.getRole());
+		userDAO.setTerms(user.getTerms());
 
 		return this.userRepository.save(userDAO);
 	}

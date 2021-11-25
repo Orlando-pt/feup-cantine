@@ -42,7 +42,7 @@ public class JwtUserDetailsServiceTest {
 
     public JwtUserDetailsServiceTest() {
         this.daoUser = new DAOUser();
-        daoUser.setFirstName("Diogo");
+        daoUser.setFullName("Diogo");
         daoUser.setEmail("diogo@mail.com");
         daoUser.setPassword("Secret");
         daoUser.setRole("ADMIN");
