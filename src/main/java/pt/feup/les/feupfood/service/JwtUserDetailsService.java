@@ -13,10 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.log4j.Log4j2;
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.repository.RedisSessionRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
+import pt.feup.les.feupfood.util.UserParser;
 
 @Service
 @Log4j2
@@ -40,11 +42,11 @@ public class JwtUserDetailsService implements UserDetailsService{
 
 		return new User(user.getEmail(), user.getPassword(),
 				Arrays.asList(
-					new SimpleGrantedAuthority("ROLE_" + user.getRole())
+					new SimpleGrantedAuthority(user.getRole())
 				));
 	}
 
-	public DAOUser save(UserDto user) {
+	public RegisterUserResponseDto save(UserDto user) {
 		// verify if role was provided
 		if (user.getRole() == null || user.getRole().equals(""))
 			return null;
@@ -57,16 +59,15 @@ public class JwtUserDetailsService implements UserDetailsService{
 		if (checkUser.isPresent())
 			throw new AuthenticationServiceException("There is already a user with email: " + user.getEmail());
 
-		var userDAO = new DAOUser();
-		userDAO.setFirstName(user.getFirstName());
-		userDAO.setLastName(user.getLastName());
+		var parser = new UserParser();
+		var userDAO = parser.registerUsertoDaoUser(user);
 		userDAO.setPassword(this.bcryptEncoder.encode(
 			user.getPassword()
 		));
-		userDAO.setEmail(user.getEmail());
-		userDAO.setRole(user.getRole());
 
-		return this.userRepository.save(userDAO);
+		return parser.daoUserToRegisterUserResponse(
+			this.userRepository.save(userDAO)
+		);
 	}
 
 	public boolean userIsActive(String email) {
@@ -83,7 +84,7 @@ public class JwtUserDetailsService implements UserDetailsService{
 		log.info("User signed out, user email:" + email);
 	}
 
-	private DAOUser loadUserFromDb(String email) {
+	public DAOUser loadUserFromDb(String email) {
 		return this.userRepository.findByEmail(email).orElseThrow(
 			() -> new UsernameNotFoundException("User not found with email: " + email)
 		);

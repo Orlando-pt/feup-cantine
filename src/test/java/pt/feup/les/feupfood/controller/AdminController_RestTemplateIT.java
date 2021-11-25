@@ -17,8 +17,8 @@ import org.springframework.http.HttpStatus;
 
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
-import pt.feup.les.feupfood.dto.UserDto;
-import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.dto.RegisterUserDto;
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,14 +30,17 @@ public class AdminController_RestTemplateIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private UserDto adminUser;
+    private RegisterUserDto adminUser;
     private String token;
 
     public AdminController_RestTemplateIT() {
-        this.adminUser = new UserDto();
+        this.adminUser = new RegisterUserDto();
 
         this.adminUser.setEmail("admin@mail.com");
         this.adminUser.setPassword("secretPassword");
+        this.adminUser.setConfirmPassword("secretPassword");
+        this.adminUser.setFullName("António");
+        this.adminUser.setTerms(true);
     }
 
     @BeforeAll
@@ -49,6 +52,32 @@ public class AdminController_RestTemplateIT {
     @AfterAll
     public void teardown() {
         this.signOutAdmin();
+    }
+
+    @Test
+    void registerWithBadParametersTest() {
+        var badUser = new RegisterUserDto();
+        badUser.setEmail("new@mail.com");
+        badUser.setFullName("fullName");
+        badUser.setPassword("");
+
+        var response = this.restTemplate.postForEntity("/api/admin/register",
+                badUser,
+                RegisterUserResponseDto.class);
+        
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // different passwords
+        badUser.setPassword("manel");
+        badUser.setConfirmPassword("maria");
+
+        Assertions.assertThat(
+            this.restTemplate.postForEntity("/api/admin/register",
+                badUser,
+                RegisterUserResponseDto.class).getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -74,7 +103,7 @@ public class AdminController_RestTemplateIT {
     private void registerAdmin() {
         this.restTemplate.postForEntity("/api/admin/register",
                 this.adminUser,
-                DAOUser.class);
+                RegisterUserResponseDto.class);
     }
 
     private JwtResponse authenticateAdmin() {
@@ -101,7 +130,7 @@ public class AdminController_RestTemplateIT {
 
         Assertions.assertThat(
             response.getStatusCode()
-        ).isEqualTo(HttpStatus.OK);
+        ).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     private HttpHeaders getStandardHeaders() {

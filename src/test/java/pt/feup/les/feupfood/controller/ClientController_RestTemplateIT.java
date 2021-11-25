@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
 
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
-import pt.feup.les.feupfood.dto.UserDto;
-import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.dto.RegisterUserDto;
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -29,14 +29,17 @@ public class ClientController_RestTemplateIT {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private UserDto clientUser;
+    private RegisterUserDto clientUser;
     private String token;
 
     public ClientController_RestTemplateIT() {
-        this.clientUser = new UserDto();
+        this.clientUser = new RegisterUserDto();
 
-        this.clientUser.setEmail("client@mail.com");
+        this.clientUser.setEmail("alzira@mail.com");
         this.clientUser.setPassword("secretPassword");
+        this.clientUser.setConfirmPassword("secretPassword");
+        this.clientUser.setFullName("Alzira");
+        this.clientUser.setTerms(true);
     }
 
     @BeforeAll
@@ -68,7 +71,7 @@ public class ClientController_RestTemplateIT {
     private void registerClient() {
         this.restTemplate.postForEntity("/api/client/register",
                 this.clientUser,
-                DAOUser.class);
+                RegisterUserResponseDto.class);
     }
 
     private JwtResponse authenticateClient() {

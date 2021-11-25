@@ -48,18 +48,21 @@ public class AuthController {
             jwtRequest.getEmail()
         );
 
-        final String token = this.jwtTokenUtil.generateToken(userDetails);
+        var userDao = this.userDetailsService.loadUserFromDb(jwtRequest.getEmail());
+
+        final String token = this.jwtTokenUtil.generateToken(userDetails, userDao.getFullName(), userDao.getRole());
 
         this.userDetailsService.activateUser(jwtRequest.getEmail());
 
-        return ResponseEntity.ok(new JwtResponse(token, userDetails.getAuthorities().iterator().next().getAuthority()));
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping("sign-out")
     public ResponseEntity<String> signout(Principal principal) {
         log.info("User signing out. Email: " + principal.getName());
         this.userDetailsService.deactivateUser(principal.getName());
-        return ResponseEntity.ok("Logged out.");
+        return ResponseEntity.status(204).body("");
+
     }
     
     private void authenticate(String username, String password) throws DisabledException, BadCredentialsException {

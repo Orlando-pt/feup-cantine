@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.log4j.Log4j2;
-import pt.feup.les.feupfood.dto.UserDto;
-import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.dto.RegisterUserDto;
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 
 @RestController
 @CrossOrigin
@@ -24,11 +24,10 @@ public class ClientController {
     private JwtAuthenticationControllerUtil jwtAuthenticationUtil;
     
 	@PostMapping("register")
-	public ResponseEntity<DAOUser> saveUser(@RequestBody UserDto userDto) throws AuthenticationServiceException {
+	public ResponseEntity<RegisterUserResponseDto> saveUser(@RequestBody RegisterUserDto userDto) throws AuthenticationServiceException {
 		log.info("Saving new user: " + userDto);
 
-        userDto.setRole("USER_CLIENT");
-		return this.jwtAuthenticationUtil.saveUser(userDto);
+		return this.jwtAuthenticationUtil.saveUser(userDto, "ROLE_USER_CLIENT");
 	}
 
 	@GetMapping("home")

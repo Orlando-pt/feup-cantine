@@ -20,9 +20,8 @@ public class DAOUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName;
-
-    private String lastName;
+    @Column(nullable = false)
+    private String fullName;
 
     @Column(nullable = false)
     private String password;
@@ -30,7 +29,8 @@ public class DAOUser {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(columnDefinition = "varchar(20) check (role in ('ADMIN', 'USER_CLIENT', 'USER_RESTAURANT'))")
+    @Column(columnDefinition = "varchar(20) check (role in ('ROLE_ADMIN', 'ROLE_USER_CLIENT', 'ROLE_USER_RESTAURANT'))")
     private String role;
 
+    private Boolean terms;
 }
