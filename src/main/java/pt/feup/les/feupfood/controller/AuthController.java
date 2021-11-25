@@ -48,11 +48,13 @@ public class AuthController {
             jwtRequest.getEmail()
         );
 
-        final String token = this.jwtTokenUtil.generateToken(userDetails);
+        var userDao = this.userDetailsService.loadUserFromDb(jwtRequest.getEmail());
+
+        final String token = this.jwtTokenUtil.generateToken(userDetails, userDao.getFullName(), userDao.getRole());
 
         this.userDetailsService.activateUser(jwtRequest.getEmail());
 
-        return ResponseEntity.ok(new JwtResponse(token, userDetails.getAuthorities().iterator().next().getAuthority()));
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping("sign-out")

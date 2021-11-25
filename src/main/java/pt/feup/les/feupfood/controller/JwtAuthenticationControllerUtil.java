@@ -3,11 +3,13 @@ package pt.feup.les.feupfood.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
-import pt.feup.les.feupfood.dto.UserDto;
-import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.dto.RegisterUserDto;
+import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.service.JwtUserDetailsService;
+import pt.feup.les.feupfood.util.UserParser;
 
 @Service
 public class JwtAuthenticationControllerUtil {
@@ -15,9 +17,12 @@ public class JwtAuthenticationControllerUtil {
 	@Autowired
 	private JwtUserDetailsService userDetailsService;
 	
-	public ResponseEntity<DAOUser> saveUser(UserDto userDto) throws AuthenticationServiceException {
-		var response = this.userDetailsService.save(userDto);
-		response.setPassword("");
+	public ResponseEntity<RegisterUserResponseDto> saveUser(RegisterUserDto userDto, String role) throws AuthenticationServiceException, BadCredentialsException {
+		// confirm passwords
+		if ("".equals(userDto.getPassword()) || !userDto.getPassword().equals(userDto.getConfirmPassword()))
+			throw new BadCredentialsException("Provided empty password or password different from it confirmation.");
+
+		var response = this.userDetailsService.save(UserParser.registerUsertoUserDto(userDto, role));
 		return ResponseEntity.ok(response);
 	}
 }
