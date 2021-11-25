@@ -7,7 +7,7 @@ import pt.feup.les.feupfood.model.DAOUser;
 
 public class UserParser {
     
-    public static UserDto registerUsertoUserDto(RegisterUserDto user, String role) {
+    public UserDto registerUsertoUserDto(RegisterUserDto user, String role) {
         var daoUser = new UserDto();
         daoUser.setEmail(user.getEmail());
         daoUser.setFullName(user.getFullName());
@@ -18,7 +18,7 @@ public class UserParser {
         return daoUser;
     }
     
-    public static DAOUser registerUsertoDaoUser(UserDto user) {
+    public DAOUser registerUsertoDaoUser(UserDto user) {
         var daoUser = new DAOUser();
         daoUser.setEmail(user.getEmail());
         daoUser.setFullName(user.getFullName());
@@ -28,7 +28,7 @@ public class UserParser {
         return daoUser;
     }
 
-    public static RegisterUserResponseDto daoUserToRegisterUserResponse(DAOUser daoUser) {
+    public RegisterUserResponseDto daoUserToRegisterUserResponse(DAOUser daoUser) {
         var user = new RegisterUserResponseDto();
         user.setEmail(daoUser.getEmail());
         user.setFullName(daoUser.getFullName());

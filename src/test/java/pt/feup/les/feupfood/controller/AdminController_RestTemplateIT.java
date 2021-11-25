@@ -49,10 +49,10 @@ public class AdminController_RestTemplateIT {
         this.token = this.authenticateAdmin().getJwttoken();
     }
 
-    @AfterAll
-    public void teardown() {
-        this.signOutAdmin();
-    }
+    // @AfterAll
+    // public void teardown() {
+    //     this.signOutAdmin();
+    // }
 
     @Test
     void callAdminHome() {
@@ -104,7 +104,7 @@ public class AdminController_RestTemplateIT {
 
         Assertions.assertThat(
             response.getStatusCode()
-        ).isEqualTo(HttpStatus.OK);
+        ).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     private HttpHeaders getStandardHeaders() {
