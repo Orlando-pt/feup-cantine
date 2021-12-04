@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -33,4 +34,8 @@ public class DAOUser {
     private String role;
 
     private Boolean terms;
+
+    // in the case user is a restaurant
+    @OneToOne(mappedBy = "owner")
+    private Restaurant restaurant;
 }
