@@ -65,6 +65,8 @@ public class JwtUserDetailsService implements UserDetailsService{
 			user.getPassword()
 		));
 
+		// TODO add here logic to create restaurant
+
 		return parser.daoUserToRegisterUserResponse(
 			this.userRepository.save(userDAO)
 		);
