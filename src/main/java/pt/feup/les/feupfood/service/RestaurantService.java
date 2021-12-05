@@ -34,7 +34,6 @@ public class RestaurantService {
 
         owner.setFullName(profileDto.getFullName());
 
-        restaurant.setName(profileDto.getName());
         restaurant.setLocation(profileDto.getLocation());
         restaurant.setOpeningSchedule(profileDto.getOpeningSchedule());
         restaurant.setClosingSchedule(profileDto.getClosingSchedule());

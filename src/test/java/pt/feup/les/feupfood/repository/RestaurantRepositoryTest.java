@@ -1,6 +1,5 @@
 package pt.feup.les.feupfood.repository;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -48,11 +47,9 @@ public class RestaurantRepositoryTest {
         this.ownerDeolinda.setRole("ROLE_USER_RESTAURANT");
         this.ownerDeolinda.setTerms(true);
 
-        this.restaurantAlzira.setName("Restaurant Dona Alzira");
         this.restaurantAlzira.setOwner(this.ownerAlzira);
         this.restaurantAlzira.setLocation("In the corner");
 
-        this.restaurantDeolinda.setName("Restaurant Dona Deolinda");
         this.restaurantDeolinda.setOwner(this.ownerDeolinda);
         this.restaurantDeolinda.setLocation("In the other corner");
 
@@ -70,18 +67,6 @@ public class RestaurantRepositoryTest {
         this.entityManager.persist(this.restaurantAlzira);
         this.entityManager.persist(this.restaurantDeolinda);
         this.entityManager.flush();
-    }
-
-    @Test
-    void whenFindDonaAlzira_shouldOnlyReturnDonaAlzira() {
-        var expectedResult = new ArrayList<Restaurant>();
-        expectedResult.add(this.restaurantAlzira);
-
-        Assertions.assertThat(
-            this.restaurantRepository.findByName(
-                this.restaurantAlzira.getName()
-            )
-        ).isEqualTo(expectedResult);
     }
 
     @Test
@@ -103,6 +88,5 @@ public class RestaurantRepositoryTest {
             this.restaurantDeolinda
         );
     }
-    
 
 }

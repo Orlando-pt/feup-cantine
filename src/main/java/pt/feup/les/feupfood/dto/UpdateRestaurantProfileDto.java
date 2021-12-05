@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class UpdateRestaurantProfileDto {
 
     private String fullName;
-    private String name;
     private String location;
     private Date openingSchedule;
     private Date closingSchedule;

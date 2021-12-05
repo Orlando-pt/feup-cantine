@@ -1,9 +1,5 @@
 package pt.feup.les.feupfood.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
 import java.sql.Date;
 import java.util.Optional;
@@ -12,7 +8,6 @@ import javax.persistence.PersistenceException;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -74,7 +69,6 @@ public class RestaurantServiceTest {
         this.owner1.setFullName(profileDto.getFullName());
         Mockito.verify(this.userRepository, Mockito.times(1)).save(this.owner1);
 
-        this.restaurant1.setName(profileDto.getName());
         this.restaurant1.setLocation(profileDto.getLocation());
         Mockito.verify(this.restaurantRepository, Mockito.times(1)).save(this.restaurant1);
 
@@ -140,7 +134,6 @@ public class RestaurantServiceTest {
     private void commonUpdateProfileData() {
         this.profileDto = new UpdateRestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
-        this.profileDto.setName("Restaurant chenged name");
         this.profileDto.setLocation("on the other corner");
         this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
         this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
@@ -170,7 +163,6 @@ public class RestaurantServiceTest {
 
         this.restaurant1 = new Restaurant();
         this.restaurant1.setLocation("On the left corner");
-        this.restaurant1.setName("Maria Restaurant");
         this.restaurant1.setOpeningSchedule(
             new Date(1638703519L)
         );
@@ -188,7 +180,6 @@ public class RestaurantServiceTest {
 
         this.restaurant2 = new Restaurant();
         this.restaurant2.setLocation("On the right corner");
-        this.restaurant2.setName("Josefina Restaurant");
         this.restaurant2.setOpeningSchedule(
             new Date(1638703519L)
         );

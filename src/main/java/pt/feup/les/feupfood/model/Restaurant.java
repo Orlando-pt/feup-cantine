@@ -2,7 +2,6 @@ package pt.feup.les.feupfood.model;
 
 import java.sql.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,9 +27,6 @@ public class Restaurant {
     @JoinColumn(name = "user_id", nullable = false)
     private DAOUser owner;
     
-    @Column(nullable = false)
-    private String name;
-
     private String location;
 
     private Date openingSchedule;
