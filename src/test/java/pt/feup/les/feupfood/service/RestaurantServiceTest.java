@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import pt.feup.les.feupfood.dto.UpdateRestaurantProfileDto;
+import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
@@ -42,7 +42,7 @@ public class RestaurantServiceTest {
 
     // auxiliar resources
     private Principal user;
-    private UpdateRestaurantProfileDto profileDto;
+    private RestaurantProfileDto profileDto;
 
     @BeforeEach
     void setup() {
@@ -132,7 +132,7 @@ public class RestaurantServiceTest {
     }
 
     private void commonUpdateProfileData() {
-        this.profileDto = new UpdateRestaurantProfileDto();
+        this.profileDto = new RestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
         this.profileDto.setLocation("on the other corner");
         this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());

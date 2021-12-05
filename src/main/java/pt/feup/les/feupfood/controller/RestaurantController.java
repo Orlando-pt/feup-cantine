@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
-import pt.feup.les.feupfood.dto.UpdateRestaurantProfileDto;
+import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.service.RestaurantService;
 
 @RestController
@@ -43,9 +43,16 @@ public class RestaurantController {
 		return ResponseEntity.ok("Hello restaurant owner!");
 	}
 
+	@GetMapping("profile")
+	public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
+		Principal user
+	) {
+		return this.service.getRestaurantProfile(user);
+	}
+
 	@PutMapping("profile")
 	public ResponseEntity<?> updateRestaurantProfile(
-		@RequestBody UpdateRestaurantProfileDto profileDto,
+		@RequestBody RestaurantProfileDto profileDto,
 		Principal user
 	) {
 		return this.service.updateRestaurantProfile(user, profileDto);

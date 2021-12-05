@@ -16,7 +16,9 @@ import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.UserDto;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.RedisSessionRepository;
+import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.UserParser;
 
@@ -26,6 +28,9 @@ public class JwtUserDetailsService implements UserDetailsService{
     
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private RestaurantRepository restaurantRepository;
 
 	@Autowired
 	private RedisSessionRepository redisSessionRepository;
@@ -65,10 +70,14 @@ public class JwtUserDetailsService implements UserDetailsService{
 			user.getPassword()
 		));
 
-		// TODO add here logic to create restaurant
+		userDAO = this.userRepository.save(userDAO);
+
+		// if user is a restaurant, initialize the restaurant table
+		if (user.getRole().equals("ROLE_USER_RESTAURANT"))
+			this.initializeRestaurantOnDB(userDAO);
 
 		return parser.daoUserToRegisterUserResponse(
-			this.userRepository.save(userDAO)
+			userDAO
 		);
 	}
 
@@ -91,5 +100,14 @@ public class JwtUserDetailsService implements UserDetailsService{
 			() -> new UsernameNotFoundException("User not found with email: " + email)
 		);
 
+	}
+
+	private void initializeRestaurantOnDB(DAOUser user) {
+		Restaurant restaurant = new Restaurant();
+		restaurant.setOwner(user);
+
+		user.setRestaurant(restaurant);
+
+		this.restaurantRepository.save(restaurant);
 	}
 }

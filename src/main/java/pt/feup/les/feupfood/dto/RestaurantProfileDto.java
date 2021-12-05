@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UpdateRestaurantProfileDto {
+public class RestaurantProfileDto {
 
     private String fullName;
     private String location;

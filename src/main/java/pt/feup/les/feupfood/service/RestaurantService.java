@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import pt.feup.les.feupfood.dto.UpdateRestaurantProfileDto;
+import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
@@ -22,9 +22,25 @@ public class RestaurantService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
+        Principal user
+    ) {
+        RestaurantProfileDto restaurantDto = new RestaurantProfileDto();
+
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+        Restaurant restaurant = this.retrieveRestaurant(owner);
+
+        restaurantDto.setFullName(owner.getFullName());
+        restaurantDto.setLocation(restaurant.getLocation());
+        restaurantDto.setClosingSchedule(restaurant.getClosingSchedule());
+        restaurantDto.setOpeningSchedule(restaurant.getOpeningSchedule());
+        
+        return ResponseEntity.ok(restaurantDto);
+    }
+
     public ResponseEntity<?> updateRestaurantProfile(
         Principal user,
-        UpdateRestaurantProfileDto profileDto
+        RestaurantProfileDto profileDto
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
