@@ -1,7 +1,5 @@
 package pt.feup.les.feupfood.repository;
 
-import static org.mockito.ArgumentMatchers.isNull;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
