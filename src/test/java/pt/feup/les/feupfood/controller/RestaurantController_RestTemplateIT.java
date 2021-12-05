@@ -18,6 +18,7 @@ import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
+import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -66,6 +67,57 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             response.getBody()
         ).isEqualTo("Hello restaurant owner!");
+    }
+
+    @Test
+    void restaurantProfileTest() {
+        var headers = this.getStandardHeaders();
+
+        var response = this.restTemplate.exchange(
+            "/api/restaurant/profile",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            RestaurantProfileDto.class
+        );
+
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            response.getBody().getLocation()
+        ).isNull();
+
+        // update the profile information
+        RestaurantProfileDto updateProfileDto = new RestaurantProfileDto();
+        updateProfileDto.setFullName(response.getBody().getFullName());
+        updateProfileDto.setLocation("I do not really know");
+
+        var httpEntity = new HttpEntity<>(updateProfileDto, headers);
+        
+        
+        var responseAfterUpdate = this.restTemplate.exchange(
+            "/api/restaurant/profile",
+            HttpMethod.PUT,
+            httpEntity,
+            RestaurantProfileDto.class
+        );
+
+        Assertions.assertThat(
+            responseAfterUpdate.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        // check that the information was updated
+        var getResponseAfterUpdate = this.restTemplate.exchange(
+            "/api/restaurant/profile",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            RestaurantProfileDto.class
+        );
+
+        Assertions.assertThat(
+            getResponseAfterUpdate.getBody().getLocation()
+        ).isEqualTo(updateProfileDto.getLocation());
     }
 
     private void registerRestaurant() {
