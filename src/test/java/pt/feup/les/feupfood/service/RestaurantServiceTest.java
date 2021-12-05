@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
@@ -91,7 +92,7 @@ public class RestaurantServiceTest {
             this.userRepository.save(Mockito.any())
         ).thenThrow(new PersistenceException("Full name is incorrect"));
 
-        ResponseEntity<?> answer = this.service.updateRestaurantProfile(
+        ResponseEntity<ResponseInterfaceDto> answer = this.service.updateRestaurantProfile(
             this.user,
             this.profileDto
             );
@@ -102,7 +103,7 @@ public class RestaurantServiceTest {
 
         Assertions.assertThat(
             answer.getBody()
-        ).isInstanceOf(PersistenceException.class);
+        ).isInstanceOf(ResponseInterfaceDto.class);
     }
 
     @Test
@@ -117,7 +118,7 @@ public class RestaurantServiceTest {
             this.restaurantRepository.save(Mockito.any())
         ).thenThrow(new PersistenceException("The restaurant profile data submited was badly written."));
 
-        ResponseEntity<?> answer = this.service.updateRestaurantProfile(
+        ResponseEntity<ResponseInterfaceDto> answer = this.service.updateRestaurantProfile(
             this.user,
             this.profileDto
             );
@@ -128,7 +129,7 @@ public class RestaurantServiceTest {
 
         Assertions.assertThat(
             answer.getBody()
-        ).isInstanceOf(PersistenceException.class);
+        ).isInstanceOf(ResponseInterfaceDto.class);
     }
 
     private void commonUpdateProfileData() {

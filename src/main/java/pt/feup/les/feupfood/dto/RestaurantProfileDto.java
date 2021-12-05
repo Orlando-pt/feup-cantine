@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RestaurantProfileDto {
+public class RestaurantProfileDto implements ResponseInterfaceDto{
 
     private String fullName;
     private String location;

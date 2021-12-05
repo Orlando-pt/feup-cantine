@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
+import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.service.RestaurantService;
 
@@ -51,7 +52,7 @@ public class RestaurantController {
 	}
 
 	@PutMapping("profile")
-	public ResponseEntity<?> updateRestaurantProfile(
+	public ResponseEntity<ResponseInterfaceDto> updateRestaurantProfile(
 		@RequestBody RestaurantProfileDto profileDto,
 		Principal user
 	) {

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import pt.feup.les.feupfood.dto.ExceptionResponseDto;
+import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
@@ -38,7 +40,7 @@ public class RestaurantService {
         return ResponseEntity.ok(restaurantDto);
     }
 
-    public ResponseEntity<?> updateRestaurantProfile(
+    public ResponseEntity<ResponseInterfaceDto> updateRestaurantProfile(
         Principal user,
         RestaurantProfileDto profileDto
     ) {
@@ -54,11 +56,11 @@ public class RestaurantService {
         restaurant.setOpeningSchedule(profileDto.getOpeningSchedule());
         restaurant.setClosingSchedule(profileDto.getClosingSchedule());
 
-        ResponseEntity<Exception> saveOwner = this.saveOwner(owner);
+        ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
             return saveOwner;
         
-        ResponseEntity<Exception> saveRestaurant = this.saveRestaurant(restaurant);
+        ResponseEntity<ResponseInterfaceDto> saveRestaurant = this.saveRestaurant(restaurant);
         if (saveRestaurant != null)
             return saveRestaurant;
 
@@ -79,21 +81,21 @@ public class RestaurantService {
         );
     }
 
-    private ResponseEntity<Exception> saveOwner(DAOUser owner) {
+    private ResponseEntity<ResponseInterfaceDto> saveOwner(DAOUser owner) {
         try {
             this.userRepository.save(owner);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(new ExceptionResponseDto(e.toString()));
         }
 
         return null;
     }
 
-    private ResponseEntity<Exception> saveRestaurant(Restaurant restaurant) {
+    private ResponseEntity<ResponseInterfaceDto> saveRestaurant(Restaurant restaurant) {
         try {
             this.restaurantRepository.save(restaurant);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(new ExceptionResponseDto(e.toString()));
         }
 
         return null;
