@@ -1,5 +1,7 @@
 package pt.feup.les.feupfood.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.security.Principal;
 import java.sql.Date;
 import java.util.Optional;
@@ -22,6 +24,8 @@ import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
+import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.MealTypeEnum;
@@ -258,6 +262,92 @@ public class RestaurantServiceTest {
         ).isEqualTo(HttpStatus.BAD_REQUEST);
 
         Mockito.verify(this.mealRepository, Mockito.times(1)).save(mealSaved);
+    }
+
+    @Test
+    void getMealTestAllOk() {
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Mockito.when(this.mealRepository.findById(this.meal1.getId())).thenReturn(
+            Optional.of(this.meal1)
+        );
+
+        ResponseEntity<ResponseInterfaceDto> answer = this.service.getMeal(
+            this.user,
+            this.meal1.getId()
+        );
+
+        Mockito.verify(this.mealRepository, 
+            Mockito.times(1)).findById(this.meal1.getId());
+
+        Assertions.assertThat(
+            answer.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            answer.getBody()
+        ).isEqualTo(this.mealDtoResponse);
+    }
+
+    @Test
+    void getMealTestThrowResourceNotFoundException() {
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Mockito.when(this.mealRepository.findById(this.meal1.getId())).thenReturn(
+            Optional.ofNullable(null)
+        );
+
+        assertThrows(ResourceNotFoundException.class, 
+            () -> this.service.getMeal(
+                this.user, this.meal1.getId())
+        );
+
+        Mockito.verify(this.mealRepository, 
+            Mockito.times(1)).findById(this.meal1.getId());
+
+    }
+
+    @Test
+    void getMealTestThrowResourceNotOwnedException() {
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        this.meal1.setRestaurant(new Restaurant());
+        Mockito.when(this.mealRepository.findById(this.meal1.getId())).thenReturn(
+            Optional.ofNullable(this.meal1)
+        );
+
+        assertThrows(ResourceNotOwnedException.class, 
+            () -> this.service.getMeal(
+                this.user, this.meal1.getId())
+        );
+
+        Mockito.verify(this.mealRepository, 
+            Mockito.times(1)).findById(this.meal1.getId());
+
     }
 
     private void commonUpdateProfileData() {
