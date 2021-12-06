@@ -315,7 +315,7 @@ public class RestaurantServiceTest {
 
         assertThrows(ResourceNotFoundException.class, 
             () -> this.service.getMeal(
-                this.user, this.meal1.getId())
+                this.user, 100L)
         );
 
         Mockito.verify(this.mealRepository, 
@@ -342,7 +342,7 @@ public class RestaurantServiceTest {
 
         assertThrows(ResourceNotOwnedException.class, 
             () -> this.service.getMeal(
-                this.user, this.meal1.getId())
+                this.user, 100L)
         );
 
         Mockito.verify(this.mealRepository, 
