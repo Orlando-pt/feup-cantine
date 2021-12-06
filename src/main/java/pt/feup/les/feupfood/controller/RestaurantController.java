@@ -64,9 +64,10 @@ public class RestaurantController {
 	@GetMapping("meal/{id}")
 	public ResponseEntity<ResponseInterfaceDto> getMeal(
 		Principal user,
-		@PathVariable Long mealId
+		@PathVariable Long id
 	) {
-		return this.service.getMeal(user, mealId);
+		log.info("[meal/id] Requiring meal number: " + id);
+		return this.service.getMeal(user, id);
 	}
 
 	@PostMapping("meal")
