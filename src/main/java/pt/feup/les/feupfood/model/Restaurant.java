@@ -19,9 +19,12 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@EqualsAndHashCode(exclude = {"meals"})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Restaurant.class)
 @Entity
 @Table(name = "restaurants")
 public class Restaurant {
@@ -40,6 +43,7 @@ public class Restaurant {
 
     private Date closingSchedule;
 
+    // @ToString.Exclude
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Meal> meals;
 
@@ -50,4 +54,5 @@ public class Restaurant {
     public boolean addMeal(Meal meal) {
         return this.meals.add(meal);
     }
+
 }

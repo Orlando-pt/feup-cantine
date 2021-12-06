@@ -13,10 +13,11 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = DAOUser.class)
 @Entity
 @Table(name = "users")
 public class DAOUser {
@@ -40,6 +41,8 @@ public class DAOUser {
     private Boolean terms;
 
     // in the case user is a restaurant
+    @ToString.Exclude
     @OneToOne(mappedBy = "owner")
     private Restaurant restaurant;
+
 }

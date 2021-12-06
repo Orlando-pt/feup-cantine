@@ -16,11 +16,14 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
+@EqualsAndHashCode(exclude = {"restaurant"})
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Meal.class)
 @Entity
 @Table(name = "meals")
 public class Meal {
@@ -38,7 +41,8 @@ public class Meal {
 
     private String nutritionalInformation;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ToString.Exclude
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 

@@ -48,15 +48,19 @@ public class MealRepositoryTest {
     void testFindMealsByMealType() {
         List<Meal> expectedMeals = Arrays.asList(this.meal1, this.meal2);
 
-        // Assertions.assertThat(
-        //     this.mealRepository.findMealsByMealType(MealTypeEnum.DESERT)
-        // ).isEqualTo(
-        //     expectedMeals
-        // );
+        var result = this.mealRepository.findMealsByMealType(MealTypeEnum.DESERT);
+        
+        Assertions.assertThat(
+            result
+        ).isEqualTo(expectedMeals);
+    }
 
-        System.out.println(
-            this.mealRepository.findMealsByMealType(MealTypeEnum.DESERT)
-        );
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+
+    @Test
+    void apagar() {
+        System.out.println(restaurantRepository.findAll());
     }
 
     private void generateMealData() {
