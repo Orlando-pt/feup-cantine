@@ -15,9 +15,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.Data;
 
 @Data
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "restaurants")
 public class Restaurant {
@@ -41,5 +45,9 @@ public class Restaurant {
 
     public Restaurant() {
         this.meals = new ArrayList<>();
+    }
+
+    public boolean addMeal(Meal meal) {
+        return this.meals.add(meal);
     }
 }
