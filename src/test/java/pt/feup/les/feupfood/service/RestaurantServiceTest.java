@@ -17,10 +17,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.ExceptionResponseDto;
+import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.Meal;
+import pt.feup.les.feupfood.model.MealTypeEnum;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
@@ -33,6 +39,9 @@ public class RestaurantServiceTest {
     @Mock
     private RestaurantRepository restaurantRepository;
 
+    @Mock
+    private MealRepository mealRepository;
+
     @InjectMocks
     private RestaurantService service;
 
@@ -44,6 +53,10 @@ public class RestaurantServiceTest {
     // auxiliar resources
     private Principal user;
     private RestaurantProfileDto profileDto;
+
+    private Meal meal1;
+    private AddMealDto mealDto;
+    private GetPutMealDto mealDtoResponse;
 
     @BeforeEach
     void setup() {
@@ -132,6 +145,121 @@ public class RestaurantServiceTest {
         ).isInstanceOf(ResponseInterfaceDto.class);
     }
 
+    @Test
+    void addMealTest() {
+        this.profileDto = new RestaurantProfileDto();
+        this.profileDto.setFullName("new Full Name");
+        this.profileDto.setLocation("on the other corner");
+        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
+        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Meal mealSaved = new Meal();
+        mealSaved.setDescription(this.meal1.getDescription());
+        mealSaved.setMealType(this.meal1.getMealType());
+        mealSaved.setNutritionalInformation(this.meal1.getNutritionalInformation());
+        mealSaved.setRestaurant(this.restaurant1);
+
+        Mockito.when(this.mealRepository.save(mealSaved)).thenReturn(
+            this.meal1
+        );
+
+        Mockito.when(this.restaurantRepository.save(Mockito.any())).thenReturn(
+            null
+        );
+
+        Assertions.assertThat(
+            this.service.addMeal(this.user, this.mealDto).getBody()
+        ).isEqualTo(this.mealDtoResponse);
+
+        Mockito.verify(this.mealRepository, Mockito.times(1)).save(mealSaved);
+
+    }
+
+    @Test
+    void addMealTestThrowExceptionOnBadMeal() {
+        this.profileDto = new RestaurantProfileDto();
+        this.profileDto.setFullName("new Full Name");
+        this.profileDto.setLocation("on the other corner");
+        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
+        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Meal mealSaved = new Meal();
+        mealSaved.setDescription(this.meal1.getDescription());
+        mealSaved.setMealType(this.meal1.getMealType());
+        mealSaved.setNutritionalInformation(this.meal1.getNutritionalInformation());
+        mealSaved.setRestaurant(this.restaurant1);
+
+        Mockito.when(this.mealRepository.save(mealSaved)).thenThrow(
+            new PersistenceException("Upsi")
+        );
+
+        Assertions.assertThat(
+            this.service.addMeal(this.user, this.mealDto).getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        Mockito.verify(this.mealRepository, Mockito.times(1)).save(mealSaved);
+
+    }
+
+    @Test
+    void addMealTestThrowExceptionOnBadRestaurantSave() {
+        this.profileDto = new RestaurantProfileDto();
+        this.profileDto.setFullName("new Full Name");
+        this.profileDto.setLocation("on the other corner");
+        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
+        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Meal mealSaved = new Meal();
+        mealSaved.setDescription(this.meal1.getDescription());
+        mealSaved.setMealType(this.meal1.getMealType());
+        mealSaved.setNutritionalInformation(this.meal1.getNutritionalInformation());
+        mealSaved.setRestaurant(this.restaurant1);
+
+        Mockito.when(this.mealRepository.save(mealSaved)).thenReturn(
+            this.meal1
+        );
+
+        Mockito.when(
+            this.restaurantRepository.save(Mockito.any())
+        ).thenThrow(new PersistenceException("The restaurant profile data submited was badly written."));
+
+        Assertions.assertThat(
+            this.service.addMeal(this.user, this.mealDto).getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        Mockito.verify(this.mealRepository, Mockito.times(1)).save(mealSaved);
+    }
+
     private void commonUpdateProfileData() {
         this.profileDto = new RestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
@@ -191,5 +319,23 @@ public class RestaurantServiceTest {
 
         this.owner1.setRestaurant(this.restaurant1);
         this.owner2.setRestaurant(this.restaurant2);
+
+        this.meal1 = new Meal();
+        this.meal1.setDescription("Rotten apple");
+        this.meal1.setId(100L);
+        this.meal1.setMealType(MealTypeEnum.DESERT);
+        this.meal1.setNutritionalInformation("very good for your muscles");
+        this.meal1.setRestaurant(this.restaurant1);
+
+        this.mealDto = new AddMealDto();
+        this.mealDto.setDescription(this.meal1.getDescription());
+        this.mealDto.setMealType(this.meal1.getMealType());
+        this.mealDto.setNutritionalInformation(this.meal1.getNutritionalInformation());
+
+        this.mealDtoResponse = new GetPutMealDto();
+        this.mealDtoResponse.setDescription(this.meal1.getDescription());
+        this.mealDtoResponse.setId(this.meal1.getId());
+        this.mealDtoResponse.setMealType(this.meal1.getMealType());
+        this.mealDtoResponse.setNutritionalInformation(this.meal1.getNutritionalInformation());
     }
 }
