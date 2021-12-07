@@ -1,41 +1,55 @@
 package pt.feup.les.feupfood.model;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(exclude = {"meals", "assignments"})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Menu.class)
 @Entity
 @Table(name = "menus")
 public class Menu {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private Schedule schedule;
+    private String additionalInformation;
 
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Meal meatMeal;
+    private Double startPrice;
 
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Meal fishMeal;
+    private Double endPrice;
 
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Meal dietMeal;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "menu_meals",
+        joinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name ="menu_id", referencedColumnName = "id")
+        )
+    private List<Meal> meals;
 
-    @OneToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Meal vegetarianMeal;
+    @ToString.Exclude
+    @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<AssignMenu> assignments;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private AssignMenu assignMenu;
+    public Menu() {
+        this.meals = new ArrayList<>();
+        this.assignments = new ArrayList<>();
+    }
+
+    public boolean addMeal(Meal meal) {
+        return this.meals.add(meal);
+    }
 
 }

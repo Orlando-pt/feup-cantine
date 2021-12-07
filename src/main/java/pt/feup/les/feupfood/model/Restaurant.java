@@ -20,9 +20,10 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(exclude = {"meals"})
+@EqualsAndHashCode(exclude = {"meals", "assignments"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Restaurant.class)
 @Entity
 @Table(name = "restaurants")
@@ -46,12 +47,21 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Meal> meals;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<AssignMenu> assignments;
+
     public Restaurant() {
         this.meals = new ArrayList<>();
+        this.assignments = new ArrayList<>();
     }
 
     public boolean addMeal(Meal meal) {
         return this.meals.add(meal);
+    }
+
+    public boolean addAssignment(AssignMenu assignment) {
+        return this.assignments.add(assignment);
     }
 
 }

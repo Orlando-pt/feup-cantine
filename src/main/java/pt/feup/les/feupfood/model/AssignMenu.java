@@ -4,25 +4,37 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = AssignMenu.class)
 @Entity
 @Table(name = "assignments")
 public class AssignMenu {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startingDate;
+    @Column(nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endDate;
+    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    private ScheduleEnum schedule;
 
-    @OneToMany(mappedBy = "assignMenu", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Menu> menus;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
 
 }

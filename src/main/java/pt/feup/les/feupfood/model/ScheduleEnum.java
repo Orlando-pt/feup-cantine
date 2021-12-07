@@ -1,6 +1,6 @@
 package pt.feup.les.feupfood.model;
 
-public enum Schedule {
+public enum ScheduleEnum {
     LUNCH,
     DINNER
 }
