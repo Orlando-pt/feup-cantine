@@ -3,14 +3,15 @@ package pt.feup.les.feupfood.service;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.support.DaoSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
@@ -183,6 +184,20 @@ public class RestaurantService {
                 this.retrieveMenu(daoUser, menuId)
             )
         );
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> addAssignment(
+        Principal user,
+        AddAssignmentDto assignmentDto
+    ) {
+
+        return ResponseEntity.ok(new GetAssignmentDto());
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> getAssignments(
+        Principal user
+    ) {
+        return ResponseEntity.ok(new GetAssignmentDto());
     }
 
     private Menu retrieveMenu(DAOUser user, Long menuId) {

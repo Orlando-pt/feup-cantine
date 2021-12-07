@@ -1,8 +1,10 @@
 package pt.feup.les.feupfood.util;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
+import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 
@@ -53,5 +55,16 @@ public class RestaurantParser {
         );
 
         return menuDto;
+    }
+
+    public GetAssignmentDto parseAssignmentToAssignmentDto(AssignMenu assignment) {
+        GetAssignmentDto assignmentDto = new GetAssignmentDto();
+
+        assignmentDto.setId(assignment.getId());
+        assignmentDto.setDate(assignment.getDate());
+        assignmentDto.setSchedule(assignment.getSchedule());
+        assignmentDto.setMenu(parseMenutoMenuDto(assignment.getMenu()));
+
+        return assignmentDto;
     }
 }
