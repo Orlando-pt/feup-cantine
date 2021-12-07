@@ -52,4 +52,8 @@ public class Menu {
         return this.meals.add(meal);
     }
 
+    public boolean addAssignment(AssignMenu assignment) {
+        return this.assignments.add(assignment);
+    }
+
 }
