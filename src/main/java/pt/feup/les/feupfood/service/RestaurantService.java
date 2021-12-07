@@ -3,11 +3,13 @@ package pt.feup.les.feupfood.service;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DaoSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
@@ -15,8 +17,10 @@ import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Meal;
+import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.MealRepository;
+import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.RestaurantParser;
@@ -32,6 +36,9 @@ public class RestaurantService {
 
     @Autowired
     private MealRepository mealRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
         Principal user
@@ -121,6 +128,77 @@ public class RestaurantService {
         return ResponseEntity.ok(
             new RestaurantParser().parseMealtoMealDto(meal)
         );
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> addMenu(
+        Principal user,
+        AddMenuDto menuDto
+    ) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Menu menu = new Menu();
+        menu.setName(menuDto.getName());
+        menu.setAdditionalInformation(menuDto.getAdditionalInformaiton());
+        menu.setStartPrice(menuDto.getStartPrice());
+        menu.setEndPrice(menuDto.getEndPrice());
+
+        // add meals referent to the menu
+        Meal meal = this.retrieveMeal(daoUser, menuDto.getMeatMealId());
+        menu.addMeal(meal);
+        meal.addMenu(menu);
+        this.mealRepository.save(meal);
+        this.menuRepository.save(menu);
+
+        meal = this.retrieveMeal(daoUser, menuDto.getFishMealId());
+        menu.addMeal(meal);
+        meal.addMenu(menu);
+        this.mealRepository.save(meal);
+        this.menuRepository.save(menu);
+
+        meal = this.retrieveMeal(daoUser, menuDto.getDietMealId());
+        menu.addMeal(meal);
+        meal.addMenu(menu);
+        this.mealRepository.save(meal);
+        this.menuRepository.save(menu);
+        
+        meal = this.retrieveMeal(daoUser, menuDto.getVegetarianMealId());
+        menu.addMeal(meal);
+        meal.addMenu(menu);
+        this.mealRepository.save(meal);
+        this.menuRepository.save(menu);
+        return ResponseEntity.ok(new AddMenuDto());
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> getMenu(
+        Principal user,
+        Long menuId
+    ) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+        return ResponseEntity.ok(
+            new RestaurantParser().parseMenutoMenuDto(
+                this.retrieveMenu(daoUser, menuId)
+            )
+        );
+    }
+
+    private Menu retrieveMenu(DAOUser user, Long menuId) {
+        Menu menu = this.menuRepository.findById(menuId).orElseThrow(
+            () -> new ResourceNotFoundException("No menu was found with id: " + menuId)
+        );
+
+        // TODO add verification if the menu belongs to this user
+        return menu;
+    }
+
+    private Meal retrieveMeal(DAOUser user, Long mealId) {
+        Meal meal = this.mealRepository.findById(mealId).orElseThrow(
+            () -> new ResourceNotFoundException("Meal not found with id: " + mealId)
+        );
+
+        if (!meal.getRestaurant().equals(user.getRestaurant()))
+            throw new ResourceNotOwnedException("Meal is not owned by user with email: " + user.getEmail());
+
+        return meal;
     }
 
     private DAOUser retrieveRestaurantOwner(String email) {

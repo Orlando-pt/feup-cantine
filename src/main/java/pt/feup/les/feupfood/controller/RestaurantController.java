@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -76,5 +77,22 @@ public class RestaurantController {
 		@RequestBody AddMealDto mealDto
 	) {
 		return this.service.addMeal(user, mealDto);
+	}
+
+	// create endpoints to make operations at menu
+	@PostMapping("menu")
+	public ResponseEntity<ResponseInterfaceDto> addMenu(
+		Principal user,
+		@RequestBody AddMenuDto menuDto
+	) {
+		return this.service.addMenu(user, menuDto);
+	}
+
+	@GetMapping("menu/{id}")
+	public ResponseEntity<ResponseInterfaceDto> getMenu(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.getMenu(user, id);
 	}
 }

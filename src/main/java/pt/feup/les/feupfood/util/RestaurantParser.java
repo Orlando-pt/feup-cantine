@@ -2,7 +2,9 @@ package pt.feup.les.feupfood.util;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
+import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.model.Meal;
+import pt.feup.les.feupfood.model.Menu;
 
 public class RestaurantParser {
 
@@ -23,5 +25,33 @@ public class RestaurantParser {
         mealDto.setNutritionalInformation(meal.getNutritionalInformation());
         return mealDto;
     }
-    
+
+    public GetPutMenuDto parseMenutoMenuDto(Menu menu) {
+        GetPutMenuDto menuDto = new GetPutMenuDto();
+
+        menuDto.setId(menu.getId());        
+        menuDto.setName(menu.getName());
+        menuDto.setAdditionalInformaiton(menu.getAdditionalInformation());
+        menuDto.setStartPrice(menu.getStartPrice());
+        menuDto.setEndPrice(menu.getEndPrice());
+        
+        // TODO modify this way of parsing things
+        menuDto.setMeatMeal(
+            parseMealtoMealDto(menu.getMeals().get(0))
+        );
+
+        menuDto.setFishMeal(
+            parseMealtoMealDto(menu.getMeals().get(1))
+        );
+
+        menuDto.setDietMeal(
+            parseMealtoMealDto(menu.getMeals().get(2))
+        );
+
+        menuDto.setVegetarianMeal(
+            parseMealtoMealDto(menu.getMeals().get(3))
+        );
+
+        return menuDto;
+    }
 }
