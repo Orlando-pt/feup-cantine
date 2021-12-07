@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
+import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
@@ -164,6 +166,75 @@ public class RestaurantController_RestTemplateIT {
         ).extracting(ResponseEntity::getBody)
             .extracting(GetPutMealDto::getDescription)
             .isEqualTo(mealDto.getDescription());
+
+    }
+
+    @Test
+    void addAndGetMenuTest() {
+        var headers = this.getStandardHeaders();
+
+        var mealDto = new AddMealDto();
+        mealDto.setDescription("Spagheti with atum");
+        mealDto.setMealType(MealTypeEnum.FISH);
+        mealDto.setNutritionalInformation("Tuna is very healthy.");
+
+        var meal1 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto, headers),
+            GetPutMealDto.class
+        );
+
+        var mealDto2 = new AddMealDto();
+        mealDto2.setDescription("Rice with carrots");
+        mealDto2.setMealType(MealTypeEnum.VEGETARIAN);
+        mealDto2.setNutritionalInformation("Tuna is very healthy.");
+
+        var meal2 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto2, headers),
+            GetPutMealDto.class
+        );
+
+        var menuDto = new AddMenuDto();
+        menuDto.setAdditionalInformaiton("something else");
+        menuDto.setDietMealId(meal1.getBody().getId());
+        menuDto.setEndPrice(10.0);
+        menuDto.setFishMealId(meal2.getBody().getId());
+        menuDto.setMeatMealId(meal1.getBody().getId());
+        menuDto.setName("Monday morning for this week");
+        menuDto.setStartPrice(4.5);
+        menuDto.setVegetarianMealId(meal2.getBody().getId());
+        
+        var response = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.POST,
+            new HttpEntity<>(menuDto, headers),
+            GetPutMenuDto.class
+        );
+
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var getResponse = this.restTemplate.exchange(
+            "/api/restaurant/menu/" + response.getBody().getId(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetPutMenuDto.class
+        );
+
+        Assertions.assertThat(
+            getResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getResponse
+        ).extracting(ResponseEntity::getBody)
+            .extracting(GetPutMenuDto::getName)
+            .isEqualTo(menuDto.getName()
+            );
 
     }
 

@@ -165,8 +165,12 @@ public class RestaurantService {
         menu.addMeal(meal);
         meal.addMenu(menu);
         this.mealRepository.save(meal);
-        this.menuRepository.save(menu);
-        return ResponseEntity.ok(new AddMenuDto());
+        
+        return ResponseEntity.ok(
+            new RestaurantParser().parseMenutoMenuDto(
+                this.menuRepository.save(menu)
+            )
+        );
     }
 
     public ResponseEntity<ResponseInterfaceDto> getMenu(
