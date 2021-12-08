@@ -1,5 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
+import java.util.Date;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,8 +17,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.JwtRequest;
@@ -25,6 +29,7 @@ import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.model.MealTypeEnum;
+import pt.feup.les.feupfood.model.ScheduleEnum;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -236,6 +241,81 @@ public class RestaurantController_RestTemplateIT {
             .isEqualTo(menuDto.getName()
             );
 
+    }
+
+    @Test
+    void addAndGetAssignmentTest() {
+        var headers = this.getStandardHeaders();
+
+        var mealDto = new AddMealDto();
+        mealDto.setDescription("Spagheti with atum");
+        mealDto.setMealType(MealTypeEnum.FISH);
+        mealDto.setNutritionalInformation("Tuna is very healthy.");
+
+        var meal1 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto, headers),
+            GetPutMealDto.class
+        );
+
+        var mealDto2 = new AddMealDto();
+        mealDto2.setDescription("Rice with carrots");
+        mealDto2.setMealType(MealTypeEnum.VEGETARIAN);
+        mealDto2.setNutritionalInformation("Tuna is very healthy.");
+
+        var meal2 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto2, headers),
+            GetPutMealDto.class
+        );
+
+        var menuDto = new AddMenuDto();
+        menuDto.setAdditionalInformaiton("something else");
+        menuDto.setDietMealId(meal1.getBody().getId());
+        menuDto.setEndPrice(10.0);
+        menuDto.setFishMealId(meal2.getBody().getId());
+        menuDto.setMeatMealId(meal1.getBody().getId());
+        menuDto.setName("Monday morning for this week");
+        menuDto.setStartPrice(4.5);
+        menuDto.setVegetarianMealId(meal2.getBody().getId());
+        
+        var response = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.POST,
+            new HttpEntity<>(menuDto, headers),
+            GetPutMenuDto.class
+        );
+
+        var assignemntDto = new AddAssignmentDto();
+        assignemntDto.setDate(
+            new Date(1639094400000L)
+        );
+
+        assignemntDto.setMenuId(response.getBody().getId());
+        assignemntDto.setSchedule(ScheduleEnum.LUNCH);
+
+        var createAssignment = this.restTemplate.exchange(
+            "/api/restaurant/assignment",
+            HttpMethod.POST,
+            new HttpEntity<>(assignemntDto, headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            createAssignment.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var getAssignments = this.restTemplate.exchange(
+            "/api/restaurant/assignment",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto[].class
+        );
+
+        for (GetAssignmentDto assign : getAssignments.getBody())
+            System.out.println(assign);
     }
 
     private void registerRestaurant() {

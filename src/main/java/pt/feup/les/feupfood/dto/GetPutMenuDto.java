@@ -17,6 +17,7 @@ public class GetPutMenuDto implements ResponseInterfaceDto{
     private GetPutMealDto dietMeal;
     private GetPutMealDto vegetarianMeal;
 
+    // private RestaurantProfileDto restaurant;
     // TODO add assignments
 
 }

@@ -1,6 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -109,7 +110,7 @@ public class RestaurantController {
 	// TODO assignments for next 7 days
 
 	@GetMapping("assignment")
-	public ResponseEntity<ResponseInterfaceDto> getAssignments(
+	public ResponseEntity<List<ResponseInterfaceDto>> getAssignments(
 		Principal user
 	) {
 		return this.service.getAssignments(user);

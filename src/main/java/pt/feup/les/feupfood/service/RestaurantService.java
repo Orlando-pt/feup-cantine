@@ -1,6 +1,8 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +18,12 @@ import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
+import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
@@ -40,6 +44,9 @@ public class RestaurantService {
 
     @Autowired
     private MenuRepository menuRepository;
+
+    @Autowired
+    private AssignMenuRepository assignMenuRepository;
 
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
         Principal user
@@ -142,6 +149,7 @@ public class RestaurantService {
         menu.setAdditionalInformation(menuDto.getAdditionalInformaiton());
         menu.setStartPrice(menuDto.getStartPrice());
         menu.setEndPrice(menuDto.getEndPrice());
+        menu.setRestaurant(daoUser.getRestaurant());
 
         // add meals referent to the menu
         Meal meal = this.retrieveMeal(daoUser, menuDto.getMeatMealId());
@@ -192,15 +200,33 @@ public class RestaurantService {
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
+        AssignMenu assignment = new AssignMenu();
+        assignment.setDate(assignmentDto.getDate());
+        assignment.setSchedule(assignmentDto.getSchedule());
+        assignment.setRestaurant(owner.getRestaurant());
 
+        assignment.setMenu(
+            this.retrieveMenu(owner, assignmentDto.getMenuId())
+        );
 
-        return ResponseEntity.ok(new GetAssignmentDto());
+        return ResponseEntity.ok(
+            new RestaurantParser().parseAssignmentToAssignmentDto(
+                this.assignMenuRepository.save(assignment)
+            )
+        );
     }
 
-    public ResponseEntity<ResponseInterfaceDto> getAssignments(
+    public ResponseEntity<List<ResponseInterfaceDto>> getAssignments(
         Principal user
     ) {
-        return ResponseEntity.ok(new GetAssignmentDto());
+        RestaurantParser parser = new RestaurantParser();
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        return ResponseEntity.ok(
+            this.assignMenuRepository.findByRestaurant(owner.getRestaurant()).stream().map(
+                (assignment) -> parser.parseAssignmentToAssignmentDto(assignment)
+            ).collect(Collectors.toList())
+        );
     }
 
     private Menu retrieveMenu(DAOUser user, Long menuId) {
@@ -208,7 +234,9 @@ public class RestaurantService {
             () -> new ResourceNotFoundException("No menu was found with id: " + menuId)
         );
 
-        // TODO add verification if the menu belongs to this user
+        if (!menu.getRestaurant().equals(user.getRestaurant()))
+            throw new ResourceNotOwnedException("Menu is not owned by user with email: " + user.getEmail());
+
         return menu;
     }
 
