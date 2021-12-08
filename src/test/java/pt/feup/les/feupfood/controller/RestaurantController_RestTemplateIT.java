@@ -314,8 +314,13 @@ public class RestaurantController_RestTemplateIT {
             GetAssignmentDto[].class
         );
 
-        for (GetAssignmentDto assign : getAssignments.getBody())
-            System.out.println(assign);
+        Assertions.assertThat(
+            getAssignments.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getAssignments.getBody()
+        ).hasSize(1);
     }
 
     private void registerRestaurant() {

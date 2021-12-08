@@ -13,7 +13,6 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
-import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
@@ -223,7 +222,7 @@ public class RestaurantService {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
         return ResponseEntity.ok(
-            this.assignMenuRepository.findByRestaurant(owner.getRestaurant()).stream().map(
+            owner.getRestaurant().getAssignments().stream().map(
                 (assignment) -> parser.parseAssignmentToAssignmentDto(assignment)
             ).collect(Collectors.toList())
         );
