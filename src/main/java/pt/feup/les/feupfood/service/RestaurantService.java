@@ -190,6 +190,9 @@ public class RestaurantService {
         Principal user,
         AddAssignmentDto assignmentDto
     ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+
 
         return ResponseEntity.ok(new GetAssignmentDto());
     }

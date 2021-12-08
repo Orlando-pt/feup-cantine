@@ -1,9 +1,12 @@
 package pt.feup.les.feupfood.repository;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +58,26 @@ public class AssignMenuRepositoryTest {
         ).hasSize(1).isEqualTo(
             Arrays.asList(this.assignment1)
         );
+    }
+
+    @Test
+    void testFindAllByDateBetween() {
+        Date date = null;
+        try {
+            date = new Date(
+                new SimpleDateFormat("yyyy-MM-dd").parse("2021-12-07").getTime()
+            );
+        } catch (ParseException e) {
+            // make the test fail
+            assertTrue(false);
+        }
+
+        // add more 7 days to date
+        Date dateAfter7Days = new Date(date.getTime() + (7000 * 60 * 60 * 24));
+
+        Assertions.assertThat(
+            this.assignMenuRepository.findAllByDateBetween(date, dateAfter7Days)
+        ).hasSize(1).contains(this.assignment1).doesNotContain(this.assignment2);
     }
 
     private void generateAssignMenuData() {
@@ -154,7 +177,13 @@ public class AssignMenuRepositoryTest {
         this.restaurant1.addAssignment(this.assignment1);
 
         this.assignment2 = new AssignMenu();
-        this.assignment2.setDate(this.assignment1.getDate());
+        try {
+            this.assignment2.setDate(
+                new Date(formatDate.parse("2021-12-06").getTime())
+            );
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
         this.assignment2.setSchedule(ScheduleEnum.LUNCH);
         this.assignment2.setMenu(this.menu2);
         this.menu2.addAssignment(this.assignment2);

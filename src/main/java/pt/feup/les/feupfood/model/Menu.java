@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Data
-@EqualsAndHashCode(exclude = {"meals", "assignments"})
+@EqualsAndHashCode(exclude = {"meals", "assignments", "restaurant"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Menu.class)
 @Entity
 @Table(name = "menus")
@@ -42,6 +42,11 @@ public class Menu {
     @ToString.Exclude
     @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AssignMenu> assignments;
+
+    @ToString.Exclude
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
 
     public Menu() {
         this.meals = new ArrayList<>();

@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(exclude = {"meals", "assignments"})
+@EqualsAndHashCode(exclude = {"meals", "assignments", "menus"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Restaurant.class)
 @Entity
 @Table(name = "restaurants")
@@ -43,7 +43,7 @@ public class Restaurant {
 
     private Date closingSchedule;
 
-    // @ToString.Exclude
+    @ToString.Exclude
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Meal> meals;
 
@@ -51,9 +51,14 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AssignMenu> assignments;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Menu> menus;
+
     public Restaurant() {
         this.meals = new ArrayList<>();
         this.assignments = new ArrayList<>();
+        this.menus = new ArrayList<>();
     }
 
     public boolean addMeal(Meal meal) {
@@ -62,6 +67,10 @@ public class Restaurant {
 
     public boolean addAssignment(AssignMenu assignment) {
         return this.assignments.add(assignment);
+    }
+
+    public boolean addMenu(Menu menu) {
+        return this.menus.add(menu);
     }
 
 }
