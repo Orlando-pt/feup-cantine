@@ -1,20 +1,18 @@
 package pt.feup.les.feupfood.model;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(exclude = "reviews")
 @Entity
 @Table(name = "restaurants")
 public class Restaurant {
@@ -26,10 +24,22 @@ public class Restaurant {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private DAOUser owner;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    List <Review> reviews;
     
     private String location;
 
     private Date openingSchedule;
 
     private Date closingSchedule;
+
+    public Restaurant() {
+        this.reviews = new ArrayList<>();
+    }
+
+    public boolean addReview(Review review) {
+        return this.reviews.add(review);
+    }
 }

@@ -1,7 +1,6 @@
 package pt.feup.les.feupfood.repository;
 
 import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,28 +10,35 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.model.Review;
 
 @DataJpaTest
-public class RestaurantRepositoryTest {
+public class ReviewRepositoryTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private RestaurantRepository restaurantRepository;
+    private ReviewRepository reviewRepository;
 
     private Restaurant restaurantAlzira;
     private Restaurant restaurantDeolinda;
     
     private DAOUser ownerAlzira;
     private DAOUser ownerDeolinda;
+    private DAOUser client1;
 
-    public RestaurantRepositoryTest() {
+    private Review reviewClient1;
+
+    public ReviewRepositoryTest() {
         this.restaurantAlzira = new Restaurant();
         this.restaurantDeolinda = new Restaurant();
 
         this.ownerAlzira = new DAOUser();
         this.ownerDeolinda = new DAOUser();
+        this.client1 = new DAOUser();
+
+        this.reviewClient1 = new Review();
 
         this.ownerAlzira.setFullName("Alzira Esteves");
         this.ownerAlzira.setPassword("password");
@@ -47,6 +53,12 @@ public class RestaurantRepositoryTest {
         this.ownerDeolinda.setRole("ROLE_USER_RESTAURANT");
         this.ownerDeolinda.setTerms(true);
 
+        this.client1.setFullName("John");
+        this.client1.setPassword("password");
+        this.client1.setEmail("emailsomething");
+        this.client1.setRole("ROLE_USER_CLIENT");
+        this.client1.setTerms(true);
+
         this.restaurantAlzira.setOwner(this.ownerAlzira);
         this.restaurantAlzira.setLocation("In the corner");
 
@@ -55,6 +67,14 @@ public class RestaurantRepositoryTest {
 
         this.ownerAlzira.setRestaurant(restaurantAlzira);
         this.ownerDeolinda.setRestaurant(restaurantDeolinda);
+
+        this.reviewClient1.setComment("The food was great");
+        this.reviewClient1.setClassificationGrade(5);
+        this.reviewClient1.setClient(this.client1);
+        this.reviewClient1.setRestaurant(this.restaurantAlzira);
+
+        this.restaurantAlzira.addReview(this.reviewClient1);
+        this.client1.addReview(this.reviewClient1);
     }
 
     @BeforeEach
@@ -63,31 +83,30 @@ public class RestaurantRepositoryTest {
 
         this.entityManager.persist(this.ownerAlzira);
         this.entityManager.persist(this.ownerDeolinda);
+        this.entityManager.persist(this.client1);
 
         this.entityManager.persist(this.restaurantAlzira);
         this.entityManager.persist(this.restaurantDeolinda);
+        this.entityManager.persist(this.reviewClient1);
+
         this.entityManager.flush();
     }
 
     @Test
-    void findByOwnerTest() {
+    void testFindByRestaurant () {
         Assertions.assertThat(
-            this.restaurantRepository.findByOwner(
-                this.ownerAlzira
-            )
-        ).isEqualTo(
-            Optional.of(this.restaurantAlzira)
-        );
+                this.reviewRepository.findAllByRestaurant(
+                        this.restaurantAlzira
+                )
+        ).hasSize(1).contains(this.reviewClient1);
     }
-
 
     @Test
-    void fromUserGetRestaurant() {
+    void testFindByClient () {
         Assertions.assertThat(
-            this.ownerDeolinda.getRestaurant()
-        ).isEqualTo(
-            this.restaurantDeolinda
-        );
+                this.reviewRepository.findAllByClient(
+                        this.client1
+                )
+        ).hasSize(1).contains(this.reviewClient1);
     }
-
 }

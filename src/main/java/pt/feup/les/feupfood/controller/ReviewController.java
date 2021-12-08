@@ -14,21 +14,23 @@ import pt.feup.les.feupfood.service.ReviewService;
 @RequestMapping("/api/review/")
 @Log4j2
 public class ReviewController {
-
+/*
     @Autowired
     ReviewService reviewService;
 
-    @PostMapping("/get/restaurant/review")
+    @GetMapping("/review")
     public ResponseEntity getReviewsOfRestaurant(@RequestBody GetRestaurantReviewRequest getRestaurantReviewRequest) {
         return reviewService.getAllReviewsByRestaurant(getRestaurantReviewRequest.getRestaurantId());
     }
-    @PostMapping("/get/user/review")
+    @GetMapping("/review")
     public ResponseEntity getReviewsByUser(@RequestBody GetUserReviewRequest getUserReviewRequest) {
         return reviewService.getAllReviewsByRestaurant(getUserReviewRequest.getUserId());
     }
 
-    @PostMapping("/save/review")
+    @GetMapping("/review")
     public ResponseEntity saveReview(@RequestBody SaveReviewRequest saveReviewRequest) {
         return reviewService.saveReview(saveReviewRequest);
     }
+    */
+
 }
