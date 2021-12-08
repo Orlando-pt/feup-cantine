@@ -6,7 +6,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,13 +83,13 @@ public class AssignMenuRepositoryTest {
         this.user1 = new DAOUser();
         this.user1.setFullName("Diogo");
         this.user1.setPassword("password");
-        this.user1.setEmail("email21212@mail.com");
+        this.user1.setEmail("email2asdasd1212@mail.com");
         this.user1.setRole("ROLE_USER_RESTAURANT");
         
         this.user2 = new DAOUser();
         this.user2.setFullName("André");
         this.user2.setPassword("password");
-        this.user2.setEmail("email2121asdasd2@mail.com");
+        this.user2.setEmail("email212asdasdas1asdasd2@mail.com");
         this.user2.setRole("ROLE_USER_RESTAURANT");
 
         this.entityManager.persist(this.user1);
@@ -143,6 +142,7 @@ public class AssignMenuRepositoryTest {
         this.menu1.setStartPrice(5.11);
         this.menu1.setEndPrice(10.50);
         this.menu1.addMeal(this.meal1);
+        this.menu1.setRestaurant(this.restaurant1);
         this.menu1.addMeal(this.meal2);
 
 
@@ -151,6 +151,7 @@ public class AssignMenuRepositoryTest {
         this.menu2.setStartPrice(5.11);
         this.menu2.setEndPrice(10.50);
         this.menu2.addMeal(this.meal3);
+        this.menu2.setRestaurant(this.restaurant2);
 
         this.entityManager.persist(this.menu1);
         this.entityManager.persist(this.menu2);
