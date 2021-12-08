@@ -1,12 +1,9 @@
 package pt.feup.les.feupfood.service;
 
-import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
@@ -15,9 +12,11 @@ import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
+import java.security.Principal;
+
 @Service
 public class RestaurantService {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -25,7 +24,7 @@ public class RestaurantService {
     private RestaurantRepository restaurantRepository;
 
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
-        Principal user
+            Principal user
     ) {
         RestaurantProfileDto restaurantDto = new RestaurantProfileDto();
 
@@ -36,18 +35,18 @@ public class RestaurantService {
         restaurantDto.setLocation(restaurant.getLocation());
         restaurantDto.setClosingSchedule(restaurant.getClosingSchedule());
         restaurantDto.setOpeningSchedule(restaurant.getOpeningSchedule());
-        
+
         return ResponseEntity.ok(restaurantDto);
     }
 
     public ResponseEntity<ResponseInterfaceDto> updateRestaurantProfile(
-        Principal user,
-        RestaurantProfileDto profileDto
+            Principal user,
+            RestaurantProfileDto profileDto
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
         Restaurant restaurant = this.retrieveRestaurant(
-            owner
+                owner
         );
 
         owner.setFullName(profileDto.getFullName());
@@ -59,7 +58,7 @@ public class RestaurantService {
         ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
             return saveOwner;
-        
+
         ResponseEntity<ResponseInterfaceDto> saveRestaurant = this.saveRestaurant(restaurant);
         if (saveRestaurant != null)
             return saveRestaurant;
@@ -69,15 +68,15 @@ public class RestaurantService {
 
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
-            () -> new UsernameNotFoundException("User not found with email: " + email)
+                () -> new UsernameNotFoundException("User not found with email: " + email)
         );
     }
 
     private Restaurant retrieveRestaurant(DAOUser owner) {
         return this.restaurantRepository.findByOwner(
-            owner
+                owner
         ).orElseThrow(
-            () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
+                () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
         );
     }
 
