@@ -1,10 +1,12 @@
 package pt.feup.les.feupfood.model;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import java.sql.Time;
+
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,9 +40,17 @@ public class Restaurant {
     
     private String location;
 
-    private Date openingSchedule;
+    @Basic
+    private Time morningOpeningSchedule;
 
-    private Date closingSchedule;
+    @Basic
+    private Time morningClosingSchedule;
+
+    @Basic
+    private Time afternoonOpeningSchedule;
+
+    @Basic
+    private Time afternoonClosingSchedule;
 
     // @ToString.Exclude
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -54,4 +64,5 @@ public class Restaurant {
         return this.meals.add(meal);
     }
 
+    
 }
