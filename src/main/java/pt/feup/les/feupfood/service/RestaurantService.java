@@ -1,6 +1,8 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
+import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
@@ -127,6 +130,48 @@ public class RestaurantService {
         );
     }
 
+    public ResponseEntity<List<GetPutMealDto>> getMeals(Principal user) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+        RestaurantParser parser = new RestaurantParser();
+
+        return ResponseEntity.ok(daoUser.getRestaurant().getMeals().stream().map(
+            parser::parseMealtoMealDto
+        ).collect(Collectors.toList()));
+    }
+
+    public ResponseEntity<GetPutMealDto> updateMeal(
+        Principal user,
+        GetPutMealDto mealDto
+    ) {
+
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Meal meal = this.retrieveMeal(daoUser, mealDto.getId());
+
+        meal.setMealType(mealDto.getMealType());
+        meal.setDescription(mealDto.getDescription());
+        meal.setNutritionalInformation(meal.getNutritionalInformation());
+
+        meal = this.mealRepository.save(meal);
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseMealtoMealDto(meal)
+        );
+    }
+
+    public ResponseEntity<String> deleteMeal(
+        Principal user,
+        Long mealId
+    ) {
+
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Meal meal = this.retrieveMeal(daoUser, mealId);
+        this.mealRepository.delete(meal);
+
+        return ResponseEntity.ok("");
+    }
+
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
             () -> new UsernameNotFoundException("User not found with email: " + email)
@@ -139,6 +184,17 @@ public class RestaurantService {
         ).orElseThrow(
             () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
         );
+    }
+
+    private Meal retrieveMeal(DAOUser owner, Long mealId) {
+        Meal meal = this.mealRepository.findById(mealId).orElseThrow(
+            () -> new ResourceNotFoundException("No Meal matches the id: " + mealId)
+        );
+        
+        if (!owner.getRestaurant().equals(meal.getRestaurant()))
+            throw new ResourceNotOwnedException("No meal matches the id [" + mealId + "] for user: " + owner.getEmail());
+
+        return meal;
     }
 
     private ResponseEntity<ResponseInterfaceDto> saveOwner(DAOUser owner) {
