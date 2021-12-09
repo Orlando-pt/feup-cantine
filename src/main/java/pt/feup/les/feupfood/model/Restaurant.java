@@ -1,7 +1,8 @@
 package pt.feup.les.feupfood.model;
 
-import java.sql.Date;
+import java.sql.Time;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,7 +30,15 @@ public class Restaurant {
     
     private String location;
 
-    private Date openingSchedule;
+    @Basic
+    private Time morningOpeningSchedule;
 
-    private Date closingSchedule;
+    @Basic
+    private Time morningClosingSchedule;
+
+    @Basic
+    private Time afternoonOpeningSchedule;
+
+    @Basic
+    private Time afternoonClosingSchedule;
 }

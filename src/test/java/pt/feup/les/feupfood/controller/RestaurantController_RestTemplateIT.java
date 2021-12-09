@@ -1,5 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
+import java.sql.Time;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -92,6 +94,9 @@ public class RestaurantController_RestTemplateIT {
         RestaurantProfileDto updateProfileDto = new RestaurantProfileDto();
         updateProfileDto.setFullName(response.getBody().getFullName());
         updateProfileDto.setLocation("I do not really know");
+        updateProfileDto.setMorningOpeningSchedule(
+            Time.valueOf("1:10:10")
+        );
 
         var httpEntity = new HttpEntity<>(updateProfileDto, headers);
         
@@ -118,6 +123,7 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             getResponseAfterUpdate.getBody().getLocation()
         ).isEqualTo(updateProfileDto.getLocation());
+
     }
 
     private void registerRestaurant() {

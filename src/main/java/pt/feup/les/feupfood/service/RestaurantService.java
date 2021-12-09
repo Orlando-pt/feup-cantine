@@ -34,8 +34,10 @@ public class RestaurantService {
 
         restaurantDto.setFullName(owner.getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
-        restaurantDto.setClosingSchedule(restaurant.getClosingSchedule());
-        restaurantDto.setOpeningSchedule(restaurant.getOpeningSchedule());
+        restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
+        restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
+        restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
+        restaurantDto.setAfternoonClosingSchedule(restaurant.getAfternoonClosingSchedule());
         
         return ResponseEntity.ok(restaurantDto);
     }
@@ -53,8 +55,10 @@ public class RestaurantService {
         owner.setFullName(profileDto.getFullName());
 
         restaurant.setLocation(profileDto.getLocation());
-        restaurant.setOpeningSchedule(profileDto.getOpeningSchedule());
-        restaurant.setClosingSchedule(profileDto.getClosingSchedule());
+        restaurant.setMorningOpeningSchedule(profileDto.getMorningOpeningSchedule());
+        restaurant.setMorningClosingSchedule(profileDto.getMorningClosingSchedule());
+        restaurant.setAfternoonOpeningSchedule(profileDto.getAfternoonOpeningSchedule());
+        restaurant.setAfternoonClosingSchedule(profileDto.getAfternoonClosingSchedule());
 
         ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
