@@ -11,7 +11,8 @@ public class RestaurantProfileDto implements ResponseInterfaceDto{
 
     private String fullName;
     private String location;
-    private Time openingSchedule;
-    private Time closingSchedule;
-    
+    private Time morningOpeningSchedule;
+    private Time morningClosingSchedule;
+    private Time afternoonOpeningSchedule;
+    private Time afternoonClosingSchedule;
 }

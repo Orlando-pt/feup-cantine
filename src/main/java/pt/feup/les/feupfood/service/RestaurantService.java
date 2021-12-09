@@ -1,9 +1,6 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +34,10 @@ public class RestaurantService {
 
         restaurantDto.setFullName(owner.getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
-        restaurantDto.setClosingSchedule(restaurant.getClosingSchedule());
-        restaurantDto.setOpeningSchedule(restaurant.getOpeningSchedule());
+        restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
+        restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
+        restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
+        restaurantDto.setAfternoonClosingSchedule(restaurant.getAfternoonClosingSchedule());
         
         return ResponseEntity.ok(restaurantDto);
     }
@@ -56,8 +55,10 @@ public class RestaurantService {
         owner.setFullName(profileDto.getFullName());
 
         restaurant.setLocation(profileDto.getLocation());
-        restaurant.setOpeningSchedule(profileDto.getOpeningSchedule());
-        restaurant.setClosingSchedule(profileDto.getClosingSchedule());
+        restaurant.setMorningOpeningSchedule(profileDto.getMorningOpeningSchedule());
+        restaurant.setMorningClosingSchedule(profileDto.getMorningClosingSchedule());
+        restaurant.setAfternoonOpeningSchedule(profileDto.getAfternoonOpeningSchedule());
+        restaurant.setAfternoonClosingSchedule(profileDto.getAfternoonClosingSchedule());
 
         ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
@@ -68,16 +69,6 @@ public class RestaurantService {
             return saveRestaurant;
 
         return ResponseEntity.ok(profileDto);
-    }
-
-    private Date getDateFromStringParam(String stringDate) {
-        if (stringDate == null)
-            return null;
-        try {
-            return new SimpleDateFormat("HH:mm:ss").parse(stringDate);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException();
-        }
     }
 
     private DAOUser retrieveRestaurantOwner(String email) {

@@ -31,8 +31,14 @@ public class Restaurant {
     private String location;
 
     @Basic
-    private Time openingSchedule;
+    private Time morningOpeningSchedule;
 
     @Basic
-    private Time closingSchedule;
+    private Time morningClosingSchedule;
+
+    @Basic
+    private Time afternoonOpeningSchedule;
+
+    @Basic
+    private Time afternoonClosingSchedule;
 }
