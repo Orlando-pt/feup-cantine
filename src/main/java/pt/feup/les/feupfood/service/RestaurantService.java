@@ -1,6 +1,9 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +68,16 @@ public class RestaurantService {
             return saveRestaurant;
 
         return ResponseEntity.ok(profileDto);
+    }
+
+    private Date getDateFromStringParam(String stringDate) {
+        if (stringDate == null)
+            return null;
+        try {
+            return new SimpleDateFormat("HH:mm:ss").parse(stringDate);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private DAOUser retrieveRestaurantOwner(String email) {

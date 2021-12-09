@@ -1,6 +1,6 @@
 package pt.feup.les.feupfood.dto;
 
-import java.sql.Date;
+import java.sql.Time;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ public class RestaurantProfileDto implements ResponseInterfaceDto{
 
     private String fullName;
     private String location;
-    private Date openingSchedule;
-    private Date closingSchedule;
+    private Time openingSchedule;
+    private Time closingSchedule;
     
 }
