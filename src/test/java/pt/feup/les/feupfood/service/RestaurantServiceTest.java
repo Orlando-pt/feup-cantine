@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
@@ -295,6 +296,53 @@ public class RestaurantServiceTest {
         Assertions.assertThat(
             answer.getBody()
         ).isEqualTo(this.mealDtoResponse);
+    }
+
+    @Test
+    void getOwnerRetrievesError() {
+        String email = "email@mail.com";
+        Mockito.when(this.userRepository.findByEmail(email)).thenReturn(
+            Optional.ofNullable(null)
+        );
+
+        Principal user = Mockito.mock(Principal.class);
+        Mockito.when(user.getName()).thenReturn(
+            email
+        );
+
+        assertThrows(
+            UsernameNotFoundException.class,
+            () -> this.service.deleteMeal(user, 1L)
+        );
+    }
+
+    @Test
+    void getRestaurantRetrievesUsernameNotFoundException() {
+        DAOUser user = new DAOUser();
+        user.setEmail("email");
+        user.setFullName("fullName");
+        user.setPassword("password");
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn(
+            user.getEmail()
+        );
+
+        Mockito.when(
+            this.userRepository.findByEmail(Mockito.any())
+        ).thenReturn(
+            Optional.of(user)
+        );
+
+        Mockito.when(
+            this.restaurantRepository.findByOwner(user)
+        ).thenReturn(null);
+
+        assertThrows(
+            UsernameNotFoundException.class,
+            () -> this.service.getRestaurantProfile(principal)
+        );
+
     }
 
     @Test
