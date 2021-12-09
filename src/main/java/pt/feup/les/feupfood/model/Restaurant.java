@@ -1,21 +1,31 @@
 package pt.feup.les.feupfood.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import java.sql.Time;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(exclude = {"meals"})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Restaurant.class)
 @Entity
 @Table(name = "restaurants")
 public class Restaurant {
@@ -41,4 +51,18 @@ public class Restaurant {
 
     @Basic
     private Time afternoonClosingSchedule;
+
+    // @ToString.Exclude
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Meal> meals;
+
+    public Restaurant() {
+        this.meals = new ArrayList<>();
+    }
+
+    public boolean addMeal(Meal meal) {
+        return this.meals.add(meal);
+    }
+
+    
 }

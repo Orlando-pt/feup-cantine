@@ -15,12 +15,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.model.MealTypeEnum;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -123,6 +127,49 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             getResponseAfterUpdate.getBody().getLocation()
         ).isEqualTo(updateProfileDto.getLocation());
+
+    }
+
+    @Test
+    void addAndGetMealTest() {
+        var headers = this.getStandardHeaders();
+
+        var mealDto = new AddMealDto();
+        mealDto.setDescription("Spagheti with atum");
+        mealDto.setMealType(MealTypeEnum.FISH);
+        mealDto.setNutritionalInformation("Tuna is very healthy.");
+
+        var response = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto, headers),
+            GetPutMealDto.class
+        );
+
+        Assertions.assertThat(
+            response.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            response.getBody()
+        ).extracting(GetPutMealDto::getId).isNotNull();
+
+        var getMeal = this.restTemplate.exchange(
+            "/api/restaurant/meal/" + response.getBody().getId(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetPutMealDto.class
+        );
+
+        Assertions.assertThat(
+            getMeal.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getMeal
+        ).extracting(ResponseEntity::getBody)
+            .extracting(GetPutMealDto::getDescription)
+            .isEqualTo(mealDto.getDescription());
 
     }
 
