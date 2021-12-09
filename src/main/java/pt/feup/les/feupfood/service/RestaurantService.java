@@ -151,7 +151,7 @@ public class RestaurantService {
 
         meal.setMealType(mealDto.getMealType());
         meal.setDescription(mealDto.getDescription());
-        meal.setNutritionalInformation(meal.getNutritionalInformation());
+        meal.setNutritionalInformation(mealDto.getNutritionalInformation());
 
         meal = this.mealRepository.save(meal);
 
