@@ -94,7 +94,7 @@ public class RestaurantController_RestTemplateIT {
         RestaurantProfileDto updateProfileDto = new RestaurantProfileDto();
         updateProfileDto.setFullName(response.getBody().getFullName());
         updateProfileDto.setLocation("I do not really know");
-        updateProfileDto.setOpeningSchedule(
+        updateProfileDto.setMorningOpeningSchedule(
             Time.valueOf("1:10:10")
         );
 
