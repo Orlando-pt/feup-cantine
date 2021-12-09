@@ -124,7 +124,6 @@ public class RestaurantController_RestTemplateIT {
             getResponseAfterUpdate.getBody().getLocation()
         ).isEqualTo(updateProfileDto.getLocation());
 
-        System.out.println(getResponseAfterUpdate);
     }
 
     private void registerRestaurant() {
