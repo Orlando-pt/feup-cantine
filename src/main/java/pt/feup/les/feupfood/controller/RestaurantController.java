@@ -89,12 +89,13 @@ public class RestaurantController {
 		return this.service.addMeal(user, mealDto);
 	}
 
-	@PutMapping("meal")
+	@PutMapping("meal/{id}")
 	public ResponseEntity<GetPutMealDto> updateMeal(
 		Principal user,
-		@RequestBody GetPutMealDto mealDto
+		@RequestBody AddMealDto mealDto,
+		@PathVariable Long id
 	) {
-		return this.service.updateMeal(user, mealDto);
+		return this.service.updateMeal(user, id, mealDto);
 	}
 
 	@DeleteMapping("meal/{id}")

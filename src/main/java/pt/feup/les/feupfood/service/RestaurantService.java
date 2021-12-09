@@ -141,12 +141,13 @@ public class RestaurantService {
 
     public ResponseEntity<GetPutMealDto> updateMeal(
         Principal user,
-        GetPutMealDto mealDto
+        Long mealId,
+        AddMealDto mealDto
     ) {
 
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
 
-        Meal meal = this.retrieveMeal(daoUser, mealDto.getId());
+        Meal meal = this.retrieveMeal(daoUser, mealId);
 
         meal.setMealType(mealDto.getMealType());
         meal.setDescription(mealDto.getDescription());

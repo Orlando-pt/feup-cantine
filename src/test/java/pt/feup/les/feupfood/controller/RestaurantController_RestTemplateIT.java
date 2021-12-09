@@ -190,6 +190,20 @@ public class RestaurantController_RestTemplateIT {
             getMeals.getBody()
         ).hasSize(3).contains(responseMeal1.getBody(), responseMeal2.getBody(), responseMeal3.getBody());
 
+        // TODO add here the update
+        mealDto.setDescription("A very different description");
+
+        var updateMeal = this.restTemplate.exchange(
+            "/api/restaurant/meal/" + responseMeal1.getBody().getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(mealDto, headers),
+            GetPutMealDto.class
+        );
+
+        Assertions.assertThat(
+            updateMeal.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
         var getMeal = this.restTemplate.exchange(
             "/api/restaurant/meal/" + responseMeal1.getBody().getId(),
             HttpMethod.GET,
@@ -202,8 +216,8 @@ public class RestaurantController_RestTemplateIT {
         ).isEqualTo(HttpStatus.OK);
 
         Assertions.assertThat(
-            getMeal.getBody().getId()
-        ).isEqualTo(responseMeal1.getBody().getId());
+            getMeal.getBody().getDescription()
+        ).isEqualTo(mealDto.getDescription());
 
         var deleteMeal = this.restTemplate.exchange(
             "/api/restaurant/meal/" + responseMeal1.getBody().getId(),
