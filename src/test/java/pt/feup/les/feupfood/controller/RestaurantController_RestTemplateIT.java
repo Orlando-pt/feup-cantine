@@ -190,7 +190,6 @@ public class RestaurantController_RestTemplateIT {
             getMeals.getBody()
         ).hasSize(3).contains(responseMeal1.getBody(), responseMeal2.getBody(), responseMeal3.getBody());
 
-        // TODO add here the update
         mealDto.setDescription("A very different description");
 
         var updateMeal = this.restTemplate.exchange(
