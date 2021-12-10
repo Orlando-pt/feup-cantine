@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
+import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -64,6 +66,7 @@ public class RestaurantController {
 		return this.service.updateRestaurantProfile(user, profileDto);
 	}
 
+	// meal endpoints
 	@GetMapping("meal/{id}")
 	public ResponseEntity<ResponseInterfaceDto> getMeal(
 		Principal user,
@@ -71,6 +74,13 @@ public class RestaurantController {
 	) {
 		log.info("[meal/id] Requiring meal number: " + id);
 		return this.service.getMeal(user, id);
+	}
+
+	@GetMapping("meal")
+	public ResponseEntity<List<GetPutMealDto>> getMeals(
+		Principal user
+	) {
+		return this.service.getMeals(user);
 	}
 
 	@PostMapping("meal")
@@ -81,15 +91,24 @@ public class RestaurantController {
 		return this.service.addMeal(user, mealDto);
 	}
 
-	// menu endpoints
-	@PostMapping("menu")
-	public ResponseEntity<ResponseInterfaceDto> addMenu(
+	@PutMapping("meal/{id}")
+	public ResponseEntity<GetPutMealDto> updateMeal(
 		Principal user,
-		@RequestBody AddMenuDto menuDto
+		@RequestBody AddMealDto mealDto,
+		@PathVariable Long id
 	) {
-		return this.service.addMenu(user, menuDto);
+		return this.service.updateMeal(user, id, mealDto);
 	}
 
+	@DeleteMapping("meal/{id}")
+	public ResponseEntity<String> deleteMeal(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.deleteMeal(user, id);
+	}
+
+	// menu endpoints
 	@GetMapping("menu/{id}")
 	public ResponseEntity<ResponseInterfaceDto> getMenu(
 		Principal user,
@@ -98,7 +117,23 @@ public class RestaurantController {
 		return this.service.getMenu(user, id);
 	}
 
+	@PostMapping("menu")
+	public ResponseEntity<ResponseInterfaceDto> addMenu(
+		Principal user,
+		@RequestBody AddMenuDto menuDto
+	) {
+		return this.service.addMenu(user, menuDto);
+	}
+
 	// assignment endpoints
+	@GetMapping("assignment")
+	public ResponseEntity<List<ResponseInterfaceDto>> getAssignments(
+		Principal user
+	) {
+		return this.service.getAssignments(user);
+	}
+	// TODO assignments for next 7 days
+
 	@PostMapping("assignment")
 	public ResponseEntity<ResponseInterfaceDto> addAssignment(
 		Principal user,
@@ -107,12 +142,4 @@ public class RestaurantController {
 		return this.service.addAssignment(user, assignmentDto);
 	}
 
-	// TODO assignments for next 7 days
-
-	@GetMapping("assignment")
-	public ResponseEntity<List<ResponseInterfaceDto>> getAssignments(
-		Principal user
-	) {
-		return this.service.getAssignments(user);
-	}
 }

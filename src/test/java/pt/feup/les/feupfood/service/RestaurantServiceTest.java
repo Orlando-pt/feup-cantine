@@ -3,7 +3,7 @@ package pt.feup.les.feupfood.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.Principal;
-import java.sql.Date;
+import java.sql.Time;
 import java.util.Optional;
 
 import javax.persistence.PersistenceException;
@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
@@ -154,8 +155,8 @@ public class RestaurantServiceTest {
         this.profileDto = new RestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
         this.profileDto.setLocation("on the other corner");
-        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
-        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+        this.profileDto.setMorningOpeningSchedule(this.restaurant1.getMorningOpeningSchedule());
+        this.profileDto.setAfternoonClosingSchedule(this.restaurant1.getAfternoonClosingSchedule());
 
         this.user = Mockito.mock(Principal.class);
 
@@ -194,8 +195,8 @@ public class RestaurantServiceTest {
         this.profileDto = new RestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
         this.profileDto.setLocation("on the other corner");
-        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
-        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+        this.profileDto.setMorningOpeningSchedule(this.restaurant1.getMorningOpeningSchedule());
+        this.profileDto.setAfternoonClosingSchedule(this.restaurant1.getAfternoonClosingSchedule());
 
         this.user = Mockito.mock(Principal.class);
 
@@ -230,8 +231,8 @@ public class RestaurantServiceTest {
         this.profileDto = new RestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
         this.profileDto.setLocation("on the other corner");
-        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
-        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+        this.profileDto.setMorningOpeningSchedule(this.restaurant1.getMorningOpeningSchedule());
+        this.profileDto.setAfternoonClosingSchedule(this.restaurant1.getAfternoonClosingSchedule());
 
         this.user = Mockito.mock(Principal.class);
 
@@ -298,6 +299,128 @@ public class RestaurantServiceTest {
     }
 
     @Test
+    void getOwnerRetrievesError() {
+        String email = "email@mail.com";
+        Mockito.when(this.userRepository.findByEmail(email)).thenReturn(
+            Optional.ofNullable(null)
+        );
+
+        Principal user = Mockito.mock(Principal.class);
+        Mockito.when(user.getName()).thenReturn(
+            email
+        );
+
+        assertThrows(
+            UsernameNotFoundException.class,
+            () -> this.service.deleteMeal(user, 1L)
+        );
+    }
+
+    @Test
+    void getRestaurantRetrievesUsernameNotFoundException() {
+        DAOUser user = new DAOUser();
+        user.setEmail("email");
+        user.setFullName("fullName");
+        user.setPassword("password");
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn(
+            user.getEmail()
+        );
+
+        Mockito.when(
+            this.userRepository.findByEmail(user.getEmail())
+        ).thenReturn(
+            Optional.of(user)
+        );
+
+        Mockito.when(
+            this.restaurantRepository.findByOwner(user)
+        ).thenReturn(Optional.ofNullable(null));
+
+        assertThrows(
+            UsernameNotFoundException.class,
+            () -> this.service.getRestaurantProfile(principal)
+        );
+
+    }
+
+    @Test
+    void getMealRetrievesResourceNotFoundException() {
+        DAOUser user = new DAOUser();
+        user.setEmail("email");
+        user.setFullName("fullName");
+        user.setPassword("password");
+
+        Long mealId = 10L;
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn(
+            user.getEmail()
+        );
+
+        Mockito.when(
+            this.userRepository.findByEmail(user.getEmail())
+        ).thenReturn(
+            Optional.of(user)
+        );
+
+        Mockito.when(
+            this.mealRepository.findById(mealId)
+        ).thenReturn(Optional.ofNullable(null));
+
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> this.service.deleteMeal(principal, mealId)
+        );
+    }
+
+    @Test
+    void getMealRetrievesResourceNotOwnedException() {
+        DAOUser user = new DAOUser();
+        user.setEmail("email");
+        user.setFullName("fullName");
+        user.setPassword("password");
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setLocation("location");
+        restaurant.setId(1L);
+        restaurant.setOwner(user);
+        user.setRestaurant(restaurant);
+
+        Restaurant otherRestaurant = new Restaurant();
+        otherRestaurant.setLocation("location");
+        otherRestaurant.setId(2L);
+
+        Meal meal = new Meal();
+        meal.setDescription("description");
+        meal.setMealType(MealTypeEnum.DESERT);
+        meal.setNutritionalInformation("nutritionalInformation");
+        meal.setId(10L);
+        meal.setRestaurant(otherRestaurant);
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn(
+            user.getEmail()
+        );
+
+        Mockito.when(
+            this.userRepository.findByEmail(user.getEmail())
+        ).thenReturn(
+            Optional.of(user)
+        );
+
+        Mockito.when(
+            this.mealRepository.findById(meal.getId())
+        ).thenReturn(Optional.ofNullable(meal));
+
+        assertThrows(
+            ResourceNotOwnedException.class,
+            () -> this.service.deleteMeal(principal, meal.getId())
+        );
+    }
+
+    @Test
     void getMealTestThrowResourceNotFoundException() {
         this.user = Mockito.mock(Principal.class);
 
@@ -354,8 +477,8 @@ public class RestaurantServiceTest {
         this.profileDto = new RestaurantProfileDto();
         this.profileDto.setFullName("new Full Name");
         this.profileDto.setLocation("on the other corner");
-        this.profileDto.setOpeningSchedule(this.restaurant1.getOpeningSchedule());
-        this.profileDto.setClosingSchedule(this.restaurant1.getClosingSchedule());
+        this.profileDto.setMorningOpeningSchedule(this.restaurant1.getMorningOpeningSchedule());
+        this.profileDto.setAfternoonClosingSchedule(this.restaurant1.getAfternoonClosingSchedule());
 
         this.user = Mockito.mock(Principal.class);
 
@@ -382,11 +505,11 @@ public class RestaurantServiceTest {
 
         this.restaurant1 = new Restaurant();
         this.restaurant1.setLocation("On the left corner");
-        this.restaurant1.setOpeningSchedule(
-            new Date(1638703519L)
+        this.restaurant1.setMorningOpeningSchedule(
+            Time.valueOf("09:30:00")
         );
-        this.restaurant1.setClosingSchedule(
-            new Date(1638703819L)
+        this.restaurant1.setAfternoonOpeningSchedule(
+            Time.valueOf("19:30:00")
         );
         this.restaurant1.setOwner(this.owner1);
 
@@ -399,11 +522,11 @@ public class RestaurantServiceTest {
 
         this.restaurant2 = new Restaurant();
         this.restaurant2.setLocation("On the right corner");
-        this.restaurant2.setOpeningSchedule(
-            new Date(1638703519L)
+        this.restaurant2.setMorningOpeningSchedule(
+            Time.valueOf("09:30:00")
         );
-        this.restaurant2.setClosingSchedule(
-            new Date(1638703819L)
+        this.restaurant2.setAfternoonOpeningSchedule(
+            Time.valueOf("19:30:00")
         );
         this.restaurant2.setOwner(this.owner2);
 

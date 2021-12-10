@@ -13,6 +13,7 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
+import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
@@ -57,8 +58,10 @@ public class RestaurantService {
 
         restaurantDto.setFullName(owner.getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
-        restaurantDto.setClosingSchedule(restaurant.getClosingSchedule());
-        restaurantDto.setOpeningSchedule(restaurant.getOpeningSchedule());
+        restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
+        restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
+        restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
+        restaurantDto.setAfternoonClosingSchedule(restaurant.getAfternoonClosingSchedule());
         
         return ResponseEntity.ok(restaurantDto);
     }
@@ -76,8 +79,10 @@ public class RestaurantService {
         owner.setFullName(profileDto.getFullName());
 
         restaurant.setLocation(profileDto.getLocation());
-        restaurant.setOpeningSchedule(profileDto.getOpeningSchedule());
-        restaurant.setClosingSchedule(profileDto.getClosingSchedule());
+        restaurant.setMorningOpeningSchedule(profileDto.getMorningOpeningSchedule());
+        restaurant.setMorningClosingSchedule(profileDto.getMorningClosingSchedule());
+        restaurant.setAfternoonOpeningSchedule(profileDto.getAfternoonOpeningSchedule());
+        restaurant.setAfternoonClosingSchedule(profileDto.getAfternoonClosingSchedule());
 
         ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
@@ -228,26 +233,47 @@ public class RestaurantService {
         );
     }
 
-    private Menu retrieveMenu(DAOUser user, Long menuId) {
-        Menu menu = this.menuRepository.findById(menuId).orElseThrow(
-            () -> new ResourceNotFoundException("No menu was found with id: " + menuId)
-        );
+    public ResponseEntity<List<GetPutMealDto>> getMeals(Principal user) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+        RestaurantParser parser = new RestaurantParser();
 
-        if (!menu.getRestaurant().equals(user.getRestaurant()))
-            throw new ResourceNotOwnedException("Menu is not owned by user with email: " + user.getEmail());
-
-        return menu;
+        return ResponseEntity.ok(daoUser.getRestaurant().getMeals().stream().map(
+            parser::parseMealtoMealDto
+        ).collect(Collectors.toList()));
     }
 
-    private Meal retrieveMeal(DAOUser user, Long mealId) {
-        Meal meal = this.mealRepository.findById(mealId).orElseThrow(
-            () -> new ResourceNotFoundException("Meal not found with id: " + mealId)
+    public ResponseEntity<GetPutMealDto> updateMeal(
+        Principal user,
+        Long mealId,
+        AddMealDto mealDto
+    ) {
+
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Meal meal = this.retrieveMeal(daoUser, mealId);
+
+        meal.setMealType(mealDto.getMealType());
+        meal.setDescription(mealDto.getDescription());
+        meal.setNutritionalInformation(mealDto.getNutritionalInformation());
+
+        meal = this.mealRepository.save(meal);
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseMealtoMealDto(meal)
         );
+    }
 
-        if (!meal.getRestaurant().equals(user.getRestaurant()))
-            throw new ResourceNotOwnedException("Meal is not owned by user with email: " + user.getEmail());
+    public ResponseEntity<String> deleteMeal(
+        Principal user,
+        Long mealId
+    ) {
 
-        return meal;
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Meal meal = this.retrieveMeal(daoUser, mealId);
+        this.mealRepository.delete(meal);
+
+        return ResponseEntity.ok("");
     }
 
     private DAOUser retrieveRestaurantOwner(String email) {
@@ -262,6 +288,28 @@ public class RestaurantService {
         ).orElseThrow(
             () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
         );
+    }
+
+    private Meal retrieveMeal(DAOUser owner, Long mealId) {
+        Meal meal = this.mealRepository.findById(mealId).orElseThrow(
+            () -> new ResourceNotFoundException("No Meal matches the id: " + mealId)
+        );
+        
+        if (!owner.getRestaurant().equals(meal.getRestaurant()))
+            throw new ResourceNotOwnedException("No meal matches the id [" + mealId + "] for user: " + owner.getEmail());
+
+        return meal;
+    }
+
+    private Menu retrieveMenu(DAOUser user, Long menuId) {
+        Menu menu = this.menuRepository.findById(menuId).orElseThrow(
+            () -> new ResourceNotFoundException("No menu was found with id: " + menuId)
+        );
+
+        if (!menu.getRestaurant().equals(user.getRestaurant()))
+            throw new ResourceNotOwnedException("Menu is not owned by user with email: " + user.getEmail());
+
+        return menu;
     }
 
     private ResponseEntity<ResponseInterfaceDto> saveOwner(DAOUser owner) {
