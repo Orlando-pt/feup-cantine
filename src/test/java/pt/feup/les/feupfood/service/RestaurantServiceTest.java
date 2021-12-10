@@ -329,20 +329,95 @@ public class RestaurantServiceTest {
         );
 
         Mockito.when(
-            this.userRepository.findByEmail(Mockito.any())
+            this.userRepository.findByEmail(user.getEmail())
         ).thenReturn(
             Optional.of(user)
         );
 
         Mockito.when(
             this.restaurantRepository.findByOwner(user)
-        ).thenReturn(null);
+        ).thenReturn(Optional.ofNullable(null));
 
         assertThrows(
             UsernameNotFoundException.class,
             () -> this.service.getRestaurantProfile(principal)
         );
 
+    }
+
+    @Test
+    void getMealRetrievesResourceNotFoundException() {
+        DAOUser user = new DAOUser();
+        user.setEmail("email");
+        user.setFullName("fullName");
+        user.setPassword("password");
+
+        Long mealId = 10L;
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn(
+            user.getEmail()
+        );
+
+        Mockito.when(
+            this.userRepository.findByEmail(user.getEmail())
+        ).thenReturn(
+            Optional.of(user)
+        );
+
+        Mockito.when(
+            this.mealRepository.findById(mealId)
+        ).thenReturn(Optional.ofNullable(null));
+
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> this.service.deleteMeal(principal, mealId)
+        );
+    }
+
+    @Test
+    void getMealRetrievesResourceNotOwnedException() {
+        DAOUser user = new DAOUser();
+        user.setEmail("email");
+        user.setFullName("fullName");
+        user.setPassword("password");
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setLocation("location");
+        restaurant.setId(1L);
+        restaurant.setOwner(user);
+        user.setRestaurant(restaurant);
+
+        Restaurant otherRestaurant = new Restaurant();
+        otherRestaurant.setLocation("location");
+        otherRestaurant.setId(2L);
+
+        Meal meal = new Meal();
+        meal.setDescription("description");
+        meal.setMealType(MealTypeEnum.DESERT);
+        meal.setNutritionalInformation("nutritionalInformation");
+        meal.setId(10L);
+        meal.setRestaurant(otherRestaurant);
+
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn(
+            user.getEmail()
+        );
+
+        Mockito.when(
+            this.userRepository.findByEmail(user.getEmail())
+        ).thenReturn(
+            Optional.of(user)
+        );
+
+        Mockito.when(
+            this.mealRepository.findById(meal.getId())
+        ).thenReturn(Optional.ofNullable(meal));
+
+        assertThrows(
+            ResourceNotOwnedException.class,
+            () -> this.service.deleteMeal(principal, meal.getId())
+        );
     }
 
     @Test

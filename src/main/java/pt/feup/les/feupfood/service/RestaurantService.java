@@ -192,6 +192,8 @@ public class RestaurantService {
             () -> new ResourceNotFoundException("No Meal matches the id: " + mealId)
         );
         
+        System.out.println(owner.getRestaurant().equals(meal.getRestaurant()));
+
         if (!owner.getRestaurant().equals(meal.getRestaurant()))
             throw new ResourceNotOwnedException("No meal matches the id [" + mealId + "] for user: " + owner.getEmail());
 
