@@ -26,7 +26,7 @@ import pt.feup.les.feupfood.util.RestaurantParser;
 
 @Service
 public class RestaurantService {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -37,7 +37,7 @@ public class RestaurantService {
     private MealRepository mealRepository;
 
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
-        Principal user
+            Principal user
     ) {
         RestaurantProfileDto restaurantDto = new RestaurantProfileDto();
 
@@ -55,13 +55,13 @@ public class RestaurantService {
     }
 
     public ResponseEntity<ResponseInterfaceDto> updateRestaurantProfile(
-        Principal user,
-        RestaurantProfileDto profileDto
+            Principal user,
+            RestaurantProfileDto profileDto
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
         Restaurant restaurant = this.retrieveRestaurant(
-            owner
+                owner
         );
 
         owner.setFullName(profileDto.getFullName());
@@ -75,7 +75,7 @@ public class RestaurantService {
         ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
             return saveOwner;
-        
+
         ResponseEntity<ResponseInterfaceDto> saveRestaurant = this.saveRestaurant(restaurant);
         if (saveRestaurant != null)
             return saveRestaurant;
@@ -175,15 +175,15 @@ public class RestaurantService {
 
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
-            () -> new UsernameNotFoundException("User not found with email: " + email)
+                () -> new UsernameNotFoundException("User not found with email: " + email)
         );
     }
 
     private Restaurant retrieveRestaurant(DAOUser owner) {
         return this.restaurantRepository.findByOwner(
-            owner
+                owner
         ).orElseThrow(
-            () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
+                () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
         );
     }
 

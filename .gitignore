@@ -35,6 +35,8 @@ target/
 .springBeans
 .sts4-cache
 
+.DS_STORE
+
 # Generated files
 .idea/**/contentModel.xml
 

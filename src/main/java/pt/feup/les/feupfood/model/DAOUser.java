@@ -1,10 +1,14 @@
 package pt.feup.les.feupfood.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -12,11 +16,11 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(exclude = "reviews")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = DAOUser.class)
 @Entity
 @Table(name = "users")
@@ -40,9 +44,22 @@ public class DAOUser {
 
     private Boolean terms;
 
+    private String biography;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy="client")
+    private List <Review> reviews;
+
     // in the case user is a restaurant
     @ToString.Exclude
     @OneToOne(mappedBy = "owner")
     private Restaurant restaurant;
 
+    public DAOUser() {
+        this.reviews = new ArrayList<>();
+    }
+
+    public boolean addReview(Review review) {
+        return this.reviews.add(review);
+    }
 }
