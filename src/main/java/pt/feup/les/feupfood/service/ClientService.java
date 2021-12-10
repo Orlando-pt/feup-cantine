@@ -29,6 +29,32 @@ public class ClientService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    public ResponseEntity<UpdateProfileDto> getProfile(
+        Principal user
+    ) {
+        return ResponseEntity.ok(
+            new ClientParser().parseUserProfile(
+                this.retrieveUser(user.getName())
+            )
+        );
+    }
+
+    public ResponseEntity<UpdateProfileDto> updateProfile(
+        Principal user,
+        UpdateProfileDto profileDto
+    ) {
+        DAOUser daoUser = this.retrieveUser(user.getName());
+
+        daoUser.setFullName(profileDto.getFullName());
+        daoUser.setBiography(profileDto.getBiography());
+
+        daoUser = this.userRepository.save(daoUser);
+        
+        return ResponseEntity.ok(
+            new ClientParser().parseUserProfile(daoUser)
+        );
+    }
+
     private DAOUser retrieveUser(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
