@@ -21,6 +21,7 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
+import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -109,8 +110,15 @@ public class RestaurantController {
 	}
 
 	// menu endpoints
+	@GetMapping("menu")
+	public ResponseEntity<List<GetPutMenuDto>> getMenus(
+		Principal user
+	) {
+		return this.service.getMenus(user);
+	}
+
 	@GetMapping("menu/{id}")
-	public ResponseEntity<ResponseInterfaceDto> getMenu(
+	public ResponseEntity<GetPutMenuDto> getMenu(
 		Principal user,
 		@PathVariable Long id
 	) {
@@ -118,11 +126,28 @@ public class RestaurantController {
 	}
 
 	@PostMapping("menu")
-	public ResponseEntity<ResponseInterfaceDto> addMenu(
+	public ResponseEntity<GetPutMenuDto> addMenu(
 		Principal user,
 		@RequestBody AddMenuDto menuDto
 	) {
 		return this.service.addMenu(user, menuDto);
+	}
+
+	@PutMapping("menu/{id}")
+	public ResponseEntity<GetPutMenuDto> updateMenu(
+		Principal user,
+		@RequestBody AddMenuDto menuDto,
+		@PathVariable Long id
+	) {
+		return this.service.updateMenu(user, menuDto, id);
+	}
+
+	@DeleteMapping("menu/{id}")
+	public ResponseEntity<String> deleteMenu(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.deleteMenu(user, id);
 	}
 
 	// assignment endpoints

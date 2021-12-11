@@ -263,6 +263,13 @@ public class RestaurantController_RestTemplateIT {
     void addAndGetMenuTest() {
         var headers = this.getStandardHeaders();
 
+        var currentMenus = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetPutMealDto[].class
+        ).getBody().length;
+
         var mealDto = new AddMealDto();
         mealDto.setDescription("Spagheti with atum");
         mealDto.setMealType(MealTypeEnum.FISH);
@@ -287,12 +294,22 @@ public class RestaurantController_RestTemplateIT {
             GetPutMealDto.class
         );
 
+        var mealDto3 = new AddMealDto();
+        mealDto3.setDescription("Chocolat mousse");
+        mealDto3.setMealType(MealTypeEnum.DESERT);
+        mealDto3.setNutritionalInformation("Mhummm mhumm");
+
+        var meal3 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto3, headers),
+            GetPutMealDto.class
+        );
+
         var menuDto = new AddMenuDto();
-        menuDto.setAdditionalInformaiton("something else");
-        menuDto.setDietMealId(meal1.getBody().getId());
+        menuDto.setAdditionalInformation("something else");
         menuDto.setEndPrice(10.0);
-        menuDto.setFishMealId(meal2.getBody().getId());
-        menuDto.setMeatMealId(meal1.getBody().getId());
+        menuDto.setFishMealId(meal1.getBody().getId());
         menuDto.setName("Monday morning for this week");
         menuDto.setStartPrice(4.5);
         menuDto.setVegetarianMealId(meal2.getBody().getId());
@@ -322,10 +339,87 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             getResponse
         ).extracting(ResponseEntity::getBody)
-            .extracting(GetPutMenuDto::getName)
-            .isEqualTo(menuDto.getName()
-            );
+            .extracting(GetPutMenuDto::getDesertMeal)
+            .isNull();
 
+        // check that there is one more menu
+        var getMenus = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetPutMenuDto[].class
+        );
+
+        Assertions.assertThat(
+            getMenus.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getMenus.getBody()
+        ).hasSize(currentMenus + 1).contains(response.getBody());
+
+        // update menu with desert and change one of the previous ones
+        var newFishMeal = new AddMealDto();
+        newFishMeal.setDescription("Sardine with potatoes");
+        newFishMeal.setMealType(MealTypeEnum.FISH);
+        newFishMeal.setNutritionalInformation("Good for your health");
+
+        var newMeal = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(newFishMeal, headers),
+            GetPutMealDto.class
+        );
+
+        menuDto.setFishMealId(newMeal.getBody().getId());
+        menuDto.setDesertMealId(meal3.getBody().getId());
+
+        var updateResponse = this.restTemplate.exchange(
+            "/api/restaurant/menu/" + response.getBody().getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(menuDto, headers),
+            GetPutMenuDto.class
+        );
+        
+        Assertions.assertThat(
+            updateResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            updateResponse.getBody()
+        ).extracting(GetPutMenuDto::getFishMeal).isEqualTo(newMeal.getBody());
+
+        Assertions.assertThat(
+            updateResponse.getBody()
+        ).extracting(GetPutMenuDto::getDesertMeal).isEqualTo(meal3.getBody());
+
+        // delete menu
+
+        var deleteResponse = this.restTemplate.exchange(
+            "/api/restaurant/menu/" + updateResponse.getBody().getId(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            deleteResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var menusAfterDelete = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetPutMenuDto[].class
+        );
+
+        Assertions.assertThat(
+            menusAfterDelete.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            menusAfterDelete.getBody()
+        ).hasSize(currentMenus).doesNotContain(updateResponse.getBody());
     }
 
     @Test
@@ -357,7 +451,7 @@ public class RestaurantController_RestTemplateIT {
         );
 
         var menuDto = new AddMenuDto();
-        menuDto.setAdditionalInformaiton("something else");
+        menuDto.setAdditionalInformation("something else");
         menuDto.setDietMealId(meal1.getBody().getId());
         menuDto.setEndPrice(10.0);
         menuDto.setFishMealId(meal2.getBody().getId());

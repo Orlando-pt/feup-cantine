@@ -1,6 +1,8 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,7 @@ import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
+import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
@@ -142,7 +145,8 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<ResponseInterfaceDto> addMenu(
+    // menu methods
+    public ResponseEntity<GetPutMenuDto> addMenu(
         Principal user,
         AddMenuDto menuDto
     ) {
@@ -150,35 +154,49 @@ public class RestaurantService {
 
         Menu menu = new Menu();
         menu.setName(menuDto.getName());
-        menu.setAdditionalInformation(menuDto.getAdditionalInformaiton());
+        menu.setAdditionalInformation(menuDto.getAdditionalInformation());
         menu.setStartPrice(menuDto.getStartPrice());
         menu.setEndPrice(menuDto.getEndPrice());
         menu.setRestaurant(daoUser.getRestaurant());
 
         // add meals referent to the menu
-        Meal meal = this.retrieveMeal(daoUser, menuDto.getMeatMealId());
-        menu.addMeal(meal);
-        meal.addMenu(menu);
-        this.mealRepository.save(meal);
-        this.menuRepository.save(menu);
+        // TODO verify if that are of the correct mealtype
+        Meal meal = null;
+        if (menuDto.getMeatMealId() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getMeatMealId());
+            menu.addMeal(meal);
+            meal.addMenu(menu);
+            this.mealRepository.save(meal);
+        }
 
-        meal = this.retrieveMeal(daoUser, menuDto.getFishMealId());
-        menu.addMeal(meal);
-        meal.addMenu(menu);
-        this.mealRepository.save(meal);
-        this.menuRepository.save(menu);
+        if (menuDto.getFishMealId() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getFishMealId());
+            menu.addMeal(meal);
+            meal.addMenu(menu);
+            this.mealRepository.save(meal);
+        }
 
-        meal = this.retrieveMeal(daoUser, menuDto.getDietMealId());
-        menu.addMeal(meal);
-        meal.addMenu(menu);
-        this.mealRepository.save(meal);
-        this.menuRepository.save(menu);
+        if (menuDto.getDietMealId() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getDietMealId());
+            menu.addMeal(meal);
+            meal.addMenu(menu);
+            this.mealRepository.save(meal);
+        }
         
-        meal = this.retrieveMeal(daoUser, menuDto.getVegetarianMealId());
-        menu.addMeal(meal);
-        meal.addMenu(menu);
-        this.mealRepository.save(meal);
+        if (menuDto.getVegetarianMealId() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getVegetarianMealId());
+            menu.addMeal(meal);
+            meal.addMenu(menu);
+            this.mealRepository.save(meal);
+        }
         
+        if (menuDto.getDesertMealId() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getDesertMealId());
+            menu.addMeal(meal);
+            meal.addMenu(menu);
+            this.mealRepository.save(meal);
+        }
+
         return ResponseEntity.ok(
             new RestaurantParser().parseMenutoMenuDto(
                 this.menuRepository.save(menu)
@@ -186,7 +204,20 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<ResponseInterfaceDto> getMenu(
+    public ResponseEntity<List<GetPutMenuDto>> getMenus(
+        Principal user
+    ) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+        RestaurantParser parser = new RestaurantParser();
+
+        return ResponseEntity.ok(
+            daoUser.getRestaurant().getMenus().stream().map(
+                parser::parseMenutoMenuDto
+            ).collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<GetPutMenuDto> getMenu(
         Principal user,
         Long menuId
     ) {
@@ -198,6 +229,84 @@ public class RestaurantService {
         );
     }
 
+    public ResponseEntity<GetPutMenuDto> updateMenu(
+        Principal user,
+        AddMenuDto menuDto,
+        Long menuId
+    ) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Menu menu = this.retrieveMenu(daoUser, menuId);
+
+        // check if all meals remain the same
+        List<Long> mealIds = new ArrayList<>();
+        if (menuDto.getDietMealId() != null) mealIds.add(menuDto.getDietMealId());
+        if (menuDto.getMeatMealId() != null) mealIds.add(menuDto.getMeatMealId());
+        if (menuDto.getFishMealId() != null) mealIds.add(menuDto.getFishMealId());
+        if (menuDto.getVegetarianMealId() != null) mealIds.add(menuDto.getVegetarianMealId());
+        if (menuDto.getDesertMealId() != null) mealIds.add(menuDto.getDesertMealId());
+
+        List<Long> currentMealIds = menu.getMeals().stream().map(
+            Meal::getId
+        ).collect(Collectors.toList());
+
+        if (!currentMealIds.containsAll(mealIds)) {
+            // if the lists are different
+            // that means we need to update the list
+
+            List<Meal> meals = menu.getMeals();
+            Meal meal = null;
+            // delete meals
+            for (Long id : currentMealIds) {
+                if (!mealIds.contains(id)) {
+                    // update dto does not contain this id
+                    meal = meals.get(currentMealIds.indexOf(id));
+                    meal.removeMenu(menu);
+
+                    menu.removeMeal(meal);
+                    this.mealRepository.save(meal);
+                }
+            }
+
+            // add meals
+            for (Long id : mealIds) {
+                if (!currentMealIds.contains(id)) {
+                    // if the returned menu does not contained the meal, than we need to add it
+                    meal = this.retrieveMeal(daoUser, id);
+                    meal.addMenu(menu);
+
+                    menu.addMeal(meal);
+                    this.mealRepository.save(meal);
+                }
+            }
+        }
+
+        menu.setAdditionalInformation(menuDto.getAdditionalInformation());
+        menu.setEndPrice(menuDto.getEndPrice());
+        menu.setName(menuDto.getName());
+        menu.setStartPrice(menu.getStartPrice());
+        
+        
+        return ResponseEntity.ok(
+            new RestaurantParser().parseMenutoMenuDto(
+                this.menuRepository.save(menu)
+            )
+        );
+    }
+
+    public ResponseEntity<String> deleteMenu(
+        Principal user,
+        Long menuId
+    ) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Menu menu = this.retrieveMenu(daoUser, menuId);
+        this.menuRepository.delete(menu);
+        
+        return ResponseEntity.ok("");
+    }
+
+    // assignment methods
     public ResponseEntity<ResponseInterfaceDto> addAssignment(
         Principal user,
         AddAssignmentDto assignmentDto
@@ -276,6 +385,7 @@ public class RestaurantService {
         return ResponseEntity.ok("");
     }
 
+    // auxiliar methods
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
             () -> new UsernameNotFoundException("User not found with email: " + email)

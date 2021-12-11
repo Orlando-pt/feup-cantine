@@ -59,4 +59,8 @@ public class Meal {
     public boolean addMenu(Menu menu) {
         return this.menus.add(menu);
     }
+
+    public boolean removeMenu(Menu menu) {
+        return this.menus.remove(menu);
+    }
 }
