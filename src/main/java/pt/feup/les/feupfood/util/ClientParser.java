@@ -19,6 +19,7 @@ public class ClientParser {
     public GetRestaurantDto parseRestaurantToRestaurantDto(Restaurant restaurant) {
         var getRestaurantDto = new GetRestaurantDto();
         getRestaurantDto.setId(restaurant.getId());
+        getRestaurantDto.setFullName(restaurant.getOwner().getFullName());
         getRestaurantDto.setLocation(restaurant.getLocation());
         getRestaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         getRestaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());

@@ -9,6 +9,7 @@ import java.sql.Time;
 @NoArgsConstructor
 public class GetRestaurantDto implements ResponseInterfaceDto{
     private Long id;
+    private String fullName;
     private String location;
     private Time morningOpeningSchedule;
     private Time morningClosingSchedule;
