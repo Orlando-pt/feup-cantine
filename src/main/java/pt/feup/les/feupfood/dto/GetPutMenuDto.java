@@ -9,7 +9,7 @@ public class GetPutMenuDto implements ResponseInterfaceDto{
 
     private Long id;
     private String name;
-    private String additionalInformaiton;
+    private String additionalInformation;
     private Double startPrice;
     private Double endPrice;
     private GetPutMealDto meatMeal;

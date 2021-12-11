@@ -35,7 +35,7 @@ public class RestaurantParser {
 
         menuDto.setId(menu.getId());        
         menuDto.setName(menu.getName());
-        menuDto.setAdditionalInformaiton(menu.getAdditionalInformation());
+        menuDto.setAdditionalInformation(menu.getAdditionalInformation());
         menuDto.setStartPrice(menu.getStartPrice());
         menuDto.setEndPrice(menu.getEndPrice());
         
