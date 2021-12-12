@@ -79,6 +79,10 @@ public class Restaurant {
         return this.assignments.add(assignment);
     }
 
+    public boolean removeAssignment(AssignMenu assignment) {
+        return this.assignments.remove(assignment);
+    }
+
     public boolean addMenu(Menu menu) {
         return this.menus.add(menu);
     }

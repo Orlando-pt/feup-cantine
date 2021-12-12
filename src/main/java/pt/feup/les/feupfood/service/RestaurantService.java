@@ -2,7 +2,6 @@ package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +14,7 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -51,6 +51,7 @@ public class RestaurantService {
     @Autowired
     private AssignMenuRepository assignMenuRepository;
 
+    // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
         Principal user
     ) {
@@ -98,6 +99,7 @@ public class RestaurantService {
         return ResponseEntity.ok(profileDto);
     }
 
+    // meal methods
     public ResponseEntity<ResponseInterfaceDto> addMeal(
         Principal user,
         AddMealDto mealDto
@@ -143,6 +145,49 @@ public class RestaurantService {
         return ResponseEntity.ok(
             new RestaurantParser().parseMealtoMealDto(meal)
         );
+    }
+
+    public ResponseEntity<List<GetPutMealDto>> getMeals(Principal user) {
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+        RestaurantParser parser = new RestaurantParser();
+
+        return ResponseEntity.ok(daoUser.getRestaurant().getMeals().stream().map(
+            parser::parseMealtoMealDto
+        ).collect(Collectors.toList()));
+    }
+
+    public ResponseEntity<GetPutMealDto> updateMeal(
+        Principal user,
+        Long mealId,
+        AddMealDto mealDto
+    ) {
+
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Meal meal = this.retrieveMeal(daoUser, mealId);
+
+        meal.setMealType(mealDto.getMealType());
+        meal.setDescription(mealDto.getDescription());
+        meal.setNutritionalInformation(mealDto.getNutritionalInformation());
+
+        meal = this.mealRepository.save(meal);
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseMealtoMealDto(meal)
+        );
+    }
+
+    public ResponseEntity<String> deleteMeal(
+        Principal user,
+        Long mealId
+    ) {
+
+        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
+
+        Meal meal = this.retrieveMeal(daoUser, mealId);
+        this.mealRepository.delete(meal);
+
+        return ResponseEntity.ok("");
     }
 
     // menu methods
@@ -348,45 +393,51 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<List<GetPutMealDto>> getMeals(Principal user) {
-        DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
-        RestaurantParser parser = new RestaurantParser();
-
-        return ResponseEntity.ok(daoUser.getRestaurant().getMeals().stream().map(
-            parser::parseMealtoMealDto
-        ).collect(Collectors.toList()));
-    }
-
-    public ResponseEntity<GetPutMealDto> updateMeal(
+    public ResponseEntity<GetAssignmentDto> updateAssignment(
         Principal user,
-        Long mealId,
-        AddMealDto mealDto
+        AddAssignmentDto assignmentDto,
+        Long assignmentId
     ) {
-
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
 
-        Meal meal = this.retrieveMeal(daoUser, mealId);
+        AssignMenu assignment = this.retrieveAssignment(daoUser, assignmentId);
 
-        meal.setMealType(mealDto.getMealType());
-        meal.setDescription(mealDto.getDescription());
-        meal.setNutritionalInformation(mealDto.getNutritionalInformation());
+        assignment.setDate(assignmentDto.getDate());
+        assignment.setSchedule(assignmentDto.getSchedule());
 
-        meal = this.mealRepository.save(meal);
+        if (assignmentDto.getMenu() != null && !assignmentDto.getMenu().equals(assignment.getMenu().getId())) {
+            Menu menu = assignment.getMenu();
+            menu.removeAssignment(assignment);
+            this.menuRepository.save(menu);
+
+            menu = this.retrieveMenu(daoUser, assignmentDto.getMenu());
+            assignment.setMenu(menu);
+            menu.addAssignment(assignment);
+            this.menuRepository.save(menu);
+        }
 
         return ResponseEntity.ok(
-            new RestaurantParser().parseMealtoMealDto(meal)
+            new RestaurantParser().parseAssignmentToAssignmentDto(
+                this.assignMenuRepository.save(assignment)
+            )
         );
     }
 
-    public ResponseEntity<String> deleteMeal(
+    public ResponseEntity<String> deleteAssignment(
         Principal user,
-        Long mealId
+        Long assignmentId
     ) {
-
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
 
-        Meal meal = this.retrieveMeal(daoUser, mealId);
-        this.mealRepository.delete(meal);
+        AssignMenu assignment = this.retrieveAssignment(daoUser, assignmentId);
+
+        assignment.getMenu().removeAssignment(assignment);
+        this.menuRepository.save(assignment.getMenu());
+
+        assignment.getRestaurant().removeAssignment(assignment);
+        this.restaurantRepository.save(assignment.getRestaurant());
+
+        this.assignMenuRepository.delete(assignment);
 
         return ResponseEntity.ok("");
     }
@@ -448,4 +499,16 @@ public class RestaurantService {
         return null;
     }
 
+    private AssignMenu retrieveAssignment(DAOUser owner, Long assignmentId) {
+        AssignMenu assignment = this.assignMenuRepository.findById(
+            assignmentId
+        ).orElseThrow(
+            () -> new ResourceNotFoundException("No assignment found with id: " + assignmentId)
+        );
+
+        if (!assignment.getRestaurant().equals(owner.getRestaurant()))
+            throw new ResourceNotOwnedException("Assignment not owned.");
+
+        return assignment;
+    }
 }

@@ -65,4 +65,8 @@ public class Menu {
         return this.assignments.add(assignment);
     }
 
+    public boolean removeAssignment(AssignMenu assignment) {
+        return this.assignments.remove(assignment);
+    }
+
 }

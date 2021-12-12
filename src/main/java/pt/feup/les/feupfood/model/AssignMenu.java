@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.Date;
 
 @Data
-@EqualsAndHashCode(exclude = {"restaurant"})
+@EqualsAndHashCode(exclude = {"restaurant", "menu"})
 @NoArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = AssignMenu.class)
 @Entity

@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
@@ -166,6 +167,23 @@ public class RestaurantController {
 		@RequestBody AddAssignmentDto assignmentDto
 	) {
 		return this.service.addAssignment(user, assignmentDto);
+	}
+
+	@PutMapping("assignment/{id}")
+	public ResponseEntity<GetAssignmentDto> updateAssignment(
+		Principal user,
+		@RequestBody AddAssignmentDto assignmentDto,
+		@PathVariable Long id
+	) {
+		return this.service.updateAssignment(user, assignmentDto, id);
+	}
+
+	@DeleteMapping("assignment/{id}")
+	public ResponseEntity<String> deleteAssignment(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.deleteAssignment(user, id);
 	}
 
 }
