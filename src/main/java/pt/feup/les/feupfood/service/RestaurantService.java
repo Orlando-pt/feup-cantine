@@ -284,7 +284,7 @@ public class RestaurantService {
         menu.setAdditionalInformation(menuDto.getAdditionalInformation());
         menu.setEndPrice(menuDto.getEndPrice());
         menu.setName(menuDto.getName());
-        menu.setStartPrice(menu.getStartPrice());
+        menu.setStartPrice(menuDto.getStartPrice());
         
         
         return ResponseEntity.ok(
