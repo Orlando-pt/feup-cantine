@@ -12,6 +12,6 @@ public class AddAssignmentDto implements ResponseInterfaceDto{
 
     private Date date;
     private ScheduleEnum schedule;
-    private Long menuId;
+    private Long menu;
     
 }

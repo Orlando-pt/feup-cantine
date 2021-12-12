@@ -472,7 +472,7 @@ public class RestaurantController_RestTemplateIT {
             new Date(1639094400000L)
         );
 
-        assignemntDto.setMenuId(response.getBody().getId());
+        assignemntDto.setMenu(response.getBody().getId());
         assignemntDto.setSchedule(ScheduleEnum.LUNCH);
 
         var createAssignment = this.restTemplate.exchange(

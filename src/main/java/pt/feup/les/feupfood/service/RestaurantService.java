@@ -325,7 +325,7 @@ public class RestaurantService {
         assignment.setRestaurant(owner.getRestaurant());
 
         assignment.setMenu(
-            this.retrieveMenu(owner, assignmentDto.getMenuId())
+            this.retrieveMenu(owner, assignmentDto.getMenu())
         );
 
         return ResponseEntity.ok(
