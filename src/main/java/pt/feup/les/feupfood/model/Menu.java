@@ -32,7 +32,7 @@ public class Menu {
 
     private Double endPrice;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "menu_meals",
         joinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name ="menu_id", referencedColumnName = "id")
