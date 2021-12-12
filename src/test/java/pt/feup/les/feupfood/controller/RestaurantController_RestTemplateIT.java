@@ -426,6 +426,13 @@ public class RestaurantController_RestTemplateIT {
     void addAndGetAssignmentTest() {
         var headers = this.getStandardHeaders();
 
+        var currentAssignemnts = this.restTemplate.exchange(
+            "/api/restaurant/assignment",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto[].class
+        ).getBody().length;
+
         var mealDto = new AddMealDto();
         mealDto.setDescription("Spagheti with atum");
         mealDto.setMealType(MealTypeEnum.FISH);
@@ -486,6 +493,24 @@ public class RestaurantController_RestTemplateIT {
             createAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
+        // update assignment
+        assignemntDto.setSchedule(ScheduleEnum.DINNER);
+        var updateAssignment = this.restTemplate.exchange(
+            "/api/restaurant/assignment/" + createAssignment.getBody().getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(assignemntDto, headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            updateAssignment.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            updateAssignment.getBody()
+        ).extracting(GetAssignmentDto::getSchedule).isEqualTo(ScheduleEnum.DINNER);
+
+        // get assignments
         var getAssignments = this.restTemplate.exchange(
             "/api/restaurant/assignment",
             HttpMethod.GET,
@@ -499,7 +524,19 @@ public class RestaurantController_RestTemplateIT {
 
         Assertions.assertThat(
             getAssignments.getBody()
-        ).hasSize(1);
+        ).hasSize(currentAssignemnts + 1);
+
+        // delete assignment
+        var deleteAssignment = this.restTemplate.exchange(
+            "/api/restaurant/assignment/" + updateAssignment.getBody().getId(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            deleteAssignment.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
     }
 
     private void registerRestaurant() {

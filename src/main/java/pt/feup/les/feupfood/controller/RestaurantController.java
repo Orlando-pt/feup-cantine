@@ -159,7 +159,6 @@ public class RestaurantController {
 	) {
 		return this.service.getAssignments(user);
 	}
-	// TODO assignments for next 7 days
 
 	@PostMapping("assignment")
 	public ResponseEntity<ResponseInterfaceDto> addAssignment(
