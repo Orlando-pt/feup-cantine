@@ -309,10 +309,10 @@ public class RestaurantController_RestTemplateIT {
         var menuDto = new AddMenuDto();
         menuDto.setAdditionalInformation("something else");
         menuDto.setEndPrice(10.0);
-        menuDto.setFishMealId(meal1.getBody().getId());
+        menuDto.setFishMeal(meal1.getBody().getId());
         menuDto.setName("Monday morning for this week");
         menuDto.setStartPrice(4.5);
-        menuDto.setVegetarianMealId(meal2.getBody().getId());
+        menuDto.setVegetarianMeal(meal2.getBody().getId());
         
         var response = this.restTemplate.exchange(
             "/api/restaurant/menu",
@@ -371,8 +371,8 @@ public class RestaurantController_RestTemplateIT {
             GetPutMealDto.class
         );
 
-        menuDto.setFishMealId(newMeal.getBody().getId());
-        menuDto.setDesertMealId(meal3.getBody().getId());
+        menuDto.setFishMeal(newMeal.getBody().getId());
+        menuDto.setDesertMeal(meal3.getBody().getId());
 
         var updateResponse = this.restTemplate.exchange(
             "/api/restaurant/menu/" + response.getBody().getId(),
@@ -452,13 +452,13 @@ public class RestaurantController_RestTemplateIT {
 
         var menuDto = new AddMenuDto();
         menuDto.setAdditionalInformation("something else");
-        menuDto.setDietMealId(meal1.getBody().getId());
+        menuDto.setDietMeal(meal1.getBody().getId());
         menuDto.setEndPrice(10.0);
-        menuDto.setFishMealId(meal2.getBody().getId());
-        menuDto.setMeatMealId(meal1.getBody().getId());
+        menuDto.setFishMeal(meal2.getBody().getId());
+        menuDto.setMeatMeal(meal1.getBody().getId());
         menuDto.setName("Monday morning for this week");
         menuDto.setStartPrice(4.5);
-        menuDto.setVegetarianMealId(meal2.getBody().getId());
+        menuDto.setVegetarianMeal(meal2.getBody().getId());
         
         var response = this.restTemplate.exchange(
             "/api/restaurant/menu",

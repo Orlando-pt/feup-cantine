@@ -130,6 +130,7 @@ public class RestaurantController {
 		Principal user,
 		@RequestBody AddMenuDto menuDto
 	) {
+		log.info(menuDto);
 		return this.service.addMenu(user, menuDto);
 	}
 

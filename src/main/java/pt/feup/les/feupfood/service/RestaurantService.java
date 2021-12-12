@@ -162,36 +162,36 @@ public class RestaurantService {
         // add meals referent to the menu
         // TODO verify if that are of the correct mealtype
         Meal meal = null;
-        if (menuDto.getMeatMealId() != null) {
-            meal = this.retrieveMeal(daoUser, menuDto.getMeatMealId());
+        if (menuDto.getMeatMeal() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getMeatMeal());
             menu.addMeal(meal);
             meal.addMenu(menu);
             this.mealRepository.save(meal);
         }
 
-        if (menuDto.getFishMealId() != null) {
-            meal = this.retrieveMeal(daoUser, menuDto.getFishMealId());
+        if (menuDto.getFishMeal() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getFishMeal());
             menu.addMeal(meal);
             meal.addMenu(menu);
             this.mealRepository.save(meal);
         }
 
-        if (menuDto.getDietMealId() != null) {
-            meal = this.retrieveMeal(daoUser, menuDto.getDietMealId());
+        if (menuDto.getDietMeal() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getDietMeal());
             menu.addMeal(meal);
             meal.addMenu(menu);
             this.mealRepository.save(meal);
         }
         
-        if (menuDto.getVegetarianMealId() != null) {
-            meal = this.retrieveMeal(daoUser, menuDto.getVegetarianMealId());
+        if (menuDto.getVegetarianMeal() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getVegetarianMeal());
             menu.addMeal(meal);
             meal.addMenu(menu);
             this.mealRepository.save(meal);
         }
         
-        if (menuDto.getDesertMealId() != null) {
-            meal = this.retrieveMeal(daoUser, menuDto.getDesertMealId());
+        if (menuDto.getDesertMeal() != null) {
+            meal = this.retrieveMeal(daoUser, menuDto.getDesertMeal());
             menu.addMeal(meal);
             meal.addMenu(menu);
             this.mealRepository.save(meal);
@@ -240,11 +240,11 @@ public class RestaurantService {
 
         // check if all meals remain the same
         List<Long> mealIds = new ArrayList<>();
-        if (menuDto.getDietMealId() != null) mealIds.add(menuDto.getDietMealId());
-        if (menuDto.getMeatMealId() != null) mealIds.add(menuDto.getMeatMealId());
-        if (menuDto.getFishMealId() != null) mealIds.add(menuDto.getFishMealId());
-        if (menuDto.getVegetarianMealId() != null) mealIds.add(menuDto.getVegetarianMealId());
-        if (menuDto.getDesertMealId() != null) mealIds.add(menuDto.getDesertMealId());
+        if (menuDto.getDietMeal() != null) mealIds.add(menuDto.getDietMeal());
+        if (menuDto.getMeatMeal() != null) mealIds.add(menuDto.getMeatMeal());
+        if (menuDto.getFishMeal() != null) mealIds.add(menuDto.getFishMeal());
+        if (menuDto.getVegetarianMeal() != null) mealIds.add(menuDto.getVegetarianMeal());
+        if (menuDto.getDesertMeal() != null) mealIds.add(menuDto.getDesertMeal());
 
         List<Long> currentMealIds = menu.getMeals().stream().map(
             Meal::getId
@@ -301,6 +301,12 @@ public class RestaurantService {
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
 
         Menu menu = this.retrieveMenu(daoUser, menuId);
+		menu.getMeals().forEach(
+			(meal) -> {
+				meal.removeMenu(menu);
+				this.mealRepository.save(meal);
+			}
+		);
         this.menuRepository.delete(menu);
         
         return ResponseEntity.ok("");

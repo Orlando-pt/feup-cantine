@@ -10,9 +10,9 @@ public class AddMenuDto implements ResponseInterfaceDto {
     private String additionalInformation;
     private Double startPrice;
     private Double endPrice;
-    private Long meatMealId;
-    private Long fishMealId;
-    private Long dietMealId;
-    private Long vegetarianMealId;
-    private Long desertMealId;
+    private Long meatMeal;
+    private Long fishMeal;
+    private Long dietMeal;
+    private Long vegetarianMeal;
+    private Long desertMeal;
 }
