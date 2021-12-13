@@ -1,8 +1,9 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -284,12 +285,17 @@ public class RestaurantService {
         Menu menu = this.retrieveMenu(daoUser, menuId);
 
         // check if all meals remain the same
-        List<Long> mealIds = new ArrayList<>();
-        if (menuDto.getDietMeal() != null) mealIds.add(menuDto.getDietMeal());
-        if (menuDto.getMeatMeal() != null) mealIds.add(menuDto.getMeatMeal());
-        if (menuDto.getFishMeal() != null) mealIds.add(menuDto.getFishMeal());
-        if (menuDto.getVegetarianMeal() != null) mealIds.add(menuDto.getVegetarianMeal());
-        if (menuDto.getDesertMeal() != null) mealIds.add(menuDto.getDesertMeal());
+        List<Long> mealIds = Arrays.asList(
+            menuDto.getDietMeal(),
+            menuDto.getDesertMeal(),
+            menuDto.getMeatMeal(),
+            menuDto.getFishMeal(),
+            menuDto.getVegetarianMeal()
+        );
+
+        mealIds = mealIds.stream().filter(
+            Objects::nonNull
+        ).collect(Collectors.toList());
 
         List<Long> currentMealIds = menu.getMeals().stream().map(
             Meal::getId
@@ -347,7 +353,7 @@ public class RestaurantService {
 
         Menu menu = this.retrieveMenu(daoUser, menuId);
 		menu.getMeals().forEach(
-			(meal) -> {
+			meal -> {
 				meal.removeMenu(menu);
 				this.mealRepository.save(meal);
 			}
@@ -388,7 +394,7 @@ public class RestaurantService {
 
         return ResponseEntity.ok(
             owner.getRestaurant().getAssignments().stream().map(
-                (assignment) -> parser.parseAssignmentToAssignmentDto(assignment)
+                assignment -> parser.parseAssignmentToAssignmentDto(assignment)
             ).collect(Collectors.toList())
         );
     }

@@ -309,10 +309,8 @@ public class RestaurantController_RestTemplateIT {
         var menuDto = new AddMenuDto();
         menuDto.setAdditionalInformation("something else");
         menuDto.setEndPrice(10.0);
-        menuDto.setFishMeal(meal1.getBody().getId());
         menuDto.setName("Monday morning for this week");
         menuDto.setStartPrice(4.5);
-        menuDto.setVegetarianMeal(meal2.getBody().getId());
         
         var response = this.restTemplate.exchange(
             "/api/restaurant/menu",
@@ -371,8 +369,11 @@ public class RestaurantController_RestTemplateIT {
             GetPutMealDto.class
         );
 
-        menuDto.setFishMeal(newMeal.getBody().getId());
+        menuDto.setFishMeal(meal1.getBody().getId());
         menuDto.setDesertMeal(meal3.getBody().getId());
+        menuDto.setVegetarianMeal(meal2.getBody().getId());
+        menuDto.setMeatMeal(newMeal.getBody().getId());
+        menuDto.setDietMeal(meal2.getBody().getId());
 
         var updateResponse = this.restTemplate.exchange(
             "/api/restaurant/menu/" + response.getBody().getId(),
@@ -387,14 +388,25 @@ public class RestaurantController_RestTemplateIT {
 
         Assertions.assertThat(
             updateResponse.getBody()
-        ).extracting(GetPutMenuDto::getFishMeal).isEqualTo(newMeal.getBody());
+        ).extracting(GetPutMenuDto::getFishMeal).isEqualTo(meal1.getBody());
 
         Assertions.assertThat(
             updateResponse.getBody()
         ).extracting(GetPutMenuDto::getDesertMeal).isEqualTo(meal3.getBody());
 
-        // delete menu
+        menuDto.setAdditionalInformation("additionalInformation but different");
+        var updateResponse2 = this.restTemplate.exchange(
+            "/api/restaurant/menu/" + response.getBody().getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(menuDto, headers),
+            GetPutMenuDto.class
+        );
+        
+        Assertions.assertThat(
+            updateResponse2.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
 
+        // delete menu
         var deleteResponse = this.restTemplate.exchange(
             "/api/restaurant/menu/" + updateResponse.getBody().getId(),
             HttpMethod.DELETE,
@@ -474,6 +486,23 @@ public class RestaurantController_RestTemplateIT {
             GetPutMenuDto.class
         );
 
+        var menuDto2 = new AddMenuDto();
+        menuDto2.setAdditionalInformation("something else else");
+        menuDto2.setDietMeal(meal1.getBody().getId());
+        menuDto2.setEndPrice(10.0);
+        menuDto2.setFishMeal(meal2.getBody().getId());
+        menuDto2.setMeatMeal(meal2.getBody().getId());
+        menuDto2.setName("Monday morning");
+        menuDto2.setStartPrice(4.5);
+        menuDto2.setVegetarianMeal(meal1.getBody().getId());
+        
+        var response2 = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.POST,
+            new HttpEntity<>(menuDto2, headers),
+            GetPutMenuDto.class
+        );
+
         var assignemntDto = new AddAssignmentDto();
         assignemntDto.setDate(
             new Date(1639094400000L)
@@ -495,6 +524,7 @@ public class RestaurantController_RestTemplateIT {
 
         // update assignment
         assignemntDto.setSchedule(ScheduleEnum.DINNER);
+        assignemntDto.setMenu(response2.getBody().getId());
         var updateAssignment = this.restTemplate.exchange(
             "/api/restaurant/assignment/" + createAssignment.getBody().getId(),
             HttpMethod.PUT,
