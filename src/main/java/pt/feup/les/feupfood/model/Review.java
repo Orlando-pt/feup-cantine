@@ -13,16 +13,16 @@ import javax.persistence.*;
 @Builder
 public class Review {
     @Id
-    @SequenceGenerator(name="review_generator", sequenceName = "review_seq", allocationSize=1)
+    @SequenceGenerator(name = "review_generator", sequenceName = "review_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "review_generator")
     Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable=false, foreignKey = @ForeignKey(name="FK_T_U"))
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "FK_T_U"))
     DAOUser client;
 
     @ManyToOne
-    @JoinColumn(name = "restaurant_id", nullable=false, foreignKey = @ForeignKey(name="FK_T_R"))
+    @JoinColumn(name = "restaurant_id", nullable = false, foreignKey = @ForeignKey(name = "FK_T_R"))
     Restaurant restaurant;
 
     @Column(name = "classification_grade")
@@ -30,5 +30,11 @@ public class Review {
 
     @Column(name = "comment")
     String comment;
-    
+
+    public void setClassificationGrade(int classificationGrade) {
+        if (classificationGrade >= 0 && classificationGrade <= 5)
+            this.classificationGrade = classificationGrade;
+        else throw new IllegalArgumentException("Invalid classification, the classification should be between 0 and 5");
+    }
+
 }

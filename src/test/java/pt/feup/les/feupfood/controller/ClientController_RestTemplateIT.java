@@ -90,7 +90,7 @@ public class ClientController_RestTemplateIT {
     }
 
     @Test
-    void getRestaurantById() {
+    void getRestaurantByIdAndGetReviewsOfTheRestaurant() {
         var headers = this.getStandardHeaders();
 
         var getRestaurants = this.restTemplate.exchange(
@@ -106,29 +106,16 @@ public class ClientController_RestTemplateIT {
                 GetRestaurantDto.class);
 
         Assertions.assertThat(getRestaurantById.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
 
-    @Test
-    void getReviewByRestaurantId() {
-        var headers = this.getStandardHeaders();
-
-        var getRestaurants = this.restTemplate.exchange(
-                "/api/client/restaurant",
-                HttpMethod.GET, new HttpEntity<>(headers),
-                GetRestaurantDto[].class);
-
-        Long id = getRestaurants.getBody()[0].getId();
-
-        System.out.println("asbsahbasibasiubsaiu => " + id);
-
-        /*var getRestaurantById = this.restTemplate.exchange(
+        var getReviewsByRestaurantId = this.restTemplate.exchange(
                 "/api/client/review/restaurant/" + id,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 GetRestaurantDto[].class);
 
-        Assertions.assertThat(getRestaurantById.getStatusCode()).isEqualTo(HttpStatus.OK);
-         */
+        Assertions.assertThat(getReviewsByRestaurantId.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(getReviewsByRestaurantId.getBody()).hasSize(1).contains(getReviewsByRestaurantId.getBody());
     }
 
 
