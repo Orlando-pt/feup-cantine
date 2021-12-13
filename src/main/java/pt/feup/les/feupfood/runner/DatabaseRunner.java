@@ -44,24 +44,26 @@ public class DatabaseRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        String password = "password";
+
         DAOUser admin = new DAOUser();
         admin.setEmail("chicao@gmail.com");
         admin.setPassword(
             this.bcryptEncoder.encode(
-                "password"
+                password
             )
         );
         admin.setFullName("Chico o grande");
         admin.setRole("ROLE_ADMIN");
         admin.setTerms(true);
 
-        admin = this.userRepository.save(admin);
+        this.userRepository.save(admin);
 
         DAOUser restaurant = new DAOUser();
         restaurant.setEmail("orlando@gmail.com");
         restaurant.setPassword(
             this.bcryptEncoder.encode(
-                "password"
+                password
             )
         );
         restaurant.setFullName("Orlando's Restaurant");
@@ -75,20 +77,20 @@ public class DatabaseRunner implements ApplicationRunner {
         restaurantObject = this.restaurantRepository.save(restaurantObject);
         
         restaurant.setRestaurant(restaurantObject);
-        restaurant = this.userRepository.save(restaurant);
+        this.userRepository.save(restaurant);
 
         
         DAOUser client = new DAOUser();
         client.setEmail("francisco@gmail.com");
         client.setPassword(
             this.bcryptEncoder.encode(
-                "password"
+                password
             )
         );
         client.setFullName("Francisco Bastos");
         client.setRole("ROLE_USER_CLIENT");
         client.setTerms(true);
-        client = this.userRepository.save(client);
+        this.userRepository.save(client);
 
         // add meals
         Meal meat = new Meal();
@@ -101,28 +103,28 @@ public class DatabaseRunner implements ApplicationRunner {
         Meal fish = new Meal();
         fish.setDescription("Potatoes with sardines");
         fish.setMealType(MealTypeEnum.FISH);
-        fish.setNutritionalInformation("nutritionalInformation");
+        fish.setNutritionalInformation("nutritionalInformation1");
         fish.setRestaurant(restaurantObject);
         fish = this.mealRepository.save(fish);
 
         Meal diet = new Meal();
         diet.setDescription("A carrot");
         diet.setMealType(MealTypeEnum.DIET);
-        diet.setNutritionalInformation("nutritionalInformation");
+        diet.setNutritionalInformation("nutritionalInformation2");
         diet.setRestaurant(restaurantObject);
         diet = this.mealRepository.save(diet);
 
         Meal vegetarian = new Meal();
         vegetarian.setDescription("Rice with cogumelos");
         vegetarian.setMealType(MealTypeEnum.VEGETARIAN);
-        vegetarian.setNutritionalInformation("nutritionalInformation");
+        vegetarian.setNutritionalInformation("nutritionalInformation3");
         vegetarian.setRestaurant(restaurantObject);
         vegetarian = this.mealRepository.save(vegetarian);
 
         Meal desert = new Meal();
         desert.setDescription("Chocolat mousse");
         desert.setMealType(MealTypeEnum.DESERT);
-        desert.setNutritionalInformation("nutritionalInformation");
+        desert.setNutritionalInformation("nutritionalInformation4");
         desert.setRestaurant(restaurantObject);
         desert = this.mealRepository.save(desert);
 
@@ -147,15 +149,15 @@ public class DatabaseRunner implements ApplicationRunner {
         menu = this.menuRepository.save(menu);
 
         meat.addMenu(menu);
-        meat = this.mealRepository.save(meat);
+        this.mealRepository.save(meat);
         fish.addMenu(menu);
-        fish = this.mealRepository.save(fish);
+        this.mealRepository.save(fish);
         diet.addMenu(menu);
-        diet = this.mealRepository.save(diet);
+        this.mealRepository.save(diet);
         vegetarian.addMenu(menu);
-        vegetarian = this.mealRepository.save(vegetarian);
+        this.mealRepository.save(vegetarian);
         desert.addMenu(menu);
-        desert = this.mealRepository.save(desert);
+        this.mealRepository.save(desert);
 
         AssignMenu assignment = new AssignMenu();
         assignment.setDate(
