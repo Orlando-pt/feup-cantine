@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.log4j.Log4j2;
+import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
+import pt.feup.les.feupfood.dto.AddMenuDto;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
+import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -105,4 +109,80 @@ public class RestaurantController {
 	) {
 		return this.service.deleteMeal(user, id);
 	}
+
+	// menu endpoints
+	@GetMapping("menu")
+	public ResponseEntity<List<GetPutMenuDto>> getMenus(
+		Principal user
+	) {
+		return this.service.getMenus(user);
+	}
+
+	@GetMapping("menu/{id}")
+	public ResponseEntity<GetPutMenuDto> getMenu(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.getMenu(user, id);
+	}
+
+	@PostMapping("menu")
+	public ResponseEntity<GetPutMenuDto> addMenu(
+		Principal user,
+		@RequestBody AddMenuDto menuDto
+	) {
+		log.info(menuDto);
+		return this.service.addMenu(user, menuDto);
+	}
+
+	@PutMapping("menu/{id}")
+	public ResponseEntity<GetPutMenuDto> updateMenu(
+		Principal user,
+		@RequestBody AddMenuDto menuDto,
+		@PathVariable Long id
+	) {
+		return this.service.updateMenu(user, menuDto, id);
+	}
+
+	@DeleteMapping("menu/{id}")
+	public ResponseEntity<String> deleteMenu(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.deleteMenu(user, id);
+	}
+
+	// assignment endpoints
+	@GetMapping("assignment")
+	public ResponseEntity<List<ResponseInterfaceDto>> getAssignments(
+		Principal user
+	) {
+		return this.service.getAssignments(user);
+	}
+
+	@PostMapping("assignment")
+	public ResponseEntity<ResponseInterfaceDto> addAssignment(
+		Principal user,
+		@RequestBody AddAssignmentDto assignmentDto
+	) {
+		return this.service.addAssignment(user, assignmentDto);
+	}
+
+	@PutMapping("assignment/{id}")
+	public ResponseEntity<GetAssignmentDto> updateAssignment(
+		Principal user,
+		@RequestBody AddAssignmentDto assignmentDto,
+		@PathVariable Long id
+	) {
+		return this.service.updateAssignment(user, assignmentDto, id);
+	}
+
+	@DeleteMapping("assignment/{id}")
+	public ResponseEntity<String> deleteAssignment(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.deleteAssignment(user, id);
+	}
+
 }

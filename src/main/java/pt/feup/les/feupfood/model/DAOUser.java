@@ -25,7 +25,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "users")
 public class DAOUser {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
