@@ -42,10 +42,22 @@ public class ClientController {
         return this.clientService.getUserReviewsFromClient(user);
     }
 
+    @GetMapping("review/restaurant/{id}")
+    public ResponseEntity<List<GetPutClientReviewDto>> getClientReviewsByRestaurantId(@PathVariable Long id) {
+
+        return this.clientService.getReviewsFromRestaurantByRestaurantId(id);
+    }
+
     @GetMapping("restaurant")
     public ResponseEntity<List<GetRestaurantDto>> getClientReviews() {
 
         return this.clientService.getAllRestaurants();
+    }
+
+    @GetMapping("restaurant/{id}")
+    public ResponseEntity<ResponseInterfaceDto> getRestaurant(@PathVariable Long id) {
+        log.info("[restaurant/id] Requiring restaurant id: " + id);
+        return this.clientService.getRestaurantById(id);
     }
 
 

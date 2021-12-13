@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import pt.feup.les.feupfood.dto.*;
+import pt.feup.les.feupfood.dto.AddClientReviewDto;
+import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
+import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
+import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
@@ -12,6 +16,7 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.ClientParser;
+import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.util.List;
@@ -40,6 +45,11 @@ public class ClientService {
     private List<GetPutClientReviewDto> getAllReviewsFromClient(DAOUser client) {
         ClientParser clientParser = new ClientParser();
         return client.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
+    }
+
+    private List<GetPutClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
+        ClientParser clientParser = new ClientParser();
+        return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }
 
     public ResponseEntity<ResponseInterfaceDto> saveReview(Principal user, AddClientReviewDto reviewDto) {
@@ -76,5 +86,23 @@ public class ClientService {
     public ResponseEntity<List<GetRestaurantDto>> getAllRestaurants() {
         ClientParser clientParser = new ClientParser();
         return ResponseEntity.ok(this.restaurantRepository.findAll().stream().map(clientParser::parseRestaurantToRestaurantDto).collect(Collectors.toList()));
+    }
+
+    public ResponseEntity<List<GetPutClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
+        Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
+
+        return ResponseEntity.ok(this.getAllReviewsFromRestaurant(reviewedRestaurant));
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> getRestaurantById(Long restaurantId) {
+
+        Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(
+                () ->
+                        new ResourceNotFoundException("The restaurant id was not found")
+        );
+
+        return ResponseEntity.ok(
+                new RestaurantParser().parseRestaurantToRestaurantDto(restaurant)
+        );
     }
 }

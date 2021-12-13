@@ -13,7 +13,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-
 import pt.feup.les.feupfood.dto.*;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -89,6 +88,49 @@ public class ClientController_RestTemplateIT {
         Assertions.assertThat(getReviews.getBody()).hasSize(1).contains(addReview.getBody());
 
     }
+
+    @Test
+    void getRestaurantById() {
+        var headers = this.getStandardHeaders();
+
+        var getRestaurants = this.restTemplate.exchange(
+                "/api/client/restaurant",
+                HttpMethod.GET, new HttpEntity<>(headers),
+                GetRestaurantDto[].class);
+
+        Long id = getRestaurants.getBody()[0].getId();
+
+        var getRestaurantById = this.restTemplate.exchange(
+                "/api/client/restaurant/" + id,
+                HttpMethod.GET, new HttpEntity<>(headers),
+                GetRestaurantDto.class);
+
+        Assertions.assertThat(getRestaurantById.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void getReviewByRestaurantId() {
+        var headers = this.getStandardHeaders();
+
+        var getRestaurants = this.restTemplate.exchange(
+                "/api/client/restaurant",
+                HttpMethod.GET, new HttpEntity<>(headers),
+                GetRestaurantDto[].class);
+
+        Long id = getRestaurants.getBody()[0].getId();
+
+        System.out.println("asbsahbasibasiubsaiu => " + id);
+
+        /*var getRestaurantById = this.restTemplate.exchange(
+                "/api/client/review/restaurant/" + id,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                GetRestaurantDto[].class);
+
+        Assertions.assertThat(getRestaurantById.getStatusCode()).isEqualTo(HttpStatus.OK);
+         */
+    }
+
 
     private void registerClient() {
         this.restTemplate.postForEntity("/api/client/register", this.clientUser, RegisterUserResponseDto.class);

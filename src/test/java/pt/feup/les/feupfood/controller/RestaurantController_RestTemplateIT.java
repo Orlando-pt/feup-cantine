@@ -1,7 +1,5 @@
 package pt.feup.les.feupfood.controller;
 
-import java.sql.Time;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,17 +13,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import pt.feup.les.feupfood.dto.AddMealDto;
-import pt.feup.les.feupfood.dto.GetPutMealDto;
-import pt.feup.les.feupfood.dto.JwtRequest;
-import pt.feup.les.feupfood.dto.JwtResponse;
-import pt.feup.les.feupfood.dto.RegisterUserDto;
-import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
-import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.*;
 import pt.feup.les.feupfood.model.MealTypeEnum;
+
+import java.sql.Time;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

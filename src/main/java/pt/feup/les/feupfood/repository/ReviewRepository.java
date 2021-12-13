@@ -8,7 +8,7 @@ import pt.feup.les.feupfood.model.Review;
 import java.util.List;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Integer> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByRestaurant(Restaurant restaurant);
     List<Review> findAllByClient(DAOUser client);
 }
