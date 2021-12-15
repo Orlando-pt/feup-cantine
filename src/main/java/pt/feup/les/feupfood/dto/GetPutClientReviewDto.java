@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 public class GetPutClientReviewDto implements ResponseInterfaceDto {
     Long id;
     Long clientId;
+    String clientFullName;
     Long restaurantId;
     int classificationGrade;
     String comment;
