@@ -41,6 +41,8 @@ public class Restaurant {
 
     private String location;
 
+    private String profileImageUrl;
+
     @Basic
     private Time morningOpeningSchedule;
 

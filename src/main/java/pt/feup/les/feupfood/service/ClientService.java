@@ -34,24 +34,7 @@ public class ClientService {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    private DAOUser retrieveUser(String email) {
-        return this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-    }
-
-    private Restaurant retrieveRestaurant(Long restaurantId) {
-        return this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new UsernameNotFoundException("Restaurant not found with id :" + restaurantId));
-    }
-
-    private List<GetPutClientReviewDto> getAllReviewsFromClient(DAOUser client) {
-        ClientParser clientParser = new ClientParser();
-        return client.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
-    }
-
-    private List<GetPutClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
-        ClientParser clientParser = new ClientParser();
-        return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
-    }
-
+    // review operations
     public ResponseEntity<ResponseInterfaceDto> saveReview(Principal user, AddClientReviewDto reviewDto) {
 
         DAOUser reviewer = this.retrieveUser(user.getName());
@@ -76,31 +59,6 @@ public class ClientService {
         return ResponseEntity.ok(new ClientParser().parseReviewToReviewDto(review));
     }
 
-    public ResponseEntity<List<GetPutClientReviewDto>> getUserReviewsFromClient(Principal user) {
-
-        DAOUser reviewer = this.retrieveUser(user.getName());
-
-        return ResponseEntity.ok(this.getAllReviewsFromClient(reviewer));
-    }
-
-    public ResponseEntity<List<GetRestaurantDto>> getAllRestaurants() {
-        ClientParser clientParser = new ClientParser();
-        return ResponseEntity.ok(this.restaurantRepository.findAll().stream().map(clientParser::parseRestaurantToRestaurantDto).collect(Collectors.toList()));
-    }
-
-    public ResponseEntity<List<GetPutClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
-        Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
-
-        return ResponseEntity.ok(this.getAllReviewsFromRestaurant(reviewedRestaurant));
-    }
-
-    public ResponseEntity<ResponseInterfaceDto> getRestaurantById(Long restaurantId) {
-
-        Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new ResourceNotFoundException("The restaurant id was not found"));
-
-        return ResponseEntity.ok(new RestaurantParser().parseRestaurantToRestaurantDto(restaurant));
-    }
-
     public ResponseEntity<ResponseInterfaceDto> saveReviewsFromRestaurantByRestaurantId(Long id, AddClientReviewDto clientReviewDto, Principal user) {
         DAOUser reviewer = this.retrieveUser(user.getName());
         Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
@@ -122,5 +80,50 @@ public class ClientService {
         this.restaurantRepository.save(reviewedRestaurant);
 
         return ResponseEntity.ok(new ClientParser().parseReviewToReviewDto(review));
+    }
+
+    public ResponseEntity<List<GetPutClientReviewDto>> getUserReviewsFromClient(Principal user) {
+
+        DAOUser reviewer = this.retrieveUser(user.getName());
+
+        return ResponseEntity.ok(this.getAllReviewsFromClient(reviewer));
+    }
+
+    // restaurant operations
+    public ResponseEntity<List<GetRestaurantDto>> getAllRestaurants() {
+        ClientParser clientParser = new ClientParser();
+        return ResponseEntity.ok(this.restaurantRepository.findAll().stream().map(clientParser::parseRestaurantToRestaurantDto).collect(Collectors.toList()));
+    }
+
+    public ResponseEntity<List<GetPutClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
+        Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
+
+        return ResponseEntity.ok(this.getAllReviewsFromRestaurant(reviewedRestaurant));
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> getRestaurantById(Long restaurantId) {
+
+        Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new ResourceNotFoundException("The restaurant id was not found"));
+
+        return ResponseEntity.ok(new RestaurantParser().parseRestaurantToRestaurantDto(restaurant));
+    }
+
+    // auxiliar methods
+    private DAOUser retrieveUser(String email) {
+        return this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+
+    private Restaurant retrieveRestaurant(Long restaurantId) {
+        return this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new UsernameNotFoundException("Restaurant not found with id :" + restaurantId));
+    }
+
+    private List<GetPutClientReviewDto> getAllReviewsFromClient(DAOUser client) {
+        ClientParser clientParser = new ClientParser();
+        return client.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
+    }
+
+    private List<GetPutClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
+        ClientParser clientParser = new ClientParser();
+        return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }
 }

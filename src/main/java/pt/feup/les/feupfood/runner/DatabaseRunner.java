@@ -74,6 +74,7 @@ public class DatabaseRunner implements ApplicationRunner {
         Restaurant restaurantObject = new Restaurant();
         restaurantObject.setOwner(restaurant);
         restaurantObject.setLocation("On the corner");
+        restaurantObject.setProfileImageUrl("https://sigarra.up.pt/sasup/en/imagens/SC-alimentacao-cantina-engenharia.jpg");
         restaurantObject = this.restaurantRepository.save(restaurantObject);
         
         restaurant.setRestaurant(restaurantObject);

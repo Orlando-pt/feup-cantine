@@ -22,6 +22,7 @@ public class ClientParser {
         getRestaurantDto.setId(restaurant.getId());
         getRestaurantDto.setFullName(restaurant.getOwner().getFullName());
         getRestaurantDto.setLocation(restaurant.getLocation());
+        getRestaurantDto.setProfileImageUrl(restaurant.getProfileImageUrl());
         getRestaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         getRestaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
         getRestaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());

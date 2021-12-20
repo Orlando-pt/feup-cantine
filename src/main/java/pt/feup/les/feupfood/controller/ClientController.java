@@ -23,6 +23,7 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
+    // register endpoints
     @PostMapping("register")
     public ResponseEntity<RegisterUserResponseDto> saveUser(@RequestBody RegisterUserDto userDto) throws AuthenticationServiceException {
         log.info("Saving new user: " + userDto);
@@ -30,6 +31,7 @@ public class ClientController {
         return this.jwtAuthenticationUtil.saveUser(userDto, "ROLE_USER_CLIENT");
     }
 
+    // review endpoints
     @PostMapping("review")
     public ResponseEntity<ResponseInterfaceDto> saveReview(@RequestBody AddClientReviewDto clientReviewDto, Principal user) {
 
@@ -58,6 +60,7 @@ public class ClientController {
         return this.clientService.saveReviewsFromRestaurantByRestaurantId(id, clientReviewDto, user);
     }
 
+    // restaurant endpoints
     @GetMapping("restaurant")
     public ResponseEntity<List<GetRestaurantDto>> getClientReviews() {
 
@@ -69,7 +72,6 @@ public class ClientController {
         log.info("[restaurant/id] Requiring restaurant id: " + id);
         return this.clientService.getRestaurantById(id);
     }
-
 
     @GetMapping("home")
     public ResponseEntity<String> home() {

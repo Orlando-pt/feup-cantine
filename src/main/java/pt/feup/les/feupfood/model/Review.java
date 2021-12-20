@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "review")
+@Table(name = "reviews")
 @Data
 @EqualsAndHashCode(exclude = {"restaurant", "client"})
 @NoArgsConstructor

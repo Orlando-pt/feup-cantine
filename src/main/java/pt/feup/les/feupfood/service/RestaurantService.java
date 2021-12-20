@@ -63,6 +63,7 @@ public class RestaurantService {
 
         restaurantDto.setFullName(owner.getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
+        restaurantDto.setProfileImageUrl(restaurant.getProfileImageUrl());
         restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
         restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
@@ -84,6 +85,7 @@ public class RestaurantService {
         owner.setFullName(profileDto.getFullName());
 
         restaurant.setLocation(profileDto.getLocation());
+        restaurant.setProfileImageUrl(profileDto.getProfileImageUrl());
         restaurant.setMorningOpeningSchedule(profileDto.getMorningOpeningSchedule());
         restaurant.setMorningClosingSchedule(profileDto.getMorningClosingSchedule());
         restaurant.setAfternoonOpeningSchedule(profileDto.getAfternoonOpeningSchedule());
