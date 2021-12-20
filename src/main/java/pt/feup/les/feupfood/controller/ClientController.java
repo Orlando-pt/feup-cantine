@@ -73,12 +73,6 @@ public class ClientController {
 
     }
 
-    @PostMapping("review")
-    public ResponseEntity<ResponseInterfaceDto> saveReview(@RequestBody AddClientReviewDto clientReviewDto, Principal user) {
-
-        return this.clientService.saveReview(user, clientReviewDto);
-    }
-
     // restaurant endpoints
     @GetMapping("restaurant")
     public ResponseEntity<List<GetRestaurantDto>> getClientReviews() {

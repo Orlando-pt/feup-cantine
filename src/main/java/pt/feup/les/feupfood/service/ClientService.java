@@ -63,30 +63,6 @@ public class ClientService {
     }
 
     // review operations
-    public ResponseEntity<ResponseInterfaceDto> saveReview(Principal user, AddClientReviewDto reviewDto) {
-
-        DAOUser reviewer = this.retrieveUser(user.getName());
-        Restaurant reviewedRestaurant = this.retrieveRestaurant(reviewDto.getRestaurantId());
-        Review review = new Review();
-
-        review.setClient(reviewer);
-        review.setClassificationGrade(reviewDto.getClassificationGrade());
-        review.setComment(reviewDto.getComment());
-        review.setRestaurant(reviewedRestaurant);
-
-        review = this.reviewRepository.save(review);
-
-        // add review to the user
-        reviewer.addReview(review);
-        // add review to the restaurant
-        reviewedRestaurant.addReview(review);
-
-        this.userRepository.save(reviewer);
-        this.restaurantRepository.save(reviewedRestaurant);
-
-        return ResponseEntity.ok(new ClientParser().parseReviewToReviewDto(review));
-    }
-
     public ResponseEntity<ResponseInterfaceDto> saveReviewsFromRestaurantByRestaurantId(Long id, AddClientReviewDto clientReviewDto, Principal user) {
         DAOUser reviewer = this.retrieveUser(user.getName());
         Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
