@@ -1,5 +1,6 @@
 package pt.feup.les.feupfood.runner;
 
+import java.sql.Time;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,18 @@ public class DatabaseRunner implements ApplicationRunner {
         restaurantObject.setOwner(restaurant);
         restaurantObject.setLocation("On the corner");
         restaurantObject.setProfileImageUrl("https://sigarra.up.pt/sasup/en/imagens/SC-alimentacao-cantina-engenharia.jpg");
+        restaurantObject.setMorningOpeningSchedule(
+            Time.valueOf("11:00:00")
+        );
+        restaurantObject.setMorningClosingSchedule(
+            Time.valueOf("15:00:00")
+        );
+        restaurantObject.setAfternoonOpeningSchedule(
+            Time.valueOf("18:30:00")
+        );
+        restaurantObject.setAfternoonClosingSchedule(
+            Time.valueOf("22:30:00")
+        );
         restaurantObject = this.restaurantRepository.save(restaurantObject);
         
         restaurant.setRestaurant(restaurantObject);

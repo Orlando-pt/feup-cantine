@@ -105,7 +105,7 @@ public class ClientService {
 
         Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new ResourceNotFoundException("The restaurant id was not found"));
 
-        return ResponseEntity.ok(new RestaurantParser().parseRestaurantToRestaurantDto(restaurant));
+        return ResponseEntity.ok(new ClientParser().parseRestaurantToRestaurantDto(restaurant));
     }
 
     // auxiliar methods
