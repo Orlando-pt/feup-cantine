@@ -48,6 +48,16 @@ public class ClientController {
         return this.clientService.getReviewsFromRestaurantByRestaurantId(id);
     }
 
+    @PostMapping("review/restaurant/{id}")
+    public ResponseEntity<ResponseInterfaceDto> saveClientReviewsByRestaurantId(
+            @PathVariable Long id,
+            @RequestBody AddClientReviewDto clientReviewDto,
+            Principal user
+    ) {
+
+        return this.clientService.saveReviewsFromRestaurantByRestaurantId(id, clientReviewDto, user);
+    }
+
     @GetMapping("restaurant")
     public ResponseEntity<List<GetRestaurantDto>> getClientReviews() {
 

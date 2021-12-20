@@ -56,7 +56,7 @@ public class ClientController_RestTemplateIT {
     }
 
     @Test
-    void addGetClientReview() {
+    void addGetAndPostClientReview() {
 
         RegisterUserDto restaurantUser = new RegisterUserDto();
 
@@ -77,15 +77,24 @@ public class ClientController_RestTemplateIT {
         reviewDto.setClassificationGrade(5);
         reviewDto.setComment("Very good food!");
 
+        AddClientReviewDto reviewDto2 = new AddClientReviewDto();
+        reviewDto2.setRestaurantId(getRestaurantId.getBody()[0].getId());
+        reviewDto2.setClassificationGrade(2);
+        reviewDto2.setComment("Very bad food!");
+
         var addReview = this.restTemplate.exchange("/api/client/review", HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
 
+        var addReview2 = this.restTemplate.exchange("/api/client/review/restaurant/" + getRestaurantId.getBody()[0].getId(),
+                HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
+
         Assertions.assertThat(addReview.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertThat(addReview2.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var getReviews = this.restTemplate.exchange("/api/client/review", HttpMethod.GET, new HttpEntity<>(headers), GetPutClientReviewDto[].class);
 
         Assertions.assertThat(getReviews.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Assertions.assertThat(getReviews.getBody()).hasSize(1).contains(addReview.getBody());
+        Assertions.assertThat(getReviews.getBody()).hasSize(2).contains(addReview.getBody());
 
     }
 
@@ -115,7 +124,7 @@ public class ClientController_RestTemplateIT {
 
         Assertions.assertThat(getReviewsByRestaurantId.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Assertions.assertThat(getReviewsByRestaurantId.getBody()).hasSize(1).contains(getReviewsByRestaurantId.getBody());
+        Assertions.assertThat(getReviewsByRestaurantId.getBody()).hasSize(2).contains(getReviewsByRestaurantId.getBody());
     }
 
 

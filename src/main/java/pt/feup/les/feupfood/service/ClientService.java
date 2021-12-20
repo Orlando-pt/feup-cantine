@@ -96,13 +96,31 @@ public class ClientService {
 
     public ResponseEntity<ResponseInterfaceDto> getRestaurantById(Long restaurantId) {
 
-        Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(
-                () ->
-                        new ResourceNotFoundException("The restaurant id was not found")
-        );
+        Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new ResourceNotFoundException("The restaurant id was not found"));
 
-        return ResponseEntity.ok(
-                new RestaurantParser().parseRestaurantToRestaurantDto(restaurant)
-        );
+        return ResponseEntity.ok(new RestaurantParser().parseRestaurantToRestaurantDto(restaurant));
+    }
+
+    public ResponseEntity<ResponseInterfaceDto> saveReviewsFromRestaurantByRestaurantId(Long id, AddClientReviewDto clientReviewDto, Principal user) {
+        DAOUser reviewer = this.retrieveUser(user.getName());
+        Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
+        Review review = new Review();
+
+        review.setClient(reviewer);
+        review.setClassificationGrade(clientReviewDto.getClassificationGrade());
+        review.setComment(clientReviewDto.getComment());
+        review.setRestaurant(reviewedRestaurant);
+
+        review = this.reviewRepository.save(review);
+
+        // add review to the user
+        reviewer.addReview(review);
+        // add review to the restaurant
+        reviewedRestaurant.addReview(review);
+
+        this.userRepository.save(reviewer);
+        this.restaurantRepository.save(reviewedRestaurant);
+
+        return ResponseEntity.ok(new ClientParser().parseReviewToReviewDto(review));
     }
 }

@@ -10,6 +10,7 @@ public class ClientParser {
         var reviewDto = new GetPutClientReviewDto();
         reviewDto.setId(review.getId());
         reviewDto.setClientId(review.getClient().getId());
+        reviewDto.setClientFullName(review.getClient().getFullName());
         reviewDto.setRestaurantId(review.getRestaurant().getId());
         reviewDto.setClassificationGrade(review.getClassificationGrade());
         reviewDto.setComment(review.getComment());
