@@ -8,6 +8,7 @@ import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
+import pt.feup.les.feupfood.dto.UpdateProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
@@ -32,6 +33,34 @@ public class ClientService {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    // profile operations
+    public ResponseEntity<UpdateProfileDto> getProfile(
+        Principal user
+    ) {
+        return ResponseEntity.ok(
+            new ClientParser().parseUserProfile(
+                this.retrieveUser(user.getName())
+            )
+        );
+    }
+
+    public ResponseEntity<UpdateProfileDto> updateProfile(
+        Principal user,
+        UpdateProfileDto profileDto
+    ) {
+        DAOUser daoUser = this.retrieveUser(user.getName());
+
+        daoUser.setFullName(profileDto.getFullName());
+        daoUser.setBiography(profileDto.getBiography());
+        daoUser.setProfileImageUrl(profileDto.getProfileImageUrl());
+
+        daoUser = this.userRepository.save(daoUser);
+        
+        return ResponseEntity.ok(
+            new ClientParser().parseUserProfile(daoUser)
+        );
+    }
 
     // review operations
     public ResponseEntity<ResponseInterfaceDto> saveReview(Principal user, AddClientReviewDto reviewDto) {

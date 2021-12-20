@@ -1,6 +1,8 @@
 package pt.feup.les.feupfood.controller;
 
 import lombok.extern.log4j.Log4j2;
+
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -31,13 +33,23 @@ public class ClientController {
         return this.jwtAuthenticationUtil.saveUser(userDto, "ROLE_USER_CLIENT");
     }
 
-    // review endpoints
-    @PostMapping("review")
-    public ResponseEntity<ResponseInterfaceDto> saveReview(@RequestBody AddClientReviewDto clientReviewDto, Principal user) {
-
-        return this.clientService.saveReview(user, clientReviewDto);
+    // update endpoints
+    @GetMapping("profile")
+    public ResponseEntity<UpdateProfileDto> getProfile(
+        Principal user
+    ) {
+        return this.clientService.getProfile(user);
     }
 
+    @PutMapping("profile")
+    public ResponseEntity<UpdateProfileDto> updateProfile(
+        Principal user,
+        @RequestBody UpdateProfileDto profileDto
+    ) {
+        return this.clientService.updateProfile(user, profileDto);
+    }
+
+    // review endpoints
     @GetMapping("review")
     public ResponseEntity<List<GetPutClientReviewDto>> getClientReviews(Principal user) {
 
@@ -58,6 +70,13 @@ public class ClientController {
     ) {
 
         return this.clientService.saveReviewsFromRestaurantByRestaurantId(id, clientReviewDto, user);
+
+    }
+
+    @PostMapping("review")
+    public ResponseEntity<ResponseInterfaceDto> saveReview(@RequestBody AddClientReviewDto clientReviewDto, Principal user) {
+
+        return this.clientService.saveReview(user, clientReviewDto);
     }
 
     // restaurant endpoints
