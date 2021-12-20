@@ -1,18 +1,22 @@
 package pt.feup.les.feupfood.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.dto.PriceRangeDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
+import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
@@ -33,6 +37,9 @@ public class ClientService {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     // profile operations
     public ResponseEntity<UpdateProfileDto> getProfile(
@@ -94,6 +101,26 @@ public class ClientService {
     }
 
     // restaurant operations
+    public ResponseEntity<PriceRangeDto> getPriceRangeOfRestaurant(Long id) {
+        PriceRangeDto priceRange = new PriceRangeDto();
+
+        Restaurant restaurant = this.retrieveRestaurant(id);
+
+        priceRange.setMinimumPrice(
+            this.menuRepository.findFirstByRestaurant(
+                restaurant, Sort.by(Direction.ASC, "startPrice")
+            ).getStartPrice()
+        );
+
+        priceRange.setMaximumPrice(
+            this.menuRepository.findFirstByRestaurant(
+                restaurant, Sort.by(Direction.DESC, "endPrice")
+            ).getEndPrice()
+        );
+
+        return ResponseEntity.ok(priceRange);
+    }
+
     public ResponseEntity<List<GetRestaurantDto>> getAllRestaurants() {
         ClientParser clientParser = new ClientParser();
         return ResponseEntity.ok(this.restaurantRepository.findAll().stream().map(clientParser::parseRestaurantToRestaurantDto).collect(Collectors.toList()));

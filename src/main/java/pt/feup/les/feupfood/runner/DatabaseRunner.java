@@ -163,17 +163,19 @@ public class DatabaseRunner implements ApplicationRunner {
         menu.setRestaurant(restaurantObject);
         menu = this.menuRepository.save(menu);
 
-        meat.addMenu(menu);
-        this.mealRepository.save(meat);
-        fish.addMenu(menu);
-        this.mealRepository.save(fish);
-        diet.addMenu(menu);
-        this.mealRepository.save(diet);
-        vegetarian.addMenu(menu);
-        this.mealRepository.save(vegetarian);
-        desert.addMenu(menu);
-        this.mealRepository.save(desert);
-
+        Menu menu2 = new Menu();
+        menu2.setName("Menu 2");
+        menu2.setAdditionalInformation("We put a small portion of sugar in ou food");
+        menu2.setEndPrice(5.4);
+        menu2.setStartPrice(1.25);
+        menu2.addMeal(meat);
+        menu2.addMeal(fish);
+        menu2.addMeal(diet);
+        menu2.addMeal(vegetarian);
+        menu2.addMeal(desert);
+        menu2.setRestaurant(restaurantObject);
+        menu2 = this.menuRepository.save(menu2);
+        
         AssignMenu assignment = new AssignMenu();
         assignment.setDate(
             new Date(1639398815581L)

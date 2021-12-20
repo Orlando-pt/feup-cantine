@@ -164,7 +164,43 @@ public class ClientController_RestTemplateIT {
 
         Assertions.assertThat(getReviewsByRestaurantId.getBody()).hasSize(2).contains(getReviewsByRestaurantId.getBody());
     }
+    
+    @Test
+    void testRestaurantPriceRange() {
+        var headers = this.getStandardHeaders();
 
+        var restaurants = this.restTemplate.exchange(
+                "/api/client/restaurant",
+                HttpMethod.GET, new HttpEntity<>(headers),
+                GetRestaurantDto[].class);
+
+        Assertions.assertThat(
+            restaurants.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var priceRange = this.restTemplate.exchange(
+            "/api/client/restaurant/" + restaurants.getBody()[0].getId() + "/price-range",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            PriceRangeDto.class
+        );
+        
+        Assertions.assertThat(
+            priceRange.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            priceRange.getBody()
+        ).extracting(PriceRangeDto::getMinimumPrice)
+            .isEqualTo(1.25);
+
+        Assertions.assertThat(
+            priceRange.getBody()
+        ).extracting(PriceRangeDto::getMaximumPrice)
+            .isEqualTo(5.4);
+        
+        System.out.println(priceRange);
+    }
 
     private void registerClient() {
         this.restTemplate.postForEntity("/api/client/register", this.clientUser, RegisterUserResponseDto.class);

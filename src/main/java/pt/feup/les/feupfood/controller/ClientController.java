@@ -74,6 +74,13 @@ public class ClientController {
     }
 
     // restaurant endpoints
+    @GetMapping("restaurant/{id}/price-range")
+    public ResponseEntity<PriceRangeDto> getPriceRangeOfRestaurant(
+        @PathVariable Long id
+    ) {
+        return this.clientService.getPriceRangeOfRestaurant(id);
+    }
+
     @GetMapping("restaurant")
     public ResponseEntity<List<GetRestaurantDto>> getClientReviews() {
 
