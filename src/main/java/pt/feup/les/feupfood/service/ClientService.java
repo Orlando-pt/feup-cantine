@@ -16,7 +16,6 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.ClientParser;
-import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.util.List;

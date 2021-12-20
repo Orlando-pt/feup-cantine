@@ -33,6 +33,8 @@ public class DAOUser {
     @Column(nullable = false)
     private String fullName;
 
+    private String profileImageUrl;
+
     @Column(nullable = false)
     private String password;
 

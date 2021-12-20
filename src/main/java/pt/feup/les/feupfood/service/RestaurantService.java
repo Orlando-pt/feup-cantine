@@ -62,8 +62,8 @@ public class RestaurantService {
         Restaurant restaurant = this.retrieveRestaurant(owner);
 
         restaurantDto.setFullName(owner.getFullName());
+        restaurantDto.setProfileImageUrl(owner.getProfileImageUrl());
         restaurantDto.setLocation(restaurant.getLocation());
-        restaurantDto.setProfileImageUrl(restaurant.getProfileImageUrl());
         restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
         restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
@@ -83,9 +83,9 @@ public class RestaurantService {
         );
 
         owner.setFullName(profileDto.getFullName());
+        owner.setProfileImageUrl(profileDto.getProfileImageUrl());
 
         restaurant.setLocation(profileDto.getLocation());
-        restaurant.setProfileImageUrl(profileDto.getProfileImageUrl());
         restaurant.setMorningOpeningSchedule(profileDto.getMorningOpeningSchedule());
         restaurant.setMorningClosingSchedule(profileDto.getMorningClosingSchedule());
         restaurant.setAfternoonOpeningSchedule(profileDto.getAfternoonOpeningSchedule());

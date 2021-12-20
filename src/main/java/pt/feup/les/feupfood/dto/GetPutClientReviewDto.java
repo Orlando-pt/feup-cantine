@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class GetPutClientReviewDto implements ResponseInterfaceDto {
-    Long id;
-    Long clientId;
-    String clientFullName;
-    Long restaurantId;
-    int classificationGrade;
-    String comment;
+    private Long id;
+    private Long clientId;
+    private String clientFullName;
+    private String clientProfileImageUrl;
+    private Long restaurantId;
+    private int classificationGrade;
+    private String comment;
 }

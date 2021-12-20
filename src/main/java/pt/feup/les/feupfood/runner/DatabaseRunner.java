@@ -68,6 +68,7 @@ public class DatabaseRunner implements ApplicationRunner {
             )
         );
         restaurant.setFullName("Orlando's Restaurant");
+        restaurant.setProfileImageUrl("https://sigarra.up.pt/sasup/en/imagens/SC-alimentacao-cantina-engenharia.jpg");
         restaurant.setRole("ROLE_USER_RESTAURANT");
         restaurant.setTerms(true);
         restaurant = this.userRepository.save(restaurant);
@@ -75,7 +76,6 @@ public class DatabaseRunner implements ApplicationRunner {
         Restaurant restaurantObject = new Restaurant();
         restaurantObject.setOwner(restaurant);
         restaurantObject.setLocation("On the corner");
-        restaurantObject.setProfileImageUrl("https://sigarra.up.pt/sasup/en/imagens/SC-alimentacao-cantina-engenharia.jpg");
         restaurantObject.setMorningOpeningSchedule(
             Time.valueOf("11:00:00")
         );
@@ -102,6 +102,7 @@ public class DatabaseRunner implements ApplicationRunner {
             )
         );
         client.setFullName("Francisco Bastos");
+        client.setProfileImageUrl("https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
         client.setRole("ROLE_USER_CLIENT");
         client.setTerms(true);
         this.userRepository.save(client);

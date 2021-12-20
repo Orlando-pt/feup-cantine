@@ -11,6 +11,7 @@ public class ClientParser {
         reviewDto.setId(review.getId());
         reviewDto.setClientId(review.getClient().getId());
         reviewDto.setClientFullName(review.getClient().getFullName());
+        reviewDto.setClientProfileImageUrl(review.getClient().getProfileImageUrl());
         reviewDto.setRestaurantId(review.getRestaurant().getId());
         reviewDto.setClassificationGrade(review.getClassificationGrade());
         reviewDto.setComment(review.getComment());
@@ -22,7 +23,7 @@ public class ClientParser {
         getRestaurantDto.setId(restaurant.getId());
         getRestaurantDto.setFullName(restaurant.getOwner().getFullName());
         getRestaurantDto.setLocation(restaurant.getLocation());
-        getRestaurantDto.setProfileImageUrl(restaurant.getProfileImageUrl());
+        getRestaurantDto.setProfileImageUrl(restaurant.getOwner().getProfileImageUrl());
         getRestaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         getRestaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
         getRestaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
