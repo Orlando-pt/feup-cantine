@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class AddClientReviewDto implements ResponseInterfaceDto {
-    Long restaurantId;
     int classificationGrade;
     String comment;
 }

@@ -113,16 +113,14 @@ public class ClientController_RestTemplateIT {
         var getRestaurantId = this.restTemplate.exchange("/api/client/restaurant", HttpMethod.GET, new HttpEntity<>(headers), GetRestaurantDto[].class);
         
         AddClientReviewDto reviewDto = new AddClientReviewDto();
-        reviewDto.setRestaurantId(getRestaurantId.getBody()[0].getId());
         reviewDto.setClassificationGrade(5);
         reviewDto.setComment("Very good food!");
 
         AddClientReviewDto reviewDto2 = new AddClientReviewDto();
-        reviewDto2.setRestaurantId(getRestaurantId.getBody()[0].getId());
         reviewDto2.setClassificationGrade(2);
         reviewDto2.setComment("Very bad food!");
 
-        var addReview = this.restTemplate.exchange("/api/client/review", HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
+        var addReview = this.restTemplate.exchange("/api/client/review/restaurant/" + getRestaurantId.getBody()[0].getId(), HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
 
         var addReview2 = this.restTemplate.exchange("/api/client/review/restaurant/" + getRestaurantId.getBody()[0].getId(),
                 HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
