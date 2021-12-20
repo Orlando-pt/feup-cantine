@@ -1,21 +1,15 @@
 package pt.feup.les.feupfood.service;
 
-<<<<<<< HEAD
-=======
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
->>>>>>> main
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-<<<<<<< HEAD
-import pt.feup.les.feupfood.dto.*;
-=======
 
 import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
@@ -26,7 +20,6 @@ import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
->>>>>>> main
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.model.AssignMenu;
@@ -40,10 +33,6 @@ import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.RestaurantParser;
-
-import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RestaurantService {

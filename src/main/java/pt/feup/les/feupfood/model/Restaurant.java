@@ -72,6 +72,7 @@ public class Restaurant {
         this.meals = new ArrayList<>();
         this.assignments = new ArrayList<>();
         this.menus = new ArrayList<>();
+        this.reviews = new ArrayList<>();
     }
 
     public boolean addMeal(Meal meal) {
