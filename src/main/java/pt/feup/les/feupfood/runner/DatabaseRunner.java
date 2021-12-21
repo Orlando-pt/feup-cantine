@@ -121,12 +121,6 @@ public class DatabaseRunner implements ApplicationRunner {
         restaurantAdelaide.setMorningOpeningSchedule(
             Time.valueOf("09:00:00")
         );
-        // restaurantAdelaide.setMorningClosingSchedule(
-        //     Time.valueOf("15:00:00")
-        // );
-        // restaurantAdelaide.setAfternoonOpeningSchedule(
-        //     Time.valueOf("18:30:00")
-        // );
         restaurantAdelaide.setAfternoonClosingSchedule(
             Time.valueOf("23:30:00")
         );
@@ -151,14 +145,14 @@ public class DatabaseRunner implements ApplicationRunner {
         franciscosReview.setClient(client);
         franciscosReview.setComment("The meat is simple delicious!");
         franciscosReview.setRestaurant(restaurantAdelaide);
-        franciscosReview = this.reviewRepository.save(franciscosReview);
+        this.reviewRepository.save(franciscosReview);
 
         Review feupCantineReview = new Review();
         feupCantineReview.setClassificationGrade(2);
         feupCantineReview.setClient(client);
         feupCantineReview.setComment("Who does not like a meal of rice with potato sauce");
         feupCantineReview.setRestaurant(restaurantObject);
-        feupCantineReview = this.reviewRepository.save(feupCantineReview);
+        this.reviewRepository.save(feupCantineReview);
 
         // add meals
         Meal meat = new Meal();
@@ -227,7 +221,7 @@ public class DatabaseRunner implements ApplicationRunner {
         menu2.addMeal(vegetarian);
         menu2.addMeal(desert);
         menu2.setRestaurant(restaurantObject);
-        menu2 = this.menuRepository.save(menu2);
+        this.menuRepository.save(menu2);
         
         AssignMenu assignment = new AssignMenu();
         assignment.setDate(

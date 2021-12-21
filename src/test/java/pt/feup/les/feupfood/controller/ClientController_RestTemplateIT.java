@@ -144,7 +144,7 @@ public class ClientController_RestTemplateIT {
                 "/api/client/restaurant",
                 HttpMethod.GET, new HttpEntity<>(headers),
                 GetRestaurantDto[].class);
-
+        
         Long id = getRestaurants.getBody()[0].getId();
 
         var getRestaurantById = this.restTemplate.exchange(
@@ -158,11 +158,29 @@ public class ClientController_RestTemplateIT {
                 "/api/client/review/restaurant/" + id,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
-                GetRestaurantDto[].class);
+                GetPutClientReviewDto[].class);
+        
+        /**
+         * GetPutClientReviewDto(id=2, clientId=4, clientFullName=Francisco Bastos, 
+         * clientProfileImageUrl=https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-
+         * muscles-picture-id638471524?s=612x612, restaurantId=1, classificationGrade=2, 
+         * comment=Who does not like a meal of rice with potato sauce)
+         */
+        GetPutClientReviewDto expectedReview = new GetPutClientReviewDto();
+        expectedReview.setClassificationGrade(2);
+        expectedReview.setClientFullName("Francisco Bastos");
+        expectedReview.setClientId(4L);
+        expectedReview.setId(2L);
+        expectedReview.setClientProfileImageUrl("https://media.istockphoto.com/photos/strong-" + 
+        "real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
+        expectedReview.setRestaurantId(1L);
+        expectedReview.setComment("Who does not like a meal of rice with potato sauce");
 
         Assertions.assertThat(getReviewsByRestaurantId.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Assertions.assertThat(getReviewsByRestaurantId.getBody()).hasSize(2).contains(getReviewsByRestaurantId.getBody());
+        Assertions.assertThat(
+            getReviewsByRestaurantId.getBody()
+        ).contains(expectedReview);
     }
     
     @Test
@@ -198,8 +216,6 @@ public class ClientController_RestTemplateIT {
             priceRange.getBody()
         ).extracting(PriceRangeDto::getMaximumPrice)
             .isEqualTo(5.4);
-        
-        System.out.println(priceRange);
     }
 
     private void registerClient() {

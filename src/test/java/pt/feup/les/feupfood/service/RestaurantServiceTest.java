@@ -413,9 +413,11 @@ public class RestaurantServiceTest {
             this.mealRepository.findById(meal.getId())
         ).thenReturn(Optional.ofNullable(meal));
 
+        Long mealId = meal.getId();
+
         assertThrows(
             ResourceNotOwnedException.class,
-            () -> this.service.deleteMeal(principal, meal.getId())
+            () -> this.service.deleteMeal(principal, mealId)
         );
     }
 
