@@ -36,7 +36,7 @@ import pt.feup.les.feupfood.util.RestaurantParser;
 
 @Service
 public class RestaurantService {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -54,7 +54,7 @@ public class RestaurantService {
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
-        Principal user
+            Principal user
     ) {
         RestaurantProfileDto restaurantDto = new RestaurantProfileDto();
 
@@ -62,28 +62,34 @@ public class RestaurantService {
         Restaurant restaurant = this.retrieveRestaurant(owner);
 
         restaurantDto.setFullName(owner.getFullName());
+        restaurantDto.setProfileImageUrl(owner.getProfileImageUrl());
         restaurantDto.setLocation(restaurant.getLocation());
+        restaurantDto.setCuisines(restaurant.getCuisines());
+        restaurantDto.setTypeMeals(restaurant.getTypeMeals());
         restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
         restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
         restaurantDto.setAfternoonClosingSchedule(restaurant.getAfternoonClosingSchedule());
-        
+
         return ResponseEntity.ok(restaurantDto);
     }
 
     public ResponseEntity<ResponseInterfaceDto> updateRestaurantProfile(
-        Principal user,
-        RestaurantProfileDto profileDto
+            Principal user,
+            RestaurantProfileDto profileDto
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
         Restaurant restaurant = this.retrieveRestaurant(
-            owner
+                owner
         );
 
         owner.setFullName(profileDto.getFullName());
+        owner.setProfileImageUrl(profileDto.getProfileImageUrl());
 
         restaurant.setLocation(profileDto.getLocation());
+        restaurant.setCuisines(profileDto.getCuisines());
+        restaurant.setTypeMeals(profileDto.getTypeMeals());
         restaurant.setMorningOpeningSchedule(profileDto.getMorningOpeningSchedule());
         restaurant.setMorningClosingSchedule(profileDto.getMorningClosingSchedule());
         restaurant.setAfternoonOpeningSchedule(profileDto.getAfternoonOpeningSchedule());
@@ -92,7 +98,7 @@ public class RestaurantService {
         ResponseEntity<ResponseInterfaceDto> saveOwner = this.saveOwner(owner);
         if (saveOwner != null)
             return saveOwner;
-        
+
         ResponseEntity<ResponseInterfaceDto> saveRestaurant = this.saveRestaurant(restaurant);
         if (saveRestaurant != null)
             return saveRestaurant;
@@ -102,8 +108,8 @@ public class RestaurantService {
 
     // meal methods
     public ResponseEntity<ResponseInterfaceDto> addMeal(
-        Principal user,
-        AddMealDto mealDto
+            Principal user,
+            AddMealDto mealDto
     ) {
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
 
@@ -113,7 +119,7 @@ public class RestaurantService {
 
         Meal meal = parser.parseAddMealDtoToMeal(mealDto);
         meal.setRestaurant(restaurant);
-        
+
         try {
             meal = this.mealRepository.save(meal);
         } catch (Exception e) {
@@ -126,25 +132,25 @@ public class RestaurantService {
             return saveRestaurant;
 
         return ResponseEntity.ok(
-            parser.parseMealtoMealDto(meal)
+                parser.parseMealtoMealDto(meal)
         );
     }
 
     public ResponseEntity<ResponseInterfaceDto> getMeal(
-        Principal user,
-        Long mealId
+            Principal user,
+            Long mealId
     ) {
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
 
         Meal meal = this.mealRepository.findById(mealId).orElseThrow(
-            () -> new ResourceNotFoundException("Meal not found with id: " + mealId)
+                () -> new ResourceNotFoundException("Meal not found with id: " + mealId)
         );
 
         if (!meal.getRestaurant().equals(daoUser.getRestaurant()))
             throw new ResourceNotOwnedException("Meal is not owned by user with email: " + daoUser.getEmail());
 
         return ResponseEntity.ok(
-            new RestaurantParser().parseMealtoMealDto(meal)
+                new RestaurantParser().parseMealtoMealDto(meal)
         );
     }
 
@@ -153,14 +159,14 @@ public class RestaurantService {
         RestaurantParser parser = new RestaurantParser();
 
         return ResponseEntity.ok(daoUser.getRestaurant().getMeals().stream().map(
-            parser::parseMealtoMealDto
+                parser::parseMealtoMealDto
         ).collect(Collectors.toList()));
     }
 
     public ResponseEntity<GetPutMealDto> updateMeal(
-        Principal user,
-        Long mealId,
-        AddMealDto mealDto
+            Principal user,
+            Long mealId,
+            AddMealDto mealDto
     ) {
 
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
@@ -174,13 +180,13 @@ public class RestaurantService {
         meal = this.mealRepository.save(meal);
 
         return ResponseEntity.ok(
-            new RestaurantParser().parseMealtoMealDto(meal)
+                new RestaurantParser().parseMealtoMealDto(meal)
         );
     }
 
     public ResponseEntity<String> deleteMeal(
-        Principal user,
-        Long mealId
+            Principal user,
+            Long mealId
     ) {
 
         DAOUser daoUser = this.retrieveRestaurantOwner(user.getName());
@@ -451,21 +457,21 @@ public class RestaurantService {
     // auxiliar methods
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
-            () -> new UsernameNotFoundException("User not found with email: " + email)
+                () -> new UsernameNotFoundException("User not found with email: " + email)
         );
     }
 
     private Restaurant retrieveRestaurant(DAOUser owner) {
         return this.restaurantRepository.findByOwner(
-            owner
+                owner
         ).orElseThrow(
-            () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
+                () -> new UsernameNotFoundException("Restaurant not found with owner email:" + owner.getEmail())
         );
     }
 
     private Meal retrieveMeal(DAOUser owner, Long mealId) {
         Meal meal = this.mealRepository.findById(mealId).orElseThrow(
-            () -> new ResourceNotFoundException("No Meal matches the id: " + mealId)
+                () -> new ResourceNotFoundException("No Meal matches the id: " + mealId)
         );
         
         if (!owner.getRestaurant().equals(meal.getRestaurant()))

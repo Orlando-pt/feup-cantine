@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Meal;
@@ -26,6 +28,7 @@ public class MenuRepositoryTest {
 
     private DAOUser user1;
     private Restaurant restaurant1;
+    private Restaurant restaurant2;
     private Meal meal1;
     private Meal meal2;
     private Meal meal3;
@@ -46,6 +49,26 @@ public class MenuRepositoryTest {
         this.entityManager.persist(this.menu2);
 
         this.entityManager.flush();
+    }
+
+    @Test
+    void testFindTheMenuWithCheapestPrice() {
+        Assertions.assertThat(
+            this.menuRepository.findFirstByRestaurant(
+                this.restaurant1,
+                Sort.by(Direction.ASC, "startPrice")
+            )
+        ).isEqualTo(this.menu2);
+    }
+
+    @Test
+    void testFindMostExpensiveMenu() {
+        Assertions.assertThat(
+            this.menuRepository.findFirstByRestaurant(
+                this.restaurant1,
+                Sort.by(Direction.DESC, "endPrice")
+            )
+        ).isEqualTo(this.menu1);
     }
 
     @Test
@@ -90,14 +113,14 @@ public class MenuRepositoryTest {
         this.menu1 = new Menu();
         this.menu1.setName("Monday morning");
         this.menu1.setStartPrice(5.11);
-        this.menu1.setEndPrice(10.50);
+        this.menu1.setEndPrice(11.50);
         this.menu1.addMeal(this.meal1);
         this.menu1.setRestaurant(this.restaurant1);
         this.restaurant1.addMenu(this.menu1);
 
         this.menu2 = new Menu();
         this.menu2.setName("Monday afternoon");
-        this.menu2.setStartPrice(5.11);
+        this.menu2.setStartPrice(3.50);
         this.menu2.setEndPrice(10.50);
         this.menu2.addMeal(this.meal2);
         this.menu2.addMeal(this.meal3);

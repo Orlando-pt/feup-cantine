@@ -4,9 +4,11 @@ import java.util.List;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
+import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.model.Meal;
+import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.model.AssignMenu;
-import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.MealTypeEnum;
 import pt.feup.les.feupfood.model.Menu;
 
@@ -28,6 +30,22 @@ public class RestaurantParser {
         mealDto.setMealType(meal.getMealType());
         mealDto.setNutritionalInformation(meal.getNutritionalInformation());
         return mealDto;
+    }
+
+    public GetRestaurantDto parseRestaurantToRestaurantDto(Restaurant restaurant) {
+        var restaurantDto = new GetRestaurantDto();
+        restaurantDto.setId(restaurant.getId());
+        // This condition might not be working
+        restaurantDto.setFullName(restaurant.getOwner().getFullName());
+        restaurantDto.setLocation(restaurant.getLocation());
+        restaurantDto.setCuisines(restaurant.getCuisines());
+        restaurantDto.setTypeMeals(restaurant.getTypeMeals());
+        restaurantDto.setProfileImageUrl(restaurant.getOwner().getProfileImageUrl());
+        restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
+        restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
+        restaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
+        restaurantDto.setAfternoonClosingSchedule(restaurant.getAfternoonClosingSchedule());
+        return restaurantDto;
     }
 
     public GetPutMenuDto parseMenutoMenuDto(Menu menu) {
