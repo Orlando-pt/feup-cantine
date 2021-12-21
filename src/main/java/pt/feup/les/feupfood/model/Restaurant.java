@@ -41,6 +41,10 @@ public class Restaurant {
 
     private String location;
 
+    private String cuisines;
+
+    private String typeMeals;
+
     @Basic
     private Time morningOpeningSchedule;
 

@@ -106,17 +106,23 @@ public class ClientService {
 
         Restaurant restaurant = this.retrieveRestaurant(id);
 
-        priceRange.setMinimumPrice(
-            this.menuRepository.findFirstByRestaurant(
-                restaurant, Sort.by(Direction.ASC, "startPrice")
-            ).getStartPrice()
-        );
+        if (restaurant.getMeals().size() != 0) {
+            priceRange.setMinimumPrice(
+                this.menuRepository.findFirstByRestaurant(
+                    restaurant, Sort.by(Direction.ASC, "startPrice")
+                ).getStartPrice()
+            );
 
-        priceRange.setMaximumPrice(
-            this.menuRepository.findFirstByRestaurant(
-                restaurant, Sort.by(Direction.DESC, "endPrice")
-            ).getEndPrice()
-        );
+            priceRange.setMaximumPrice(
+                this.menuRepository.findFirstByRestaurant(
+                    restaurant, Sort.by(Direction.DESC, "endPrice")
+                ).getEndPrice()
+            );
+        } else {
+            priceRange.setMaximumPrice(0.0);
+            priceRange.setMinimumPrice(0.0);
+        }
+
 
         return ResponseEntity.ok(priceRange);
     }

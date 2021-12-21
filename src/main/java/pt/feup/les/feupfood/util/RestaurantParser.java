@@ -38,6 +38,8 @@ public class RestaurantParser {
         // This condition might not be working
         restaurantDto.setFullName(restaurant.getOwner().getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
+        restaurantDto.setCuisines(restaurant.getCuisines());
+        restaurantDto.setTypeMeals(restaurant.getTypeMeals());
         restaurantDto.setProfileImageUrl(restaurant.getOwner().getProfileImageUrl());
         restaurantDto.setMorningOpeningSchedule(restaurant.getMorningOpeningSchedule());
         restaurantDto.setMorningClosingSchedule(restaurant.getMorningClosingSchedule());
