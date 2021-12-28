@@ -2,6 +2,7 @@ package pt.feup.les.feupfood.controller;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,6 +211,21 @@ public class ClientController_RestTemplateIT {
             priceRange.getBody()
         ).extracting(PriceRangeDto::getMaximumPrice)
             .isEqualTo(5.4);
+    }
+
+    @Test
+    @Disabled
+    void testAddFavoriteRestaurant() {
+        var headers = this.getStandardHeaders();
+
+        var restaurants = this.restTemplate.exchange(
+                "/api/client/restaurant",
+                HttpMethod.GET, new HttpEntity<>(headers),
+                GetRestaurantDto[].class);
+
+
+        for (GetRestaurantDto dto : restaurants.getBody())
+            System.out.println(dto);
     }
 
     private void registerClient() {

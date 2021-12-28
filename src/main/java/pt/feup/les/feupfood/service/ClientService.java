@@ -145,6 +145,62 @@ public class ClientService {
         return ResponseEntity.ok(new ClientParser().parseRestaurantToRestaurantDto(restaurant));
     }
 
+    // add favorite restaurant operations
+    public ResponseEntity<String> addFavoriteRestaurant(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+        
+        List<Long> favoriteRestaurantIds = client.getClientFavoriteRestaurants().stream()
+                    .map(restaurant -> restaurant.getId())
+                    .collect(Collectors.toList());
+
+        if (favoriteRestaurantIds.contains(restaurantId))
+            return ResponseEntity.badRequest().body("Restaurant with id [" + restaurantId + "] is already on favorites list.");
+
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        client.addFavoriteRestaurant(restaurant);
+        this.userRepository.save(client);
+
+        return ResponseEntity.ok("Operation made successfuly");
+    }
+
+    public ResponseEntity<String> removeFavoriteRestaurant(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        List<Long> favoriteRestaurantIds = client.getClientFavoriteRestaurants().stream()
+                    .map(restaurant -> restaurant.getId())
+                    .collect(Collectors.toList());
+
+        if (!favoriteRestaurantIds.contains(restaurantId))
+            return ResponseEntity.badRequest().body("Restaurant with id [" + restaurantId + "] not on favorites list");
+
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        client.removeFavoriteRestaurant(restaurant);
+        this.userRepository.save(client);
+
+        return ResponseEntity.ok("Operation made successfuly");
+    }
+
+    public ResponseEntity<List<GetRestaurantDto>> getFavoriteRestaurants(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        ClientParser parser = new ClientParser();
+        return ResponseEntity.ok(
+            client.getClientFavoriteRestaurants().stream()
+                .map(parser::parseRestaurantToRestaurantDto)
+                .collect(Collectors.toList())
+        );
+    }
+
     // auxiliar methods
     private DAOUser retrieveUser(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
