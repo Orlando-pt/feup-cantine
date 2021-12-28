@@ -160,12 +160,6 @@ public class ClientController_RestTemplateIT {
                 new HttpEntity<>(headers),
                 GetPutClientReviewDto[].class);
         
-        /**
-         * GetPutClientReviewDto(id=2, clientId=4, clientFullName=Francisco Bastos, 
-         * clientProfileImageUrl=https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-
-         * muscles-picture-id638471524?s=612x612, restaurantId=1, classificationGrade=2, 
-         * comment=Who does not like a meal of rice with potato sauce)
-         */
         GetPutClientReviewDto expectedReview = new GetPutClientReviewDto();
         expectedReview.setClassificationGrade(2);
         expectedReview.setClientFullName("Francisco Bastos");
