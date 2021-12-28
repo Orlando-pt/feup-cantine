@@ -41,7 +41,7 @@ public class SwaggerConfiguration {
         .securityContexts(Arrays.asList(securityContext()))
         .securitySchemes(Arrays.asList(apiKey()))
         .select()
-        .apis(RequestHandlerSelectors.any())
+        .apis(RequestHandlerSelectors.basePackage("pt.feup.les.feupfood.controller"))
         .paths(PathSelectors.any())
         .build();
   }
