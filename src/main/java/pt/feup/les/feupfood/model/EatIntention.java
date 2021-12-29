@@ -51,9 +51,6 @@ public class EatIntention {
     )
     private Set<Meal> meals;
 
-    // TODO verificar se devo colocar aqui cascade por causa de 
-    // retirar as entradas desta tabela de meals
-
     public EatIntention() {
         this.meals = new HashSet<>();
     }

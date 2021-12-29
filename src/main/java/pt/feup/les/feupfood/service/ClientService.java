@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.AddEatIntention;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
@@ -31,6 +32,7 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.ClientParser;
+import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.util.List;
@@ -160,6 +162,21 @@ public class ClientService {
         Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new ResourceNotFoundException("The restaurant id was not found"));
 
         return ResponseEntity.ok(new ClientParser().parseRestaurantToRestaurantDto(restaurant));
+    }
+
+    // restaurant operations (get assignments)
+    public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurant(
+        Long restaurantId
+    ) {
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        RestaurantParser parser = new RestaurantParser();
+        
+        return ResponseEntity.ok(
+            restaurant.getAssignments().stream()
+                .map(parser::parseAssignmentToAssignmentDto)
+                .collect(Collectors.toList())
+        );
     }
 
     // add favorite restaurant operations
