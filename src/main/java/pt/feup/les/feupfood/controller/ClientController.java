@@ -121,4 +121,45 @@ public class ClientController {
         return this.clientService.removeFavoriteRestaurant(user, id);
     }
 
+    // client intends to eat a restaurant (endpoints)
+    @GetMapping("intention")
+    public ResponseEntity<List<GetClientEatIntention>> getEatingIntentions(
+        Principal user
+    ) {
+        return this.clientService.getEatIntentions(user);
+    }
+
+    @GetMapping("intention/{id}")
+    public ResponseEntity<GetClientEatIntention> getEatingIntention(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.getEatIntention(user, id);
+    }
+
+    @PostMapping("intention")
+    public ResponseEntity<GetClientEatIntention> addEatingIntention(
+        Principal user,
+        @RequestBody AddEatIntention intentionDto
+    ) {
+        return this.clientService.addEatIntention(user, intentionDto);
+    }
+
+    @PutMapping("intention/{id}")
+    public ResponseEntity<GetClientEatIntention> updateEatingIntention(
+        Principal user,
+        @PathVariable Long id,
+        @RequestBody PutClientEatIntention intentionDto
+    ) {
+        return this.clientService.updateEatIntention(user, id, intentionDto);
+    }
+
+    @DeleteMapping("intention/{id}")
+    public ResponseEntity<String> deleteEatingIntention(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.removeEatIntention(user, id);
+    }
+
 }

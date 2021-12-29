@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -42,8 +43,16 @@ public class EatIntention {
     private AssignMenu assignment;
 
     @ToString.Exclude
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "eatingIntentions")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "eating_intentions_meals",
+        joinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "eat_intention_id", referencedColumnName = "id")
+    )
     private Set<Meal> meals;
+
+    // TODO verificar se devo colocar aqui cascade por causa de 
+    // retirar as entradas desta tabela de meals
 
     public EatIntention() {
         this.meals = new HashSet<>();

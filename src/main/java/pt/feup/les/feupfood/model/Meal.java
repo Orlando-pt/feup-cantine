@@ -54,12 +54,7 @@ public class Meal {
     private List<Menu> menus;
 
     @ToString.Exclude
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "eating_intentions_meals",
-        joinColumns = @JoinColumn(name = "eat_intention_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "meals")
     private List<EatIntention> eatingIntentions;
 
     public Meal() {
