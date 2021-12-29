@@ -214,7 +214,6 @@ public class ClientController_RestTemplateIT {
     }
 
     @Test
-    @Disabled
     void testAddFavoriteRestaurant() {
         var headers = this.getStandardHeaders();
 
@@ -224,8 +223,78 @@ public class ClientController_RestTemplateIT {
                 GetRestaurantDto[].class);
 
 
-        for (GetRestaurantDto dto : restaurants.getBody())
-            System.out.println(dto);
+        var addFavoriteResponse1 = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            addFavoriteResponse1.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+
+        var addFavorite1OnceAgain = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            addFavorite1OnceAgain.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+
+        var addFavoriteResponse2 = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[1].getId(),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            addFavoriteResponse2.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var getFavoriteRestaurants = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetRestaurantDto[].class
+        );
+
+        Assertions.assertThat(
+            getFavoriteRestaurants.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getFavoriteRestaurants.getBody()
+        ).hasSize(2).extracting(GetRestaurantDto::getId).containsOnly(1L, 2L);
+
+        var removeFavoriteRestaurant = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            removeFavoriteRestaurant.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var removeFavoriteNonFavoritedRestaurant = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + 10,
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            removeFavoriteNonFavoritedRestaurant.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
     }
 
     private void registerClient() {
