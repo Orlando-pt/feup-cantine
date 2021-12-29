@@ -6,6 +6,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.AddEatIntention;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
@@ -299,7 +301,7 @@ public class ClientService {
                         .map(Meal::getId)
                         .collect(Collectors.toSet());
 
-        if (!currentMealsId.containsAll(intentionDto.getMealsId())) {
+        if (!currentMealsId.containsAll(intentionDto.getMealsId()) || currentMealsId.size() != intentionDto.getMealsId().size()) {
             Set<Meal> meals = intention.getAssignment().getMenu().getMeals()
                         .stream().filter(
                             meal -> intentionDto.getMealsId().contains(meal.getId())
