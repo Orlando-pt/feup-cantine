@@ -62,6 +62,8 @@ public class ClientService {
     @Autowired
     private EatIntentionRepository eatIntentionRepository;
 
+    private static final String RESOURCE_NOT_OWNED_INTENTION_EXCEPTION = "Intention does not belong to the authenticated user.";
+
     // profile operations
     public ResponseEntity<UpdateProfileDto> getProfile(
         Principal user
@@ -278,7 +280,7 @@ public class ClientService {
         EatIntention intention = this.retrieveIntention(intentionId);
 
         if (!intention.getClient().equals(client))
-            throw new ResourceNotOwnedException("Intention does not belong to the authenticated user.");
+            throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
 
         this.eatIntentionRepository.delete(intention);
 
@@ -295,7 +297,7 @@ public class ClientService {
         EatIntention intention = this.retrieveIntention(intentionId);
 
         if (!intention.getClient().equals(client))
-            throw new ResourceNotOwnedException("Intention does not belong to the authenticated user.");
+            throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
 
         Set<Long> currentMealsId = intention.getMeals().stream()
                         .map(Meal::getId)
@@ -340,7 +342,7 @@ public class ClientService {
         EatIntention intention = this.retrieveIntention(intentionId);
 
         if (!intention.getClient().equals(client))
-            throw new ResourceNotOwnedException("Intention does not belong to the authenticated user.");
+            throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
         
         return ResponseEntity.ok(
             new ClientParser().parseEatIntentionToDto(intention)
