@@ -3,6 +3,7 @@ package pt.feup.les.feupfood.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,7 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(exclude = {"reviews", "restaurant", "clientFavoriteRestaurants"})
+@EqualsAndHashCode(exclude = {"reviews", "restaurant", "clientFavoriteRestaurants", "eatingIntentions"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = DAOUser.class)
 @Entity
 @Table(name = "users")
@@ -54,7 +55,7 @@ public class DAOUser {
 
     @ToString.Exclude
     @OneToMany(mappedBy="client")
-    private List <Review> reviews;
+    private List<Review> reviews;
 
     // in the case user is a restaurant
     @ToString.Exclude
@@ -70,9 +71,14 @@ public class DAOUser {
     )
     private List<Restaurant> clientFavoriteRestaurants;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private List<EatIntention> eatingIntentions;
+
     public DAOUser() {
         this.reviews = new ArrayList<>();
         this.clientFavoriteRestaurants = new ArrayList<>();
+        this.eatingIntentions = new ArrayList<>();
     }
 
     public boolean addReview(Review review) {
