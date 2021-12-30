@@ -17,6 +17,7 @@ services:
   redis:
     container_name: redis-instance
     image: redis:latest
+    command: ["redis-server", "--requirepass", "feupfood"]
     volumes:
       - redis:/data
     ports:
