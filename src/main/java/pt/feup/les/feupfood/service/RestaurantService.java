@@ -454,6 +454,13 @@ public class RestaurantService {
         return ResponseEntity.ok("");
     }
 
+    // public ResponseEntity<String> getAssignmentsNextNDays(
+    //     Principal user,
+    //     int days
+    // ) {
+
+    // }
+
     // auxiliar methods
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
