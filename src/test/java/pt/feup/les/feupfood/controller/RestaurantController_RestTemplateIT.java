@@ -632,7 +632,7 @@ public class RestaurantController_RestTemplateIT {
         eatIntention.setAssignment(assignmentFromRepo);
         eatIntention.setMeals(
             assignmentFromRepo.getMenu().getMeals().stream().filter(
-                meal -> meal.getMealType() == MealTypeEnum.DESERT
+                meal -> meal.getMealType() == MealTypeEnum.FISH
             ).collect(Collectors.toSet())
         );
 
@@ -644,6 +644,8 @@ public class RestaurantController_RestTemplateIT {
             new HttpEntity<>(headers),
             GetAssignmentDto[].class
         );
+
+        System.out.println(getAssignmentsNext5Days.getBody()[0]);
 
         Assertions.assertThat(
             getAssignmentsNext5Days.getStatusCode()

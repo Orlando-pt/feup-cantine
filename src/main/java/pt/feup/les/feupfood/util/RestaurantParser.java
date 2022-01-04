@@ -29,6 +29,7 @@ public class RestaurantParser {
         mealDto.setId(meal.getId());
         mealDto.setMealType(meal.getMealType());
         mealDto.setNutritionalInformation(meal.getNutritionalInformation());
+        mealDto.setNumberOfIntentions(meal.getEatingIntentions().size());
         return mealDto;
     }
 
