@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm;
 
 import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
@@ -73,6 +72,8 @@ public class AssignMenuRepositoryTest {
             // make the test fail
             assertTrue(false);
         }
+
+        date = new Date(date.getTime() + 10000000L);
 
         // add more 7 days to date
         Date dateAfter7Days = new Date(date.getTime() + (7000 * 60 * 60 * 24));

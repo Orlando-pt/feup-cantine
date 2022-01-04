@@ -68,6 +68,7 @@ public class RestaurantParser {
         assignmentDto.setDate(assignment.getDate());
         assignmentDto.setSchedule(assignment.getSchedule());
         assignmentDto.setMenu(parseMenutoMenuDto(assignment.getMenu()));
+        assignmentDto.setNumberOfIntentions(assignment.getEatingIntentions().size());
 
         return assignmentDto;
     }
