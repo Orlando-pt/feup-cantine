@@ -10,4 +10,6 @@ public class GetClientEatIntention {
     private Long id;
     private GetAssignmentDto assignment;
     private Set<GetPutMealDto> meals;
+    private String code;
+    private Boolean validatedCode;
 }

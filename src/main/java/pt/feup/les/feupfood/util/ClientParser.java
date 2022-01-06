@@ -64,6 +64,9 @@ public class ClientParser {
                 .collect(Collectors.toSet())
         );
 
+        intentionDto.setCode(intention.getCode());
+        intentionDto.setValidatedCode(intention.getValidatedCode());
+
         return intentionDto;
     }
 }
