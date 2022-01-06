@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,12 @@ import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
@@ -452,6 +455,28 @@ public class RestaurantService {
         this.assignMenuRepository.delete(assignment);
 
         return ResponseEntity.ok("");
+    }
+
+    public ResponseEntity<VerifyCodeDto> verifyCode(
+        Principal user,
+        Long assignmentId,
+        String code
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        AssignMenu assignment = this.retrieveAssignment(owner, assignmentId);
+
+        List<EatIntention> intentionList = assignment.getEatingIntentions().stream()
+            .filter(eatIntention -> eatIntention.getCode().equals(code))
+            .collect(Collectors.toList());
+        if (intentionList.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        // it is lacking the verification if it was given more than two intentions
+        // because we really trust there will no appear duplicated codes
+        return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
+            intentionList.get(0).getClient()
+        ));
     }
 
     // auxiliar methods

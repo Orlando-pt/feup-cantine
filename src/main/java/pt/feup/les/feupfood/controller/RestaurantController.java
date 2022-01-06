@@ -27,6 +27,7 @@ import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.service.RestaurantService;
 
 @RestController
@@ -159,6 +160,17 @@ public class RestaurantController {
 	) {
 		return this.service.getAssignments(user);
 	}
+
+	@GetMapping("assignment/{id}/verify-code/{code}")
+	public ResponseEntity<VerifyCodeDto> verifyCode(
+		Principal user,
+		@PathVariable Long id,
+		@PathVariable String code
+	) {
+		return this.service.verifyCode(user, id, code);
+	}
+
+	// @GetMapping("assignment/verify-code/{code}")
 
 	@PostMapping("assignment")
 	public ResponseEntity<ResponseInterfaceDto> addAssignment(
