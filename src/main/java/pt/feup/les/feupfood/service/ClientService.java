@@ -18,6 +18,7 @@ import pt.feup.les.feupfood.dto.PutClientEatIntention;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
 import pt.feup.les.feupfood.exceptions.BadRequestParametersException;
+import pt.feup.les.feupfood.exceptions.ExceededDateForAssignmentException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.model.AssignMenu;
@@ -37,6 +38,7 @@ import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -248,6 +250,9 @@ public class ClientService {
 
         AssignMenu assignment = this.retrieveAssingment(intentionDto.getAssignmentId());
 
+        // verify if the operation is beeing made one day before the assignment
+        this.verifyAddOrUpdateIntentionDate(assignment.getDate());
+
         Set<Long> assignmentMealsId = assignment.getMenu().getMeals().stream()
                     .map(meal -> meal.getId()).collect(Collectors.toSet());
                     
@@ -263,7 +268,8 @@ public class ClientService {
         eatIntention.setClient(client);
         eatIntention.setAssignment(assignment);
         eatIntention.setMeals(meals);
-        eatIntention.setCode(this.generateRandomCode());
+
+        eatIntention.setCode(this.generateRandomCode(assignment));
         eatIntention.setValidatedCode(false);
 
         return ResponseEntity.ok(
@@ -300,6 +306,9 @@ public class ClientService {
 
         if (!intention.getClient().equals(client))
             throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
+
+        // verify if is making the update one day before the assignment
+        this.verifyAddOrUpdateIntentionDate(intention.getAssignment().getDate());
 
         Set<Long> currentMealsId = intention.getMeals().stream()
                         .map(Meal::getId)
@@ -378,13 +387,35 @@ public class ClientService {
         return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }
 
-    private String generateRandomCode() {
+    private String generateRandomCode(AssignMenu assignment) {
         String generatedCode = "";
         SecureRandom random = new SecureRandom();
+        boolean validCode = false;
 
-        for (int i = 0; i < 9; i++)
-            generatedCode += String.valueOf(random.nextInt(10));
+        List<String> listWithAssignmentCodes = assignment.getEatingIntentions().stream()
+            .map(EatIntention::getCode).collect(Collectors.toList());
+
+        while (!validCode) {
+            generatedCode = "";
+            
+            for (int i = 0; i < 9; i++)
+                generatedCode += String.valueOf(random.nextInt(10));
+            
+            // check if code generated was already assigned to anyone
+            // only in this assignment
+            // generate a new code if one already exists
+            validCode = !listWithAssignmentCodes.contains(generatedCode);
+        }
 
         return generatedCode;
+    }
+
+    private void verifyAddOrUpdateIntentionDate(Date assignmentDate) {
+        long oneDay = 1000L * 60 * 60 * 24;
+        Date tomorrow = new Date(System.currentTimeMillis() + oneDay);
+
+        if (tomorrow.after(assignmentDate))
+            throw new ExceededDateForAssignmentException("Eating intentions need to be made 1 day before of the assignment.");
+
     }
 }
