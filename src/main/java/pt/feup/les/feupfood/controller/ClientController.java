@@ -105,6 +105,14 @@ public class ClientController {
         return this.clientService.getFavoriteRestaurants(user);
     }
 
+    @GetMapping("restaurant/favorite/{id}")
+    public ResponseEntity<IsFavoriteDto> restaurantIsOnFavoriteList(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.restaurantIsFavorite(user, id);
+    }
+
     @PostMapping("restaurant/favorite/{id}")
     public ResponseEntity<String> addClientFavoriteRestaurant(
         Principal user,

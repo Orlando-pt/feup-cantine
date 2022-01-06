@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.dto.IsFavoriteDto;
 import pt.feup.les.feupfood.dto.PriceRangeDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
@@ -198,6 +199,21 @@ public class ClientService {
             client.getClientFavoriteRestaurants().stream()
                 .map(parser::parseRestaurantToRestaurantDto)
                 .collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<IsFavoriteDto> restaurantIsFavorite(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        return ResponseEntity.ok( new IsFavoriteDto(
+                !client.getClientFavoriteRestaurants().stream().filter(
+                    restaurant -> restaurant.getId().equals(restaurantId)
+                )
+                    .collect(Collectors.toList()).isEmpty()
+            )
         );
     }
 
