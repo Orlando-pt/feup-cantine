@@ -2,6 +2,7 @@ package pt.feup.les.feupfood.controller;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,6 +211,120 @@ public class ClientController_RestTemplateIT {
             priceRange.getBody()
         ).extracting(PriceRangeDto::getMaximumPrice)
             .isEqualTo(5.4);
+    }
+
+    @Test
+    void testAddFavoriteRestaurant() {
+        var headers = this.getStandardHeaders();
+
+        var restaurants = this.restTemplate.exchange(
+                "/api/client/restaurant",
+                HttpMethod.GET, new HttpEntity<>(headers),
+                GetRestaurantDto[].class);
+
+
+        var addFavoriteResponse1 = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            addFavoriteResponse1.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+
+        var addFavorite1OnceAgain = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            addFavorite1OnceAgain.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+
+        var addFavoriteResponse2 = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[1].getId(),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            addFavoriteResponse2.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var getFavoriteRestaurants = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetRestaurantDto[].class
+        );
+
+        Assertions.assertThat(
+            getFavoriteRestaurants.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getFavoriteRestaurants.getBody()
+        ).hasSize(2).extracting(GetRestaurantDto::getId).containsOnly(1L, 2L);
+
+        var getFavoriteNumberOne = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/1",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            IsFavoriteDto.class
+        );
+
+        Assertions.assertThat(
+            getFavoriteNumberOne.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getFavoriteNumberOne.getBody().getFavorite()
+        ).isTrue();
+
+        var getFavoriteNotBelongingToList = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/1000",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            IsFavoriteDto.class
+        );
+
+        Assertions.assertThat(
+            getFavoriteNotBelongingToList.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getFavoriteNotBelongingToList.getBody().getFavorite()
+        ).isFalse();
+
+        var removeFavoriteRestaurant = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            removeFavoriteRestaurant.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var removeFavoriteNonFavoritedRestaurant = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/" + 10,
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            removeFavoriteNonFavoritedRestaurant.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
     }
 
     private void registerClient() {

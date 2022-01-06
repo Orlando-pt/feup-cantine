@@ -96,4 +96,37 @@ public class ClientController {
     public ResponseEntity<String> home() {
         return ResponseEntity.ok("Hello client!");
     }
+
+    // add favorite restaurant endpoints
+    @GetMapping("restaurant/favorite")
+    public ResponseEntity<List<GetRestaurantDto>> getClientFavoriteRestaurants(
+        Principal user
+    ) {
+        return this.clientService.getFavoriteRestaurants(user);
+    }
+
+    @GetMapping("restaurant/favorite/{id}")
+    public ResponseEntity<IsFavoriteDto> restaurantIsOnFavoriteList(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.restaurantIsFavorite(user, id);
+    }
+
+    @PostMapping("restaurant/favorite/{id}")
+    public ResponseEntity<String> addClientFavoriteRestaurant(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.addFavoriteRestaurant(user, id);
+    }
+
+    @DeleteMapping("restaurant/favorite/{id}")
+    public ResponseEntity<String> removeClientFavoriteRestaurant(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.removeFavoriteRestaurant(user, id);
+    }
+
 }

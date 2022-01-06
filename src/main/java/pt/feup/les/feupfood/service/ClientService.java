@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.dto.IsFavoriteDto;
 import pt.feup.les.feupfood.dto.PriceRangeDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
@@ -143,6 +144,77 @@ public class ClientService {
         Restaurant restaurant = this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new ResourceNotFoundException("The restaurant id was not found"));
 
         return ResponseEntity.ok(new ClientParser().parseRestaurantToRestaurantDto(restaurant));
+    }
+
+    // add favorite restaurant operations
+    public ResponseEntity<String> addFavoriteRestaurant(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+        
+        List<Long> favoriteRestaurantIds = client.getClientFavoriteRestaurants().stream()
+                    .map(restaurant -> restaurant.getId())
+                    .collect(Collectors.toList());
+
+        if (favoriteRestaurantIds.contains(restaurantId))
+            return ResponseEntity.badRequest().body("Restaurant with id [" + restaurantId + "] is already on favorites list.");
+
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        client.addFavoriteRestaurant(restaurant);
+        this.userRepository.save(client);
+
+        return ResponseEntity.ok("Operation made successfuly");
+    }
+
+    public ResponseEntity<String> removeFavoriteRestaurant(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        List<Long> favoriteRestaurantIds = client.getClientFavoriteRestaurants().stream()
+                    .map(restaurant -> restaurant.getId())
+                    .collect(Collectors.toList());
+
+        if (!favoriteRestaurantIds.contains(restaurantId))
+            return ResponseEntity.badRequest().body("Restaurant with id [" + restaurantId + "] not on favorites list");
+
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        client.removeFavoriteRestaurant(restaurant);
+        this.userRepository.save(client);
+
+        return ResponseEntity.ok("Operation made successfuly");
+    }
+
+    public ResponseEntity<List<GetRestaurantDto>> getFavoriteRestaurants(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        ClientParser parser = new ClientParser();
+        return ResponseEntity.ok(
+            client.getClientFavoriteRestaurants().stream()
+                .map(parser::parseRestaurantToRestaurantDto)
+                .collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<IsFavoriteDto> restaurantIsFavorite(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        return ResponseEntity.ok( new IsFavoriteDto(
+                !client.getClientFavoriteRestaurants().stream().filter(
+                    restaurant -> restaurant.getId().equals(restaurantId)
+                )
+                    .collect(Collectors.toList()).isEmpty()
+            )
+        );
     }
 
     // auxiliar methods
