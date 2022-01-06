@@ -698,7 +698,7 @@ public class RestaurantController_RestTemplateIT {
         );
 
         Assertions.assertThat(
-            badVerificationCodeResponse.getStatusCode()
+            repeatedVerificationCodeResponse.getStatusCode()
         ).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
     }
 

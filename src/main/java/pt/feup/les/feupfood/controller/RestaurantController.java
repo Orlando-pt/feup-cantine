@@ -170,8 +170,6 @@ public class RestaurantController {
 		return this.service.verifyCode(user, id, code);
 	}
 
-	// @GetMapping("assignment/verify-code/{code}")
-
 	@GetMapping("assignment/days/{id}")
 	public ResponseEntity<List<GetAssignmentDto>> getAssignmentsForNDays(
 		Principal user,
