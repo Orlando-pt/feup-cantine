@@ -31,6 +31,7 @@ public class RestaurantParser {
         mealDto.setId(meal.getId());
         mealDto.setMealType(meal.getMealType());
         mealDto.setNutritionalInformation(meal.getNutritionalInformation());
+        mealDto.setNumberOfIntentions(meal.getEatingIntentions().size());
         return mealDto;
     }
 
@@ -70,6 +71,7 @@ public class RestaurantParser {
         assignmentDto.setDate(assignment.getDate());
         assignmentDto.setSchedule(assignment.getSchedule());
         assignmentDto.setMenu(parseMenutoMenuDto(assignment.getMenu()));
+        assignmentDto.setNumberOfIntentions(assignment.getEatingIntentions().size());
 
         return assignmentDto;
     }

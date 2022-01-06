@@ -12,4 +12,5 @@ public class GetPutMealDto implements ResponseInterfaceDto{
     private MealTypeEnum mealType;
     private String description;
     private String nutritionalInformation;
+    private int numberOfIntentions;
 }

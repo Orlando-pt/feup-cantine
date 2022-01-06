@@ -2,6 +2,7 @@ package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -477,6 +478,25 @@ public class RestaurantService {
         return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
             intentionList.get(0).getClient()
         ));
+    }
+
+    public ResponseEntity<List<GetAssignmentDto>> getAssignmentsNextNDays(
+        Principal user,
+        int days
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Date now = new Date(System.currentTimeMillis());
+
+        Date future = new Date(now.getTime() + days * 1000 * 60 * 60 * 24);
+
+        RestaurantParser parser = new RestaurantParser();
+        return ResponseEntity.ok(
+            this.assignMenuRepository.findAllByDateBetweenAndRestaurant(
+                now, future, owner.getRestaurant()
+            ).stream().map(parser::parseAssignmentToAssignmentDto)
+                .collect(Collectors.toList())
+        );
     }
 
     // auxiliar methods

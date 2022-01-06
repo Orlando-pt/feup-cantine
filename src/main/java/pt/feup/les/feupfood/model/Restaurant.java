@@ -66,6 +66,7 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
     List <Review> reviews;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AssignMenu> assignments;
 

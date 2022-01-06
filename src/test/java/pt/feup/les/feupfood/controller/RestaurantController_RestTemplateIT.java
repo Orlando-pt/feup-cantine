@@ -2,6 +2,7 @@ package pt.feup.les.feupfood.controller;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,8 +30,14 @@ import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
+import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.MealTypeEnum;
 import pt.feup.les.feupfood.model.ScheduleEnum;
+import pt.feup.les.feupfood.repository.AssignMenuRepository;
+import pt.feup.les.feupfood.repository.EatIntentionRepository;
+import pt.feup.les.feupfood.repository.UserRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,6 +48,16 @@ public class RestaurantController_RestTemplateIT {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    // direct access to client repositories
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EatIntentionRepository eatIntentionRepository;
+
+    @Autowired
+    private AssignMenuRepository assignMenuRepository;
 
     private RegisterUserDto restaurantUser;
     private String token;
@@ -567,6 +584,78 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             deleteAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
+
+        // add assignment to retrieve it on the next 5 days endpoint
+        var createAssignmentNowDto = new AddAssignmentDto();
+        createAssignmentNowDto.setDate(new Date(System.currentTimeMillis()));
+
+        long msPerDay = 86400 * 1000;
+        long ms = System.currentTimeMillis();
+        
+        createAssignmentNowDto.setDate(
+            new Date(
+                ms - (ms % msPerDay)
+            )
+        );
+
+        createAssignmentNowDto.setMenu(response2.getBody().getId());
+        createAssignmentNowDto.setSchedule(ScheduleEnum.LUNCH);
+
+        var createAssignmentNow = this.restTemplate.exchange(
+            "/api/restaurant/assignment",
+            HttpMethod.POST,
+            new HttpEntity<>(createAssignmentNowDto, headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            createAssignmentNow.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        // create user assignment
+        DAOUser client = new DAOUser();
+        client.setBiography("biography");
+        client.setTerms(true);
+        client.setFullName("jose constancionancio");
+        client.setPassword("passwordultrasecreta");
+        client.setRole("ROLE_USER_CLIENT");
+        client.setEmail("josethastreet@mail.com");
+        
+        client = this.userRepository.save(client);
+
+        var eatIntention = new EatIntention();
+        eatIntention.setClient(client);
+        
+        var assignmentFromRepo = this.assignMenuRepository.findById(createAssignmentNow.getBody().getId()).orElseThrow(
+            () -> new ResourceNotFoundException("Not found assignment with id: " + createAssignmentNow.getBody().getId())
+        );
+        eatIntention.setAssignment(assignmentFromRepo);
+        eatIntention.setMeals(
+            assignmentFromRepo.getMenu().getMeals().stream().filter(
+                meal -> meal.getMealType() == MealTypeEnum.FISH
+            ).collect(Collectors.toSet())
+        );
+
+        this.eatIntentionRepository.save(eatIntention);
+
+        var getAssignmentsNext5Days = this.restTemplate.exchange(
+            "/api/restaurant/assignment/days/5",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto[].class
+        );
+
+        System.out.println(getAssignmentsNext5Days.getBody()[0]);
+
+        Assertions.assertThat(
+            getAssignmentsNext5Days.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+        
+        Assertions.assertThat(
+            getAssignmentsNext5Days.getBody()
+        ).hasSize(1).extracting(GetAssignmentDto::getNumberOfIntentions)
+            .containsOnly(1);
+
     }
 
     private void registerRestaurant() {
