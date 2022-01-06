@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import lombok.extern.log4j.Log4j2;
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.AddEatIntention;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
@@ -37,6 +36,7 @@ import pt.feup.les.feupfood.util.ClientParser;
 import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -263,6 +263,8 @@ public class ClientService {
         eatIntention.setClient(client);
         eatIntention.setAssignment(assignment);
         eatIntention.setMeals(meals);
+        eatIntention.setCode(this.generateRandomCode());
+        eatIntention.setValidatedCode(false);
 
         return ResponseEntity.ok(
             new ClientParser().parseEatIntentionToDto(
@@ -374,5 +376,15 @@ public class ClientService {
     private List<GetPutClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
         ClientParser clientParser = new ClientParser();
         return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
+    }
+
+    private String generateRandomCode() {
+        String generatedCode = "";
+        SecureRandom random = new SecureRandom();
+
+        for (int i = 0; i < 9; i++)
+            generatedCode += String.valueOf(random.nextInt(10));
+
+        return generatedCode;
     }
 }

@@ -51,6 +51,10 @@ public class EatIntention {
     )
     private Set<Meal> meals;
 
+    private String code;
+
+    private Boolean validatedCode;
+
     public EatIntention() {
         this.meals = new HashSet<>();
     }

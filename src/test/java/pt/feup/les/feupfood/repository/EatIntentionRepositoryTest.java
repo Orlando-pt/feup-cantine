@@ -54,6 +54,13 @@ public class EatIntentionRepositoryTest {
         ).hasSize(1);
 
     }
+    
+    @Test
+    void testFindByCode() {
+        Assertions.assertThat(
+            this.eatIntentionRepository.findByCode("123456789")
+        ).contains(this.intention);
+    }
 
     private void generateData() {
 
@@ -144,6 +151,9 @@ public class EatIntentionRepositoryTest {
         this.intention.getMeals().add(
             this.assignment1.getMenu().getMeals().get(1)
         );
+
+        this.intention.setCode("123456789");
+        this.intention.setValidatedCode(false);
 
         this.entityManager.persistAndFlush(this.intention);
 
