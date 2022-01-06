@@ -25,6 +25,7 @@ import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
+import pt.feup.les.feupfood.exceptions.VerificationCodeException;
 import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
@@ -32,6 +33,7 @@ import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
+import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
@@ -55,6 +57,9 @@ public class RestaurantService {
 
     @Autowired
     private AssignMenuRepository assignMenuRepository;
+
+    @Autowired
+    private EatIntentionRepository eatIntentionRepository;
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
@@ -471,12 +476,21 @@ public class RestaurantService {
             .filter(eatIntention -> eatIntention.getCode().equals(code))
             .collect(Collectors.toList());
         if (intentionList.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new VerificationCodeException("The specified code was not found.");
 
         // it is lacking the verification if it was given more than two intentions
         // because we really trust there will no appear duplicated codes
+
+        EatIntention intention = intentionList.get(0);
+
+        if (intention.getValidatedCode())
+            throw new VerificationCodeException("This code was already validated");
+
+        intention.setValidatedCode(true);
+        this.eatIntentionRepository.save(intention);
+
         return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
-            intentionList.get(0).getClient()
+            intention.getClient()
         ));
     }
 

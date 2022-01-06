@@ -30,7 +30,9 @@ import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
+import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.MealTypeEnum;
@@ -589,12 +591,11 @@ public class RestaurantController_RestTemplateIT {
         var createAssignmentNowDto = new AddAssignmentDto();
         createAssignmentNowDto.setDate(new Date(System.currentTimeMillis()));
 
-        long msPerDay = 86400 * 1000;
-        long ms = System.currentTimeMillis();
+        long msPerDay = 86400L * 1000;
         
         createAssignmentNowDto.setDate(
             new Date(
-                ms - (ms % msPerDay)
+                System.currentTimeMillis() + (2 * msPerDay)
             )
         );
 
@@ -626,7 +627,7 @@ public class RestaurantController_RestTemplateIT {
         var eatIntention = new EatIntention();
         eatIntention.setClient(client);
         
-        var assignmentFromRepo = this.assignMenuRepository.findById(createAssignmentNow.getBody().getId()).orElseThrow(
+        AssignMenu assignmentFromRepo = this.assignMenuRepository.findById(createAssignmentNow.getBody().getId()).orElseThrow(
             () -> new ResourceNotFoundException("Not found assignment with id: " + createAssignmentNow.getBody().getId())
         );
         eatIntention.setAssignment(assignmentFromRepo);
@@ -635,6 +636,8 @@ public class RestaurantController_RestTemplateIT {
                 meal -> meal.getMealType() == MealTypeEnum.FISH
             ).collect(Collectors.toSet())
         );
+        eatIntention.setCode("complicatedCode");
+        eatIntention.setValidatedCode(false);
 
         this.eatIntentionRepository.save(eatIntention);
 
@@ -645,8 +648,6 @@ public class RestaurantController_RestTemplateIT {
             GetAssignmentDto[].class
         );
 
-        System.out.println(getAssignmentsNext5Days.getBody()[0]);
-
         Assertions.assertThat(
             getAssignmentsNext5Days.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
@@ -656,6 +657,49 @@ public class RestaurantController_RestTemplateIT {
         ).hasSize(1).extracting(GetAssignmentDto::getNumberOfIntentions)
             .containsOnly(1);
 
+        // test verification of the code
+        var verificationCodeResponse = this.restTemplate.exchange(
+            "/api/restaurant/assignment/" + createAssignmentNow.getBody().getId() + 
+            "/verify-code/" + eatIntention.getCode(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            VerifyCodeDto.class
+        );
+
+        Assertions.assertThat(
+            verificationCodeResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            verificationCodeResponse.getBody()
+        ).extracting(VerifyCodeDto::getFullName)
+            .isEqualTo(eatIntention.getClient().getFullName());
+
+        // test a bad code
+        var badVerificationCodeResponse = this.restTemplate.exchange(
+            "/api/restaurant/assignment/" + createAssignmentNow.getBody().getId() + 
+            "/verify-code/" + "blablabla i dont exist",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            VerifyCodeDto.class
+        );
+
+        Assertions.assertThat(
+            badVerificationCodeResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+
+        // test a code already accepted
+        var repeatedVerificationCodeResponse = this.restTemplate.exchange(
+            "/api/restaurant/assignment/" + createAssignmentNow.getBody().getId() + 
+            "/verify-code/" + eatIntention.getCode(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            VerifyCodeDto.class
+        );
+
+        Assertions.assertThat(
+            badVerificationCodeResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
     }
 
     private void registerRestaurant() {
