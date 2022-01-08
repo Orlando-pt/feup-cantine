@@ -278,6 +278,36 @@ public class ClientController_RestTemplateIT {
             getFavoriteRestaurants.getBody()
         ).hasSize(2).extracting(GetRestaurantDto::getId).containsOnly(1L, 2L);
 
+        var getFavoriteNumberOne = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/1",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            IsFavoriteDto.class
+        );
+
+        Assertions.assertThat(
+            getFavoriteNumberOne.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getFavoriteNumberOne.getBody().getFavorite()
+        ).isTrue();
+
+        var getFavoriteNotBelongingToList = this.restTemplate.exchange(
+            "/api/client/restaurant/favorite/1000",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            IsFavoriteDto.class
+        );
+
+        Assertions.assertThat(
+            getFavoriteNotBelongingToList.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getFavoriteNotBelongingToList.getBody().getFavorite()
+        ).isFalse();
+
         var removeFavoriteRestaurant = this.restTemplate.exchange(
             "/api/client/restaurant/favorite/" + restaurants.getBody()[0].getId(),
             HttpMethod.DELETE,
