@@ -14,5 +14,6 @@ public class GetAssignmentDto implements ResponseInterfaceDto{
     private Date date;
     private ScheduleEnum schedule;
     private GetPutMenuDto menu;
+    private int numberOfIntentions;
     
 }
