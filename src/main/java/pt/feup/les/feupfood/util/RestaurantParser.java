@@ -5,10 +5,12 @@ import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.model.AssignMenu;
+import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.MealTypeEnum;
 import pt.feup.les.feupfood.model.Menu;
 
@@ -72,6 +74,15 @@ public class RestaurantParser {
         assignmentDto.setNumberOfIntentions(assignment.getEatingIntentions().size());
 
         return assignmentDto;
+    }
+
+    public VerifyCodeDto parseUserToVerifyCodeDto(DAOUser user) {
+        VerifyCodeDto dto = new VerifyCodeDto();
+
+        dto.setFullName(user.getFullName());
+        dto.setProfileImageUrl(user.getProfileImageUrl());
+
+        return dto;
     }
 
     private void addMeals(GetPutMenuDto menuDto, List<Meal> meals) {
