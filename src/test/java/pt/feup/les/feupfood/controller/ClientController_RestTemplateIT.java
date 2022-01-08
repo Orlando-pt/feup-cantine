@@ -1,5 +1,8 @@
 package pt.feup.les.feupfood.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -15,6 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import pt.feup.les.feupfood.dto.*;
+import pt.feup.les.feupfood.model.EatIntention;
+import pt.feup.les.feupfood.model.Meal;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -324,6 +329,163 @@ public class ClientController_RestTemplateIT {
         Assertions.assertThat(
             removeFavoriteNonFavoritedRestaurant.getStatusCode()
         ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+    }
+
+    @Test
+    void testEatingIntentions() {
+        var headers = this.getStandardHeaders();
+
+        var previousIntentions = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention[].class
+        );
+
+        var restaurants = this.restTemplate.exchange(
+            "/api/client/restaurant",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetRestaurantDto[].class
+        );
+
+        Assertions.assertThat(
+            restaurants.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var assignments = this.restTemplate.exchange(
+            "/api/client/restaurant/" + restaurants.getBody()[0].getId() + "/assignment",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto[].class
+        );
+
+        Assertions.assertThat(
+            assignments.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var intentionDto = new AddEatIntention();
+        intentionDto.setAssignmentId(assignments.getBody()[0].getId());
+        Set<Long> meals = new HashSet<>();
+
+        meals.add(assignments.getBody()[0].getMenu().getFishMeal().getId());
+        meals.add(assignments.getBody()[0].getMenu().getDesertMeal().getId());
+
+        intentionDto.setMealsId(meals);
+
+        var addIntention = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.POST,
+            new HttpEntity<>(intentionDto, headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            addIntention.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        intentionDto.getMealsId().add(200L);
+        var addIntentionError = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.POST,
+            new HttpEntity<>(intentionDto, headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            addIntentionError.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        intentionDto.getMealsId().remove(200L);
+        intentionDto.getMealsId().add(assignments.getBody()[0].getMenu().getMeatMeal().getId());
+        var addIntention2 = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.POST,
+            new HttpEntity<>(intentionDto, headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            addIntention2.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+        
+        var intentions = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention[].class
+        );
+
+        Assertions.assertThat(
+            intentions.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            intentions.getBody()
+        ).hasSize(previousIntentions.getBody().length + 2);
+
+        intentionDto.getMealsId().remove(assignments.getBody()[0].getMenu().getMeatMeal().getId());
+        var updateIntentions = this.restTemplate.exchange(
+            "/api/client/intention/" + addIntention2.getBody().getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(intentionDto, headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            updateIntentions.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            updateIntentions.getBody().getMeals()
+        ).extracting(GetPutMealDto::getId)
+            .containsOnly(
+                assignments.getBody()[0].getMenu().getFishMeal().getId(),
+                assignments.getBody()[0].getMenu().getDesertMeal().getId()
+            );
+
+        var deleteIntention = this.restTemplate.exchange(
+            "/api/client/intention/" + addIntention2.getBody().getId(),
+            HttpMethod.DELETE,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            deleteIntention.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        intentions = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention[].class
+        );
+
+        Assertions.assertThat(
+            intentions.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            intentions.getBody()
+        ).hasSize(previousIntentions.getBody().length + 1);
+
+        var getIntention = this.restTemplate.exchange(
+            "/api/client/intention/" + addIntention.getBody().getId(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            getIntention.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getIntention.getBody()
+        ).extracting(GetClientEatIntention::getId)
+            .isEqualTo(addIntention.getBody().getId());
 
     }
 

@@ -1,9 +1,13 @@
 package pt.feup.les.feupfood.util;
 
+import java.util.stream.Collectors;
+
+import pt.feup.les.feupfood.dto.GetClientEatIntention;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
 
@@ -43,5 +47,23 @@ public class ClientParser {
         getRestaurantDto.setAfternoonOpeningSchedule(restaurant.getAfternoonOpeningSchedule());
         getRestaurantDto.setAfternoonClosingSchedule(restaurant.getAfternoonClosingSchedule());
         return getRestaurantDto;
+    }
+
+    public GetClientEatIntention parseEatIntentionToDto(EatIntention intention) {
+        RestaurantParser restaurantParser = new RestaurantParser();
+
+        GetClientEatIntention intentionDto = new GetClientEatIntention();
+        intentionDto.setId(intention.getId());
+        intentionDto.setAssignment(
+            restaurantParser.parseAssignmentToAssignmentDto(intention.getAssignment())
+        );
+
+        intentionDto.setMeals(
+            intention.getMeals().stream()
+                .map(restaurantParser::parseMealtoMealDto)
+                .collect(Collectors.toSet())
+        );
+
+        return intentionDto;
     }
 }

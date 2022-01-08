@@ -6,25 +6,39 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
+import pt.feup.les.feupfood.dto.AddEatIntention;
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
+import pt.feup.les.feupfood.dto.GetClientEatIntention;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.IsFavoriteDto;
 import pt.feup.les.feupfood.dto.PriceRangeDto;
+import pt.feup.les.feupfood.dto.PutClientEatIntention;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
+import pt.feup.les.feupfood.exceptions.BadRequestParametersException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
+import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
+import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.EatIntention;
+import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
+import pt.feup.les.feupfood.repository.AssignMenuRepository;
+import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.ClientParser;
+import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +55,14 @@ public class ClientService {
 
     @Autowired
     private MenuRepository menuRepository;
+
+    @Autowired
+    private AssignMenuRepository assignMenuRepository;
+
+    @Autowired
+    private EatIntentionRepository eatIntentionRepository;
+
+    private static final String RESOURCE_NOT_OWNED_INTENTION_EXCEPTION = "Intention does not belong to the authenticated user.";
 
     // profile operations
     public ResponseEntity<UpdateProfileDto> getProfile(
@@ -146,6 +168,21 @@ public class ClientService {
         return ResponseEntity.ok(new ClientParser().parseRestaurantToRestaurantDto(restaurant));
     }
 
+    // restaurant operations (get assignments)
+    public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurant(
+        Long restaurantId
+    ) {
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        RestaurantParser parser = new RestaurantParser();
+        
+        return ResponseEntity.ok(
+            restaurant.getAssignments().stream()
+                .map(parser::parseAssignmentToAssignmentDto)
+                .collect(Collectors.toList())
+        );
+    }
+
     // add favorite restaurant operations
     public ResponseEntity<String> addFavoriteRestaurant(
         Principal user,
@@ -217,15 +254,132 @@ public class ClientService {
         );
     }
 
+    // operations for client to provide eat intentions
+    public ResponseEntity<GetClientEatIntention> addEatIntention(
+        Principal user,
+        AddEatIntention intentionDto
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        AssignMenu assignment = this.retrieveAssingment(intentionDto.getAssignmentId());
+
+        Set<Long> assignmentMealsId = assignment.getMenu().getMeals().stream()
+                    .map(meal -> meal.getId()).collect(Collectors.toSet());
+                    
+        // check if all meal ids belongs to this assignment
+        if (!assignmentMealsId.containsAll(intentionDto.getMealsId()))
+            throw new BadRequestParametersException("Not all meals belong to the assignment. Meals id: " + intentionDto.getMealsId().toString());
+
+        Set<Meal> meals = assignment.getMenu().getMeals().stream()
+                    .filter(meal -> intentionDto.getMealsId().contains(meal.getId()))
+                    .collect(Collectors.toSet());
+
+        EatIntention eatIntention = new EatIntention();
+        eatIntention.setClient(client);
+        eatIntention.setAssignment(assignment);
+        eatIntention.setMeals(meals);
+
+        return ResponseEntity.ok(
+            new ClientParser().parseEatIntentionToDto(
+                this.eatIntentionRepository.save(eatIntention))
+            );
+    }
+
+    public ResponseEntity<String> removeEatIntention(
+        Principal user,
+        Long intentionId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        EatIntention intention = this.retrieveIntention(intentionId);
+
+        if (!intention.getClient().equals(client))
+            throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
+
+        this.eatIntentionRepository.delete(intention);
+
+        return ResponseEntity.ok("Intention deleted successfuly");
+    }
+
+    public ResponseEntity<GetClientEatIntention> updateEatIntention(
+        Principal user,
+        Long intentionId,
+        PutClientEatIntention intentionDto
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        EatIntention intention = this.retrieveIntention(intentionId);
+
+        if (!intention.getClient().equals(client))
+            throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
+
+        Set<Long> currentMealsId = intention.getMeals().stream()
+                        .map(Meal::getId)
+                        .collect(Collectors.toSet());
+
+        if (!currentMealsId.containsAll(intentionDto.getMealsId()) || currentMealsId.size() != intentionDto.getMealsId().size()) {
+            Set<Meal> meals = intention.getAssignment().getMenu().getMeals()
+                        .stream().filter(
+                            meal -> intentionDto.getMealsId().contains(meal.getId())
+                        ).collect(Collectors.toSet());
+            
+            intention.setMeals(meals);
+            intention = this.eatIntentionRepository.save(intention);
+        }
+
+        return ResponseEntity.ok(
+            new ClientParser().parseEatIntentionToDto(
+                intention
+            )
+        );
+    }
+
+    public ResponseEntity<List<GetClientEatIntention>> getEatIntentions(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        ClientParser parser = new ClientParser();
+        return ResponseEntity.ok(
+            client.getEatingIntentions().stream()
+                .map(parser::parseEatIntentionToDto)
+                .collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<GetClientEatIntention> getEatIntention(
+        Principal user,
+        Long intentionId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        EatIntention intention = this.retrieveIntention(intentionId);
+
+        if (!intention.getClient().equals(client))
+            throw new ResourceNotOwnedException(RESOURCE_NOT_OWNED_INTENTION_EXCEPTION);
+        
+        return ResponseEntity.ok(
+            new ClientParser().parseEatIntentionToDto(intention)
+        );
+    }
+
     // auxiliar methods
     private DAOUser retrieveUser(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
     private Restaurant retrieveRestaurant(Long restaurantId) {
-        return this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new UsernameNotFoundException("Restaurant not found with id :" + restaurantId));
+        return this.restaurantRepository.findById(restaurantId).orElseThrow(() -> new UsernameNotFoundException("Restaurant not found with id:" + restaurantId));
     }
 
+    private AssignMenu retrieveAssingment(Long assignmentId) {
+        return this.assignMenuRepository.findById(assignmentId).orElseThrow(() -> new ResourceNotFoundException("Assignment not found with id: " + assignmentId));
+    }
+
+    private EatIntention retrieveIntention(Long intentionId) {
+        return this.eatIntentionRepository.findById(intentionId).orElseThrow(() -> new ResourceNotFoundException("Eating intention not found with id: " + intentionId));
+    }
+    
     private List<GetPutClientReviewDto> getAllReviewsFromClient(DAOUser client) {
         ClientParser clientParser = new ClientParser();
         return client.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());

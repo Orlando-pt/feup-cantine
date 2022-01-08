@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -24,7 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Data
-@EqualsAndHashCode(exclude = {"restaurant", "menus"})
+@EqualsAndHashCode(exclude = {"restaurant", "menus", "eatingIntentions"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Meal.class)
 @Entity
 @Table(name = "meals")
@@ -52,8 +53,13 @@ public class Meal {
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "meals")
     private List<Menu> menus;
 
+    @ToString.Exclude
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "meals")
+    private List<EatIntention> eatingIntentions;
+
     public Meal() {
         this.menus = new ArrayList<>();
+        this.eatingIntentions = new ArrayList<>();
     }
 
     public boolean addMenu(Menu menu) {

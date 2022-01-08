@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  postgres:
+    container_name: db-postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=secretpassword
+      - PGDATA=/var/lib/postgresql/data
+      - POSTGRES_DB=feupfood
+      - POSTGRES_USER=feupfood
+    volumes:
+      - postgre:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+  
+  redis:
+    container_name: redis-instance
+    image: redis:latest
+    command: ["redis-server", "--requirepass", "feupfood"]
+    volumes:
+      - redis:/data
+    ports:
+      - "6379:6379"
+    restart: always
+  
+volumes:
+  postgre:
+  redis:
