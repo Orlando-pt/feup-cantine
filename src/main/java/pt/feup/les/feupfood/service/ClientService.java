@@ -13,6 +13,7 @@ import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
+import pt.feup.les.feupfood.dto.IsFavoriteDto;
 import pt.feup.les.feupfood.dto.PriceRangeDto;
 import pt.feup.les.feupfood.dto.PutClientEatIntention;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -241,6 +242,21 @@ public class ClientService {
         );
     }
 
+    public ResponseEntity<IsFavoriteDto> restaurantIsFavorite(
+        Principal user,
+        Long restaurantId
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        return ResponseEntity.ok( new IsFavoriteDto(
+                !client.getClientFavoriteRestaurants().stream().filter(
+                    restaurant -> restaurant.getId().equals(restaurantId)
+                )
+                    .collect(Collectors.toList()).isEmpty()
+            )
+        );
+    }
+
     // operations for client to provide eat intentions
     public ResponseEntity<GetClientEatIntention> addEatIntention(
         Principal user,
@@ -274,9 +290,8 @@ public class ClientService {
 
         return ResponseEntity.ok(
             new ClientParser().parseEatIntentionToDto(
-                this.eatIntentionRepository.save(eatIntention)
-            )
-        );
+                this.eatIntentionRepository.save(eatIntention))
+            );
     }
 
     public ResponseEntity<String> removeEatIntention(

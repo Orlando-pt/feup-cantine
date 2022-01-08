@@ -160,6 +160,14 @@ public class RestaurantController {
 		return this.service.getAssignments(user);
 	}
 
+	@GetMapping("assignment/days/{id}")
+	public ResponseEntity<List<GetAssignmentDto>> getAssignmentsForNDays(
+		Principal user,
+		@PathVariable int id
+	) {
+		return this.service.getAssignmentsNextNDays(user, id);
+	}
+
 	@PostMapping("assignment")
 	public ResponseEntity<ResponseInterfaceDto> addAssignment(
 		Principal user,

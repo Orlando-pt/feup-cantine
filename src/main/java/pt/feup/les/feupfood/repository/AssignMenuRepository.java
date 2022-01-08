@@ -12,5 +12,5 @@ import java.util.List;
 public interface AssignMenuRepository extends JpaRepository<AssignMenu, Long> {
 
     List<AssignMenu> findByRestaurant(Restaurant restaurant);
-    List<AssignMenu> findAllByDateBetween(Date startDate, Date endDate);
+    List<AssignMenu> findAllByDateBetweenAndRestaurant(Date startDate, Date endDate, Restaurant restaurant);
 }

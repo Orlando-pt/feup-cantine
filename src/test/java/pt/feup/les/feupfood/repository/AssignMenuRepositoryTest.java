@@ -42,6 +42,8 @@ public class AssignMenuRepositoryTest {
     private Menu menu2;
     private AssignMenu assignment1;
     private AssignMenu assignment2;
+    private AssignMenu assignment3;
+    private AssignMenu assignment4;
 
     @BeforeEach
     void setup() {
@@ -54,8 +56,8 @@ public class AssignMenuRepositoryTest {
     void testFindByRestaurant() {
         Assertions.assertThat(
             this.assignMenuRepository.findByRestaurant(this.restaurant1)
-        ).hasSize(1).isEqualTo(
-            Arrays.asList(this.assignment1)
+        ).hasSize(3).isEqualTo(
+            Arrays.asList(this.assignment1, this.assignment3, this.assignment4)
         );
     }
 
@@ -71,12 +73,14 @@ public class AssignMenuRepositoryTest {
             assertTrue(false);
         }
 
+        date = new Date(date.getTime() + 10000000L);
+
         // add more 7 days to date
         Date dateAfter7Days = new Date(date.getTime() + (7000 * 60 * 60 * 24));
 
         Assertions.assertThat(
-            this.assignMenuRepository.findAllByDateBetween(date, dateAfter7Days)
-        ).hasSize(1).contains(this.assignment1).doesNotContain(this.assignment2);
+            this.assignMenuRepository.findAllByDateBetweenAndRestaurant(date, dateAfter7Days, this.restaurant1)
+        ).hasSize(2).contains(this.assignment1, this.assignment3).doesNotContain(this.assignment2, this.assignment4);
     }
 
     private void generateAssignMenuData() {
@@ -180,7 +184,7 @@ public class AssignMenuRepositoryTest {
         this.assignment2 = new AssignMenu();
         try {
             this.assignment2.setDate(
-                new Date(formatDate.parse("2021-12-06").getTime())
+                new Date(formatDate.parse("2021-12-09").getTime())
             );
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
@@ -191,8 +195,40 @@ public class AssignMenuRepositoryTest {
         this.assignment2.setRestaurant(this.restaurant2);
         this.restaurant2.addAssignment(this.assignment2);
 
+        this.assignment3 = new AssignMenu();
+        try {
+            this.assignment3.setDate(
+                new Date(formatDate.parse(
+                    "2021-12-08"
+                ).getTime())
+            );
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+        this.assignment3.setSchedule(ScheduleEnum.LUNCH);
+        this.assignment3.setMenu(this.menu2);
+        this.assignment3.setRestaurant(this.restaurant1);
+
+        this.assignment4 = new AssignMenu();
+        try {
+            this.assignment4.setDate(
+                new Date(
+                    formatDate.parse(
+                        "2021-12-06"
+                    ).getTime()
+                )
+            );
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+        this.assignment4.setSchedule(ScheduleEnum.DINNER);
+        this.assignment4.setMenu(this.menu2);
+        this.assignment4.setRestaurant(this.restaurant1);
+
         this.entityManager.persist(this.assignment1);
         this.entityManager.persist(this.assignment2);
+        this.entityManager.persist(this.assignment3);
+        this.entityManager.persist(this.assignment4);
         this.entityManager.persist(this.menu1);
         this.entityManager.persist(this.menu2);
         this.entityManager.persist(this.restaurant1);
