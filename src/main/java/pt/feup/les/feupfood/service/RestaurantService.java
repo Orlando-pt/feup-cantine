@@ -21,14 +21,18 @@ import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
+import pt.feup.les.feupfood.exceptions.VerificationCodeException;
 import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
+import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
@@ -52,6 +56,9 @@ public class RestaurantService {
 
     @Autowired
     private AssignMenuRepository assignMenuRepository;
+
+    @Autowired
+    private EatIntentionRepository eatIntentionRepository;
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
@@ -453,6 +460,37 @@ public class RestaurantService {
         this.assignMenuRepository.delete(assignment);
 
         return ResponseEntity.ok("");
+    }
+
+    public ResponseEntity<VerifyCodeDto> verifyCode(
+        Principal user,
+        Long assignmentId,
+        String code
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        AssignMenu assignment = this.retrieveAssignment(owner, assignmentId);
+
+        List<EatIntention> intentionList = assignment.getEatingIntentions().stream()
+            .filter(eatIntention -> eatIntention.getCode().equals(code))
+            .collect(Collectors.toList());
+        if (intentionList.isEmpty())
+            throw new VerificationCodeException("The specified code was not found.");
+
+        // it is lacking the verification if it was given more than two intentions
+        // because we really trust there will no appear duplicated codes
+
+        EatIntention intention = intentionList.get(0);
+
+        if (intention.getValidatedCode())
+            throw new VerificationCodeException("This code was already validated");
+
+        intention.setValidatedCode(true);
+        this.eatIntentionRepository.save(intention);
+
+        return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
+            intention.getClient()
+        ));
     }
 
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsNextNDays(

@@ -3,6 +3,7 @@ package pt.feup.les.feupfood.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -50,6 +51,11 @@ public class EatIntention {
         inverseJoinColumns = @JoinColumn(name = "eat_intention_id", referencedColumnName = "id")
     )
     private Set<Meal> meals;
+
+    @Column(name = "code", nullable = false)
+    private String code;
+
+    private Boolean validatedCode;
 
     public EatIntention() {
         this.meals = new HashSet<>();

@@ -224,14 +224,25 @@ public class DatabaseRunner implements ApplicationRunner {
         this.menuRepository.save(menu2);
         
         AssignMenu assignment = new AssignMenu();
+        // set 3 days from now
+        long oneDay = 1000L * 60 * 60 * 24;
         assignment.setDate(
-            new Date(1639398815581L)
+            new Date(System.currentTimeMillis() + (3 * oneDay))
         );
         assignment.setMenu(menu);
         assignment.setRestaurant(restaurantObject);
         assignment.setSchedule(ScheduleEnum.LUNCH);
 
+        AssignMenu assignment2 = new AssignMenu();
+        assignment2.setDate(
+            new Date(System.currentTimeMillis() + oneDay)
+        );
+        assignment2.setMenu(menu);
+        assignment2.setRestaurant(restaurantObject);
+        assignment2.setSchedule(ScheduleEnum.DINNER);
+
         this.assignMenuRepository.save(assignment);
+        this.assignMenuRepository.save(assignment2);
     }
     
 }

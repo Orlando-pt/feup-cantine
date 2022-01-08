@@ -487,6 +487,24 @@ public class ClientController_RestTemplateIT {
         ).extracting(GetClientEatIntention::getId)
             .isEqualTo(addIntention.getBody().getId());
 
+        // test when client tries to add intention after the allowed time
+        
+        var intentionDtoError = new AddEatIntention();
+        intentionDtoError.setAssignmentId(11L);
+        intentionDtoError.setMealsId(intentionDto.getMealsId());
+
+        var addIntentionAddError = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.POST,
+            new HttpEntity<>(intentionDtoError, headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            addIntentionAddError.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        System.out.println(addIntentionError);
     }
 
     private void registerClient() {
