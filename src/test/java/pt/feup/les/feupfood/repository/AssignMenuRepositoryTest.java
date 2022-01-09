@@ -97,7 +97,7 @@ public class AssignMenuRepositoryTest {
         }
 
         Assertions.assertThat(
-            this.assignMenuRepository.findByDate(date)
+            this.assignMenuRepository.findByDateAndRestaurant(date, this.restaurant1)
         ).hasSize(2).contains(this.assignment4, this.assignment5);
     }
 

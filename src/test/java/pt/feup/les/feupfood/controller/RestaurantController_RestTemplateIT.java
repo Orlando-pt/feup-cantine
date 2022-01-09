@@ -1,6 +1,9 @@
 package pt.feup.les.feupfood.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.sql.Time;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -36,9 +39,11 @@ import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.MealTypeEnum;
+import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
+import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -60,6 +65,9 @@ public class RestaurantController_RestTemplateIT {
 
     @Autowired
     private AssignMenuRepository assignMenuRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     private RegisterUserDto restaurantUser;
     private String token;
@@ -700,6 +708,53 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             repeatedVerificationCodeResponse.getStatusCode()
         ).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
+
+        // test automatic verification of code
+        // create an assignment for today
+
+        AssignMenu assignmentForToday = new AssignMenu();
+        Menu menuForToday = this.menuRepository.findById(
+                response.getBody().getId()
+            ).orElseThrow(
+                () -> new ResourceNotFoundException("Menu was not found")
+            );
+
+        assignmentForToday.setMenu(menuForToday);
+        Calendar now = Calendar.getInstance();
+        assignmentForToday.setDate(now.getTime());
+        assignmentForToday.setRestaurant(menuForToday.getRestaurant());
+
+        if (now.get(Calendar.HOUR_OF_DAY) > 16)
+            assignmentForToday.setSchedule(ScheduleEnum.DINNER);
+        else
+            assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
+
+        assignmentForToday = this.assignMenuRepository.save(assignmentForToday);
+        
+        EatIntention eatIntentionForToday = new EatIntention();
+        eatIntentionForToday.setAssignment(assignmentForToday);
+        eatIntentionForToday.setMeals(
+            menuForToday.getMeals().stream().filter(
+                meal -> meal.getMealType() == MealTypeEnum.FISH
+            ).collect(Collectors.toSet())
+        );
+        String codeForToday = "justanothercode";
+        eatIntentionForToday.setCode(codeForToday);
+        eatIntentionForToday.setValidatedCode(false);
+        eatIntentionForToday.setClient(client);
+
+        this.eatIntentionRepository.save(eatIntentionForToday);
+
+        var verifyCodeAutomaticallyResponse = this.restTemplate.exchange(
+            "/api/restaurant/assignment/verify-code/" + codeForToday,
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            VerifyCodeDto.class
+        );
+
+        Assertions.assertThat(
+            verifyCodeAutomaticallyResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
     }
 
     private void registerRestaurant() {

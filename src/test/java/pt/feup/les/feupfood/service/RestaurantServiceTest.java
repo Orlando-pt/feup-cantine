@@ -1,15 +1,22 @@
 package pt.feup.les.feupfood.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.Principal;
 import java.sql.Time;
+import java.time.Clock;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.persistence.PersistenceException;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,12 +31,17 @@ import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.exceptions.DataIntegrityException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
+import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.MealTypeEnum;
+import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.model.ScheduleEnum;
+import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
@@ -45,6 +57,12 @@ public class RestaurantServiceTest {
 
     @Mock
     private MealRepository mealRepository;
+
+    @Mock
+    private AssignMenuRepository assignMenuRepository;
+
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private RestaurantService service;
@@ -62,11 +80,163 @@ public class RestaurantServiceTest {
     private AddMealDto mealDto;
     private GetPutMealDto mealDtoResponse;
 
+    private Menu menu;
+    private AssignMenu assignment;
+    private AssignMenu assignment2;
+
+    private Calendar now;
+
     @BeforeEach
     void setup() {
         this.generateData();
     }
 
+    @Test
+    void testThereAreNoAssignments() {
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.clock.millis()).thenReturn(
+            this.now.getTimeInMillis()
+        );
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> this.service.verifyCodeAutomatically(
+                this.user,
+                "blabla"
+            )
+        );
+    }
+
+    @Test
+    void testWhenThereIsOneAssignment() {
+
+        String code = "blablabla";
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.clock.millis()).thenReturn(
+            this.now.getTimeInMillis()
+        );
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Mockito.when(this.assignMenuRepository.findByDateAndRestaurant(
+            Mockito.any(),
+            Mockito.eq(this.restaurant1)
+        )).thenReturn(Arrays.asList(this.assignment));
+
+        assertThrows(ResourceNotFoundException.class, () -> this.service.verifyCodeAutomatically(user, code));
+
+        Mockito.verify(this.assignMenuRepository, Mockito.times(1)).findById(this.assignment.getId());
+    }
+
+    @Test
+    void testWhenThereAreMoreThanTwoAssignments() {
+
+        String code = "blablabla";
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.clock.millis()).thenReturn(
+            this.now.getTimeInMillis()
+        );
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        Mockito.when(this.assignMenuRepository.findByDateAndRestaurant(
+            Mockito.any(),
+            Mockito.eq(this.restaurant1)
+        )).thenReturn(Arrays.asList(this.assignment, this.assignment, this.assignment));
+
+        assertThrows(DataIntegrityException.class, () -> this.service.verifyCodeAutomatically(user, code));
+    }
+
+    @Test
+    void testWhenThereAreTwoAssignments_lunch() {
+
+        String code = "blablabla";
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.clock.millis()).thenReturn(
+            this.now.getTimeInMillis()
+        );
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        this.now.set(Calendar.HOUR_OF_DAY, 21);
+
+        Mockito.when(this.clock.millis()).thenReturn(this.now.getTimeInMillis());
+
+        Mockito.when(
+            this.assignMenuRepository.findByDateAndRestaurant(
+                Mockito.any(),
+                Mockito.eq(this.restaurant1)
+            )
+        ).thenReturn(Arrays.asList(this.assignment, this.assignment2));
+
+        assertThrows(ResourceNotFoundException.class, () -> this.service.verifyCodeAutomatically(user, code));
+
+        Mockito.verify(this.assignMenuRepository, Mockito.times(1)).findById(this.assignment2.getId());
+    }
+
+    @Test
+    void testWhenThereAreTwoAssignments_dinner() {
+
+        String code = "blablabla";
+        this.user = Mockito.mock(Principal.class);
+
+        Mockito.when(this.clock.millis()).thenReturn(
+            this.now.getTimeInMillis()
+        );
+
+        Mockito.when(this.user.getName()).thenReturn(
+            this.owner1.getEmail()
+        );
+
+        Mockito.when(this.userRepository.findByEmail(this.owner1.getEmail())).thenReturn(
+            Optional.of(this.owner1)
+        );
+
+        this.now.set(Calendar.HOUR_OF_DAY, 12);
+
+        Mockito.when(this.clock.millis()).thenReturn(this.now.getTimeInMillis());
+
+        Mockito.when(
+            this.assignMenuRepository.findByDateAndRestaurant(
+                Mockito.any(),
+                Mockito.eq(this.restaurant1)
+            )
+        ).thenReturn(Arrays.asList(this.assignment, this.assignment2));
+
+        assertThrows(ResourceNotFoundException.class, () -> this.service.verifyCodeAutomatically(user, code));
+
+        Mockito.verify(this.assignMenuRepository, Mockito.times(1)).findById(this.assignment.getId());
+    }
     @Test
     void testUpdateRestaurantProfileAllProcessWithoutProblems() {
         this.commonUpdateProfileData();
@@ -497,6 +667,8 @@ public class RestaurantServiceTest {
     }
 
     private void generateData() {
+        this.now = Calendar.getInstance();
+        this.now.set(2022, 1, 8);
         this.owner1 = new DAOUser();
         this.owner1.setEmail("email@mail.com");
         this.owner1.setFullName("Maria Antónia");
@@ -551,5 +723,30 @@ public class RestaurantServiceTest {
         this.mealDtoResponse.setId(this.meal1.getId());
         this.mealDtoResponse.setMealType(this.meal1.getMealType());
         this.mealDtoResponse.setNutritionalInformation(this.meal1.getNutritionalInformation());
+
+        this.menu = new Menu();
+        this.menu.setAdditionalInformation("additionalInformation");
+        this.menu.setEndPrice(10.5);
+        this.menu.setId(100L);
+        this.menu.setName("Monday morning");
+        this.menu.setRestaurant(this.restaurant1);
+        this.menu.setStartPrice(5.1);
+        this.menu.addMeal(this.meal1);
+
+        this.assignment = new AssignMenu();
+        this.assignment.setMenu(this.menu);
+        this.now.set(Calendar.HOUR_OF_DAY, 13);
+        this.assignment.setDate(this.now.getTime());
+        this.assignment.setId(50L);
+        this.assignment.setSchedule(ScheduleEnum.LUNCH);
+        this.assignment.setRestaurant(this.restaurant1);
+
+        this.assignment2 = new AssignMenu();
+        this.assignment2.setMenu(this.menu);
+        this.now.set(Calendar.HOUR_OF_DAY, 20);
+        this.assignment2.setDate(this.now.getTime());
+        this.assignment2.setId(51L);
+        this.assignment2.setSchedule(ScheduleEnum.DINNER);
+        this.assignment2.setRestaurant(this.restaurant1);
     }
 }

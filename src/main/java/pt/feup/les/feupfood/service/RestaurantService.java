@@ -1,7 +1,9 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.time.Clock;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +24,7 @@ import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
+import pt.feup.les.feupfood.exceptions.DataIntegrityException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.exceptions.VerificationCodeException;
@@ -31,6 +34,7 @@ import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
@@ -59,6 +63,9 @@ public class RestaurantService {
 
     @Autowired
     private EatIntentionRepository eatIntentionRepository;
+
+    @Autowired
+    private Clock clock;
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
@@ -491,6 +498,52 @@ public class RestaurantService {
         return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
             intention.getClient()
         ));
+    }
+
+    public ResponseEntity<VerifyCodeDto> verifyCodeAutomatically(
+        Principal user,
+        String code
+    ) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(this.clock.millis());
+
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Date now = calendar.getTime();
+
+        List<AssignMenu> assignments = this.assignMenuRepository.findByDateAndRestaurant(now, owner.getRestaurant());
+
+        if (assignments.isEmpty())
+            throw new ResourceNotFoundException("No assignments were found for today.");
+
+        if (assignments.size() == 1)
+            return this.verifyCode(user, assignments.get(0).getId(), code);
+
+        if (assignments.size() != 2)
+            throw new DataIntegrityException("There are more than two assignments for today.");
+
+        // else it means there are two assignments for this day
+        // we need to see which one is more appropriate for the time being
+        
+        // dinner will be after 5pm
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 16)
+            return this.verifyCode(
+                user,
+                assignments.stream().filter(
+                    assignment -> assignment.getSchedule() == ScheduleEnum.DINNER
+                ).collect(Collectors.toList()).get(0).getId(),
+                code
+            );
+
+        // if the code gets here it means its before 5pm
+        // in that can we can suppose that the meal is lunch
+        return this.verifyCode(
+            user,
+            assignments.stream().filter(
+                assignment -> assignment.getSchedule() == ScheduleEnum.LUNCH
+            ).collect(Collectors.toList()).get(0).getId(),
+            code
+        );
     }
 
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsNextNDays(
