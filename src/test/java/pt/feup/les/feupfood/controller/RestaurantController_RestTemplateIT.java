@@ -730,6 +730,14 @@ public class RestaurantController_RestTemplateIT {
             assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
 
         assignmentForToday = this.assignMenuRepository.save(assignmentForToday);
+
+        AssignMenu assignmentForTomorrow = new AssignMenu();
+        assignmentForTomorrow.setMenu(menuForToday);
+        assignmentForTomorrow.setDate(new Date(now.getTimeInMillis() + 86400001));
+        assignmentForTomorrow.setRestaurant(menuForToday.getRestaurant());
+        assignmentForTomorrow.setSchedule(ScheduleEnum.DINNER);
+
+        assignmentForTomorrow = this.assignMenuRepository.save(assignmentForTomorrow);
         
         EatIntention eatIntentionForToday = new EatIntention();
         eatIntentionForToday.setAssignment(assignmentForToday);
@@ -755,6 +763,24 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             verifyCodeAutomaticallyResponse.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
+
+        // verify the response when we try to get 0 days
+        var getAssignmentsForToday = this.restTemplate.exchange(
+            "/api/restaurant/assignment/days/0",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto[].class
+        );
+
+        Assertions.assertThat(
+            getAssignmentsForToday.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getAssignmentsForToday.getBody()
+        ).hasSize(1).extracting(GetAssignmentDto::getId)
+            .contains(assignmentForToday.getId())
+            .doesNotContain(assignmentForTomorrow.getId());
     }
 
     private void registerRestaurant() {
