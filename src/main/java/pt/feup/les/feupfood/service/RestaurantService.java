@@ -496,7 +496,7 @@ public class RestaurantService {
         this.eatIntentionRepository.save(intention);
 
         return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
-            intention.getClient()
+            intention.getClient(), intention.getMeals()
         ));
     }
 

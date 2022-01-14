@@ -1,6 +1,9 @@
 package pt.feup.les.feupfood.util;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
@@ -76,11 +79,16 @@ public class RestaurantParser {
         return assignmentDto;
     }
 
-    public VerifyCodeDto parseUserToVerifyCodeDto(DAOUser user) {
+    public VerifyCodeDto parseUserToVerifyCodeDto(DAOUser user, Set<Meal> meals) {
         VerifyCodeDto dto = new VerifyCodeDto();
 
         dto.setFullName(user.getFullName());
         dto.setProfileImageUrl(user.getProfileImageUrl());
+        dto.setMeals(
+            meals.stream().map(
+                this::parseMealtoMealDto
+            ).collect(Collectors.toSet())
+        );
 
         return dto;
     }
