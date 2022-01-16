@@ -2,6 +2,7 @@ package pt.feup.les.feupfood.runner;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
+import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.MealTypeEnum;
 import pt.feup.les.feupfood.model.Menu;
@@ -18,6 +20,7 @@ import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
 import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
+import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
@@ -44,6 +47,9 @@ public class DatabaseRunner implements ApplicationRunner {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private EatIntentionRepository eatIntentionRepository;
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
@@ -243,6 +249,15 @@ public class DatabaseRunner implements ApplicationRunner {
 
         this.assignMenuRepository.save(assignment);
         this.assignMenuRepository.save(assignment2);
+
+        EatIntention eatIntention = new EatIntention();
+        eatIntention.setAssignment(assignment);
+        eatIntention.setClient(client);
+        eatIntention.setCode("123456789");
+        eatIntention.setValidatedCode(false);
+        eatIntention.setMeals(Set.of(meat));
+
+        this.eatIntentionRepository.save(eatIntention);
     }
     
 }
