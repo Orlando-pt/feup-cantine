@@ -190,4 +190,12 @@ public class ClientController {
         return this.clientService.removeEatIntention(user, id);
     }
 
+    // stat endpoints
+    @GetMapping("stats/money-saved")
+    public ResponseEntity<ClientStats> getMoneySaved(
+        Principal user
+    ) {
+        return this.clientService.getMoneySaved(user);
+    }
+
 }

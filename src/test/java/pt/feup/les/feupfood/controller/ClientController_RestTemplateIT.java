@@ -18,8 +18,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import pt.feup.les.feupfood.dto.*;
+import pt.feup.les.feupfood.model.AssignMenu;
+import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
+import pt.feup.les.feupfood.repository.AssignMenuRepository;
+import pt.feup.les.feupfood.repository.EatIntentionRepository;
+import pt.feup.les.feupfood.repository.MenuRepository;
+import pt.feup.les.feupfood.repository.UserRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -30,6 +36,15 @@ public class ClientController_RestTemplateIT {
     
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AssignMenuRepository assignMenuRepository;
+
+    @Autowired
+    private EatIntentionRepository eatIntentionRepository;
     
     private RegisterUserDto clientUser;
     private String token;
@@ -526,7 +541,44 @@ public class ClientController_RestTemplateIT {
             addIntentionAddError.getStatusCode()
         ).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        System.out.println(addIntentionError);
+        // test client stats
+        AssignMenu assignment1 = this.assignMenuRepository.findById(13L).orElseThrow();
+        AssignMenu assignment2 = this.assignMenuRepository.findById(14L).orElseThrow();
+
+        DAOUser client = this.userRepository.findByEmail(this.clientUser.getEmail()).orElseThrow();
+
+        EatIntention previousEatIntention = new EatIntention();
+        previousEatIntention.setAssignment(assignment1);
+        previousEatIntention.setClient(client);
+        previousEatIntention.setCode("987654321");
+        previousEatIntention.setValidatedCode(true);
+        previousEatIntention.setMeals(Set.of(assignment1.getMenu().getMeals().get(0)));
+
+        EatIntention previousEatIntention2 = new EatIntention();
+        previousEatIntention2.setAssignment(assignment2);
+        previousEatIntention2.setClient(client);
+        previousEatIntention2.setCode("987654333");
+        previousEatIntention2.setValidatedCode(false);
+        previousEatIntention2.setMeals(Set.of(assignment2.getMenu().getMeals().get(0)));
+
+        this.eatIntentionRepository.save(previousEatIntention);
+        this.eatIntentionRepository.save(previousEatIntention2);
+
+        var getStatusOnMoneySaved = this.restTemplate.exchange(
+            "/api/client/stats/money-saved",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            ClientStats.class
+        );
+
+        Assertions.assertThat(
+            getStatusOnMoneySaved.getStatusCode()
+        ).isEqualTo(HttpStatus.OK); 
+
+        Assertions.assertThat(
+            getStatusOnMoneySaved.getBody()
+        ).extracting(ClientStats::getIntentionsGiven)
+            .isEqualTo(1);
     }
 
     private void registerClient() {

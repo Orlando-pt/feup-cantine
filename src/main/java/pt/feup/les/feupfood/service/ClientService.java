@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.AddEatIntention;
+import pt.feup.les.feupfood.dto.ClientStats;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
 import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
@@ -407,6 +408,35 @@ public class ClientService {
         return ResponseEntity.ok(
             new ClientParser().parseEatIntentionToDto(intention)
         );
+    }
+
+    // stats methods
+    public ResponseEntity<ClientStats> getMoneySaved(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        ClientStats stats = new ClientStats();
+
+        Date now = new Date(System.currentTimeMillis());
+
+        List<EatIntention> intentionsGiven = this.eatIntentionRepository.findByClient(client);
+
+        intentionsGiven.forEach(
+            intention -> {
+                if (intention.getValidatedCode()) {
+                    stats.incrementIntentionsGiven();
+
+                    stats.addMoney(intention.getAssignment().getMenu().getDiscount().doubleValue());
+                } else {
+                    // increment on the intentions not fulfilled if the date of the intention is before today
+                    if (intention.getAssignment().getDate().before(now))
+                        stats.incrementIntentionsNotFulfilled();
+                }
+            }
+        );
+
+        return ResponseEntity.ok(stats);
     }
 
     // auxiliar methods

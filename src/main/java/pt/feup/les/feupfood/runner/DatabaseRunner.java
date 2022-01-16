@@ -255,9 +255,23 @@ public class DatabaseRunner implements ApplicationRunner {
         assignmentForToday.setRestaurant(restaurantObject);
         assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
 
+        AssignMenu previousAssignment = new AssignMenu();
+        previousAssignment.setDate(new Date(System.currentTimeMillis() - (2 * oneDay)));
+        previousAssignment.setMenu(menu);
+        previousAssignment.setRestaurant(restaurantObject);
+        previousAssignment.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu previousAssignment2 = new AssignMenu();
+        previousAssignment2.setDate(new Date(System.currentTimeMillis() - (2 * oneDay)));
+        previousAssignment2.setMenu(menu);
+        previousAssignment2.setRestaurant(restaurantObject);
+        previousAssignment2.setSchedule(ScheduleEnum.DINNER);
+
         this.assignMenuRepository.save(assignment);
         this.assignMenuRepository.save(assignment2);
         this.assignMenuRepository.save(assignmentForToday);
+        this.assignMenuRepository.save(previousAssignment);
+        this.assignMenuRepository.save(previousAssignment2);
 
         EatIntention eatIntention = new EatIntention();
         eatIntention.setAssignment(assignment);
@@ -266,7 +280,23 @@ public class DatabaseRunner implements ApplicationRunner {
         eatIntention.setValidatedCode(false);
         eatIntention.setMeals(Set.of(meat));
 
+        EatIntention previousEatIntention = new EatIntention();
+        previousEatIntention.setAssignment(previousAssignment);
+        previousEatIntention.setClient(client);
+        previousEatIntention.setCode("987654321");
+        previousEatIntention.setValidatedCode(true);
+        previousEatIntention.setMeals(Set.of(meat));
+
+        EatIntention previousEatIntention2 = new EatIntention();
+        previousEatIntention2.setAssignment(previousAssignment2);
+        previousEatIntention2.setClient(client);
+        previousEatIntention2.setCode("987654333");
+        previousEatIntention2.setValidatedCode(false);
+        previousEatIntention2.setMeals(Set.of(meat));
+        
         this.eatIntentionRepository.save(eatIntention);
+        this.eatIntentionRepository.save(previousEatIntention);
+        this.eatIntentionRepository.save(previousEatIntention2);
     }
     
 }
