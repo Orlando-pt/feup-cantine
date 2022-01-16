@@ -1,7 +1,5 @@
 package pt.feup.les.feupfood.controller;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
@@ -784,6 +782,19 @@ public class RestaurantController_RestTemplateIT {
         ).hasSize(1).extracting(GetAssignmentDto::getId)
             .contains(assignmentForToday.getId())
             .doesNotContain(assignmentForTomorrow.getId());
+
+        var getCurrentAssignment = this.restTemplate.exchange(
+            "/api/restaurant/assignment/now",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            getCurrentAssignment.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        System.out.println(getCurrentAssignment);
     }
 
     private void registerRestaurant() {

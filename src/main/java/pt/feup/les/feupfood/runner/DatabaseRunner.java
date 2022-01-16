@@ -249,8 +249,15 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment2.setRestaurant(restaurantObject);
         assignment2.setSchedule(ScheduleEnum.DINNER);
 
+        AssignMenu assignmentForToday = new AssignMenu();
+        assignmentForToday.setDate(new Date(System.currentTimeMillis()));
+        assignmentForToday.setMenu(menu);
+        assignmentForToday.setRestaurant(restaurantObject);
+        assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
+
         this.assignMenuRepository.save(assignment);
         this.assignMenuRepository.save(assignment2);
+        this.assignMenuRepository.save(assignmentForToday);
 
         EatIntention eatIntention = new EatIntention();
         eatIntention.setAssignment(assignment);

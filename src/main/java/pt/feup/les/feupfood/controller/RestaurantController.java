@@ -186,6 +186,13 @@ public class RestaurantController {
 		return this.service.getAssignmentsNextNDays(user, n);
 	}
 
+	@GetMapping("assignment/now")
+	public ResponseEntity<GetAssignmentDto> getCurrentAssignment(
+		Principal user
+	) {
+		return this.service.getCurrentAssignment(user);
+	}
+
 	@PostMapping("assignment")
 	public ResponseEntity<ResponseInterfaceDto> addAssignment(
 		Principal user,

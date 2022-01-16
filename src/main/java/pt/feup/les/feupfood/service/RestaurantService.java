@@ -506,20 +506,42 @@ public class RestaurantService {
         Principal user,
         String code
     ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        AssignMenu currentAssignment = this.getCurrentAssignment(owner.getRestaurant());
+
+        return this.verifyCode(
+            user,
+            currentAssignment.getId(),
+            code
+        );
+    }
+
+    public ResponseEntity<GetAssignmentDto> getCurrentAssignment(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseAssignmentToAssignmentDto(
+                this.getCurrentAssignment(owner.getRestaurant())
+            )
+        );
+    }
+
+    private AssignMenu getCurrentAssignment(Restaurant restaurant) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(this.clock.millis());
 
-        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
-
         Date now = calendar.getTime();
 
-        List<AssignMenu> assignments = this.assignMenuRepository.findByDateAndRestaurant(now, owner.getRestaurant());
+        List<AssignMenu> assignments = this.assignMenuRepository.findByDateAndRestaurant(now, restaurant);
 
         if (assignments.isEmpty())
             throw new ResourceNotFoundException("No assignments were found for today.");
 
         if (assignments.size() == 1)
-            return this.verifyCode(user, assignments.get(0).getId(), code);
+            return assignments.get(0);
 
         if (assignments.size() != 2)
             throw new DataIntegrityException("There are more than two assignments for today.");
@@ -529,23 +551,15 @@ public class RestaurantService {
         
         // dinner will be after 5pm
         if (calendar.get(Calendar.HOUR_OF_DAY) > 16)
-            return this.verifyCode(
-                user,
-                assignments.stream().filter(
+            return assignments.stream().filter(
                     assignment -> assignment.getSchedule() == ScheduleEnum.DINNER
-                ).collect(Collectors.toList()).get(0).getId(),
-                code
-            );
+                ).collect(Collectors.toList()).get(0);
 
         // if the code gets here it means its before 5pm
         // in that can we can suppose that the meal is lunch
-        return this.verifyCode(
-            user,
-            assignments.stream().filter(
+        return assignments.stream().filter(
                 assignment -> assignment.getSchedule() == ScheduleEnum.LUNCH
-            ).collect(Collectors.toList()).get(0).getId(),
-            code
-        );
+            ).collect(Collectors.toList()).get(0);
     }
 
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsNextNDays(
