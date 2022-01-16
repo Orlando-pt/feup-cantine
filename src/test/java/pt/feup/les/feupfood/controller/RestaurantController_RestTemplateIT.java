@@ -794,7 +794,6 @@ public class RestaurantController_RestTemplateIT {
             getCurrentAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
-        System.out.println(getCurrentAssignment);
     }
 
     private void registerRestaurant() {
