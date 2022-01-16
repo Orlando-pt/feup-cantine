@@ -618,7 +618,7 @@ public class RestaurantService {
         return assignment;
     }
 
-    private AssignMenu getCurrentAssignment(Restaurant restaurant) {
+    protected AssignMenu getCurrentAssignment(Restaurant restaurant) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(this.clock.millis());
 

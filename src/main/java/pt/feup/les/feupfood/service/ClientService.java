@@ -65,6 +65,9 @@ public class ClientService {
     @Autowired
     private EatIntentionRepository eatIntentionRepository;
 
+    @Autowired
+    private RestaurantService restaurantService;
+
     private static final String RESOURCE_NOT_OWNED_INTENTION_EXCEPTION = "Intention does not belong to the authenticated user.";
 
     // profile operations
@@ -202,6 +205,18 @@ public class ClientService {
                 now, future, restaurant
             ).stream().map(parser::parseAssignmentToAssignmentDto)
                 .collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<GetAssignmentDto> getCurrentAssignmentOfRestaurant(
+        Long restaurantId
+    ) {
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseAssignmentToAssignmentDto(
+                this.restaurantService.getCurrentAssignment(restaurant)
+            )
         );
     }
 

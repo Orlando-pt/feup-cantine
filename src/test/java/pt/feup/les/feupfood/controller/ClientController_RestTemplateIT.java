@@ -330,7 +330,7 @@ public class ClientController_RestTemplateIT {
             removeFavoriteNonFavoritedRestaurant.getStatusCode()
         ).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        var getAssignmentsForToday = this.restTemplate.exchange(
+        var getAssignmentsForNextDays = this.restTemplate.exchange(
             "/api/client/restaurant/1/assignment/4",
             HttpMethod.GET,
             new HttpEntity<>(headers),
@@ -338,7 +338,18 @@ public class ClientController_RestTemplateIT {
         );
 
         Assertions.assertThat(
-            getAssignmentsForToday.getStatusCode()
+            getAssignmentsForNextDays.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var getCurrentAssignment = this.restTemplate.exchange(
+            "/api/client/restaurant/1/assignment/now",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            getCurrentAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
     }
