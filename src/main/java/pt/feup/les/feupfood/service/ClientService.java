@@ -186,6 +186,25 @@ public class ClientService {
         );
     }
 
+    public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurantForNDays(
+        Long restaurantId,
+        int days
+    ) {
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        Date now = new Date(System.currentTimeMillis());
+
+        Date future = new Date(now.getTime() + days * 1000 * 60 * 60 * 24);
+
+        RestaurantParser parser = new RestaurantParser();
+        return ResponseEntity.ok(
+            this.assignMenuRepository.findAllByDateBetweenAndRestaurant(
+                now, future, restaurant
+            ).stream().map(parser::parseAssignmentToAssignmentDto)
+                .collect(Collectors.toList())
+        );
+    }
+
     // add favorite restaurant operations
     public ResponseEntity<String> addFavoriteRestaurant(
         Principal user,

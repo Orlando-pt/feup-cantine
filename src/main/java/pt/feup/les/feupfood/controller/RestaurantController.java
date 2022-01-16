@@ -178,12 +178,12 @@ public class RestaurantController {
 		return this.service.verifyCodeAutomatically(user, code);
 	}
 
-	@GetMapping("assignment/days/{id}")
+	@GetMapping("assignment/days/{n}")
 	public ResponseEntity<List<GetAssignmentDto>> getAssignmentsForNDays(
 		Principal user,
-		@PathVariable int id
+		@PathVariable int n
 	) {
-		return this.service.getAssignmentsNextNDays(user, id);
+		return this.service.getAssignmentsNextNDays(user, n);
 	}
 
 	@PostMapping("assignment")

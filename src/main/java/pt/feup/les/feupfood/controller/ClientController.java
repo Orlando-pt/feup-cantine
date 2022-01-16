@@ -97,6 +97,14 @@ public class ClientController {
         return this.clientService.getAssignmentsOfRestaurant(id);
     }
 
+    @GetMapping("restaurant/{id}/assignment/{n}")
+    public ResponseEntity<List<GetAssignmentDto>> getRestaurantAssignmentsForNDays(
+        @PathVariable Long id,
+        @PathVariable int n
+    ) {
+        return this.clientService.getAssignmentsOfRestaurantForNDays(id, n);
+    }
+
     @GetMapping("home")
     public ResponseEntity<String> home() {
         return ResponseEntity.ok("Hello client!");

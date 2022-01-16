@@ -111,6 +111,7 @@ public class EatIntentionRepositoryTest {
         this.menu1.setName("Monday morning");
         this.menu1.setStartPrice(5.11);
         this.menu1.setEndPrice(10.50);
+        this.menu1.setDiscount(2.10);
         this.menu1.addMeal(this.meal1);
         this.menu1.setRestaurant(this.restaurant1);
         this.menu1.addMeal(this.meal2);

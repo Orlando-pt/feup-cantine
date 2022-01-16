@@ -1,5 +1,6 @@
 package pt.feup.les.feupfood.util;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,6 +77,9 @@ public class RestaurantParser {
         assignmentDto.setSchedule(assignment.getSchedule());
         assignmentDto.setMenu(parseMenutoMenuDto(assignment.getMenu()));
         assignmentDto.setNumberOfIntentions(assignment.getEatingIntentions().size());
+        assignmentDto.setAvailable(
+            this.verifyAvailabilityOfAssignment(assignment.getDate())
+        );
 
         return assignmentDto;
     }
@@ -119,5 +123,15 @@ public class RestaurantParser {
                     );
             }
         );
+    }
+
+    private boolean verifyAvailabilityOfAssignment(Date assignmentDate) {
+        long oneDay = 1000L * 60 * 60 * 24;
+        Date tomorrow = new Date(System.currentTimeMillis() + oneDay);
+
+        if (tomorrow.after(assignmentDate))
+            return false;
+
+        return true;
     }
 }
