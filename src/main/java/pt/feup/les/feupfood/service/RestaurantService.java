@@ -529,39 +529,6 @@ public class RestaurantService {
         );
     }
 
-    private AssignMenu getCurrentAssignment(Restaurant restaurant) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(this.clock.millis());
-
-        Date now = calendar.getTime();
-
-        List<AssignMenu> assignments = this.assignMenuRepository.findByDateAndRestaurant(now, restaurant);
-
-        if (assignments.isEmpty())
-            throw new ResourceNotFoundException("No assignments were found for today.");
-
-        if (assignments.size() == 1)
-            return assignments.get(0);
-
-        if (assignments.size() != 2)
-            throw new DataIntegrityException("There are more than two assignments for today.");
-
-        // else it means there are two assignments for this day
-        // we need to see which one is more appropriate for the time being
-        
-        // dinner will be after 5pm
-        if (calendar.get(Calendar.HOUR_OF_DAY) > 16)
-            return assignments.stream().filter(
-                    assignment -> assignment.getSchedule() == ScheduleEnum.DINNER
-                ).collect(Collectors.toList()).get(0);
-
-        // if the code gets here it means its before 5pm
-        // in that can we can suppose that the meal is lunch
-        return assignments.stream().filter(
-                assignment -> assignment.getSchedule() == ScheduleEnum.LUNCH
-            ).collect(Collectors.toList()).get(0);
-    }
-
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsNextNDays(
         Principal user,
         int days
@@ -649,5 +616,38 @@ public class RestaurantService {
             throw new ResourceNotOwnedException("Assignment not owned.");
 
         return assignment;
+    }
+
+    private AssignMenu getCurrentAssignment(Restaurant restaurant) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(this.clock.millis());
+
+        Date now = calendar.getTime();
+
+        List<AssignMenu> assignments = this.assignMenuRepository.findByDateAndRestaurant(now, restaurant);
+
+        if (assignments.isEmpty())
+            throw new ResourceNotFoundException("No assignments were found for today.");
+
+        if (assignments.size() == 1)
+            return assignments.get(0);
+
+        if (assignments.size() != 2)
+            throw new DataIntegrityException("There are more than two assignments for today.");
+
+        // else it means there are two assignments for this day
+        // we need to see which one is more appropriate for the time being
+        
+        // dinner will be after 5pm
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 16)
+            return assignments.stream().filter(
+                    assignment -> assignment.getSchedule() == ScheduleEnum.DINNER
+                ).collect(Collectors.toList()).get(0);
+
+        // if the code gets here it means its before 5pm
+        // in that can we can suppose that the meal is lunch
+        return assignments.stream().filter(
+                assignment -> assignment.getSchedule() == ScheduleEnum.LUNCH
+            ).collect(Collectors.toList()).get(0);
     }
 }
