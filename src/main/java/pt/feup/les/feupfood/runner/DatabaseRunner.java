@@ -208,6 +208,7 @@ public class DatabaseRunner implements ApplicationRunner {
         menu.setAdditionalInformation("additionalInformation");
         menu.setEndPrice(3.0);
         menu.setStartPrice(2.5);
+        menu.setDiscount(0.15);
         menu.addMeal(meat);
         menu.addMeal(fish);
         menu.addMeal(diet);
@@ -221,6 +222,7 @@ public class DatabaseRunner implements ApplicationRunner {
         menu2.setAdditionalInformation("We put a small portion of sugar in ou food");
         menu2.setEndPrice(5.4);
         menu2.setStartPrice(1.25);
+        menu2.setDiscount(0.35);
         menu2.addMeal(meat);
         menu2.addMeal(fish);
         menu2.addMeal(diet);

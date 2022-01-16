@@ -224,6 +224,7 @@ public class RestaurantService {
         menu.setAdditionalInformation(menuDto.getAdditionalInformation());
         menu.setStartPrice(menuDto.getStartPrice());
         menu.setEndPrice(menuDto.getEndPrice());
+        menu.setDiscount(menuDto.getDiscount());
         menu.setRestaurant(daoUser.getRestaurant());
 
         // add meals referent to the menu
@@ -357,6 +358,7 @@ public class RestaurantService {
         menu.setEndPrice(menuDto.getEndPrice());
         menu.setName(menuDto.getName());
         menu.setStartPrice(menuDto.getStartPrice());
+        menu.setDiscount(menuDto.getDiscount());
         
         
         return ResponseEntity.ok(

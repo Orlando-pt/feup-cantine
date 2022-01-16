@@ -12,6 +12,7 @@ public class GetPutMenuDto implements ResponseInterfaceDto{
     private String additionalInformation;
     private Double startPrice;
     private Double endPrice;
+    private Double discount;
     private GetPutMealDto meatMeal;
     private GetPutMealDto fishMeal;
     private GetPutMealDto dietMeal;

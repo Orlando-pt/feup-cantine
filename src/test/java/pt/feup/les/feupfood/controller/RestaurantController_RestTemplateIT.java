@@ -338,6 +338,7 @@ public class RestaurantController_RestTemplateIT {
         menuDto.setEndPrice(10.0);
         menuDto.setName("Monday morning for this week");
         menuDto.setStartPrice(4.5);
+        menuDto.setDiscount(0.30);
         
         var response = this.restTemplate.exchange(
             "/api/restaurant/menu",
@@ -504,6 +505,7 @@ public class RestaurantController_RestTemplateIT {
         menuDto.setMeatMeal(meal1.getBody().getId());
         menuDto.setName("Monday morning for this week");
         menuDto.setStartPrice(4.5);
+        menuDto.setDiscount(0.35);
         menuDto.setVegetarianMeal(meal2.getBody().getId());
         
         var response = this.restTemplate.exchange(
@@ -521,6 +523,7 @@ public class RestaurantController_RestTemplateIT {
         menuDto2.setMeatMeal(meal2.getBody().getId());
         menuDto2.setName("Monday morning");
         menuDto2.setStartPrice(4.5);
+        menuDto2.setDiscount(0.40);
         menuDto2.setVegetarianMeal(meal1.getBody().getId());
         
         var response2 = this.restTemplate.exchange(
