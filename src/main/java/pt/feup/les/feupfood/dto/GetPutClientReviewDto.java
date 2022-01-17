@@ -13,4 +13,5 @@ public class GetPutClientReviewDto implements ResponseInterfaceDto {
     private Long restaurantId;
     private int classificationGrade;
     private String comment;
+    private String answer;
 }

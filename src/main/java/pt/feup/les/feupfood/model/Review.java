@@ -30,6 +30,8 @@ public class Review {
     @Column(name = "comment")
     String comment;
 
+    String answer;
+
     public void setClassificationGrade(int classificationGrade) {
         if (classificationGrade > 0 && classificationGrade <= 5)
             this.classificationGrade = classificationGrade;

@@ -31,6 +31,7 @@ public class ClientParser {
         reviewDto.setRestaurantId(review.getRestaurant().getId());
         reviewDto.setClassificationGrade(review.getClassificationGrade());
         reviewDto.setComment(review.getComment());
+        reviewDto.setAnswer(review.getAnswer());
         return reviewDto;
     }
 

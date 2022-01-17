@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DaoSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,11 @@ import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
+import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
+import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.DataIntegrityException;
@@ -34,13 +37,16 @@ import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.model.Review;
 import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
+import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
+import pt.feup.les.feupfood.util.ClientParser;
 import pt.feup.les.feupfood.util.RestaurantParser;
 
 @Service
@@ -63,6 +69,9 @@ public class RestaurantService {
 
     @Autowired
     private EatIntentionRepository eatIntentionRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private Clock clock;
@@ -548,6 +557,66 @@ public class RestaurantService {
         );
     }
 
+    // review methods
+    public ResponseEntity<List<GetPutClientReviewDto>> getRestaurantReviews(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        ClientParser parser = new ClientParser();
+        return ResponseEntity.ok(
+            this.reviewRepository.findAllByRestaurant(owner.getRestaurant())
+                .stream().map(
+                    parser::parseReviewToReviewDto
+                ).collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<GetPutClientReviewDto> getRestaurantReview(
+        Principal user,
+        Long reviewId
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        return ResponseEntity.ok(
+            new ClientParser().parseReviewToReviewDto(this.retrieveReview(owner.getRestaurant(), reviewId))
+        );
+    }
+
+    public ResponseEntity<GetPutClientReviewDto> restaurantAnswerToReview(
+        Principal user,
+        Long reviewId,
+        RestaurantAnswerReviewDto dto
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Review review = this.retrieveReview(owner.getRestaurant(), reviewId);
+
+        review.setAnswer(dto.getAnswer());
+        review = this.reviewRepository.save(review);
+
+        return ResponseEntity.ok(
+            new ClientParser().parseReviewToReviewDto(review)
+        );
+    }
+
+    public ResponseEntity<GetPutClientReviewDto> restaurantUpdatesAnswerToReview(
+        Principal user,
+        Long reviewId,
+        RestaurantAnswerReviewDto dto
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Review review = this.retrieveReview(owner.getRestaurant(), reviewId);
+
+        review.setAnswer(dto.getAnswer());
+        review = this.reviewRepository.save(review);
+
+        return ResponseEntity.ok(
+            new ClientParser().parseReviewToReviewDto(review)
+        );
+    }
+
     // auxiliar methods
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
@@ -616,6 +685,17 @@ public class RestaurantService {
             throw new ResourceNotOwnedException("Assignment not owned.");
 
         return assignment;
+    }
+
+    private Review retrieveReview(Restaurant restaurant, Long reviewId) {
+        Review review = this.reviewRepository.findById(reviewId).orElseThrow(
+            () -> new ResourceNotFoundException("No review found with id: " + reviewId)
+        );
+
+        if (!review.getRestaurant().equals(restaurant))
+            throw new ResourceNotFoundException("Review not owned.");
+
+        return review;
     }
 
     protected AssignMenu getCurrentAssignment(Restaurant restaurant) {
