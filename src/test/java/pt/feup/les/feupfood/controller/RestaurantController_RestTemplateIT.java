@@ -1150,8 +1150,6 @@ public class RestaurantController_RestTemplateIT {
             getIntentionStats.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
-        System.out.println(getIntentionStats);
-
         var getIntentionErrorEndDateInferiorToStartDate = this.restTemplate.exchange(
             "/api/restaurant/stats/intention/1/Jan 02 2022/Jan 01 2022",
             HttpMethod.GET,
@@ -1162,6 +1160,28 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             getIntentionErrorEndDateInferiorToStartDate.getStatusCode()
         ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // test get clients that favorited the restaurant
+        client1.addFavoriteRestaurant(restaurant.getRestaurant());
+        client2.addFavoriteRestaurant(restaurant.getRestaurant());
+
+        this.userRepository.save(client1);
+        this.userRepository.save(client2);
+    
+        var getNumberOfFavoritedClients = this.restTemplate.exchange(
+            "/api/restaurant/stats/favorite",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            Integer.class
+        );
+
+        Assertions.assertThat(
+            getNumberOfFavoritedClients.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getNumberOfFavoritedClients.getBody()
+        ).isEqualTo(2);
     }
 
     private void registerRestaurant() {

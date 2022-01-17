@@ -636,10 +636,6 @@ public class RestaurantService {
                 
             assignments = this.assignMenuRepository.findAllByDateBetweenAndRestaurant(start, currentEndDate, owner.getRestaurant());
 
-            // assignments.forEach(
-            //     assignment -> System.out.println(assignment + String.valueOf(assignment.getEatingIntentions().size()))
-            // );
-
             stats = new StatsIntentionDto();
 
             for (AssignMenu assignment : assignments) {
@@ -665,6 +661,16 @@ public class RestaurantService {
 
         return ResponseEntity.ok(
             mapOfNumberOfIntentions
+        );
+    }
+
+    public ResponseEntity<Integer> getRestaurantFavoritedClients(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        return ResponseEntity.ok(
+            owner.getRestaurant().getFavoritedClients().size()
         );
     }
 

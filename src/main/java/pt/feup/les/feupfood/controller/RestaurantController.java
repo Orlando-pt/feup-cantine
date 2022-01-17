@@ -267,4 +267,11 @@ public class RestaurantController {
 	) {
 		return this.service.getNumberOfIntentionsInAPeriod(user, increment, start, end);
 	}
+
+	@GetMapping("stats/favorite")
+	public ResponseEntity<Integer> getRestaurantFavoritedClients(
+		Principal user
+	) {
+		return this.service.getRestaurantFavoritedClients(user);
+	}
 }
