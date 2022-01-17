@@ -1,7 +1,9 @@
 package pt.feup.les.feupfood.controller;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.StatsIntentionDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.service.RestaurantService;
 
@@ -252,5 +255,16 @@ public class RestaurantController {
 		@RequestBody RestaurantAnswerReviewDto answerDto
 	) {
 		return this.service.restaurantAnswerToReview(user, id, answerDto);
+	}
+
+	// stats endpoints
+	@GetMapping("stats/intention/{increment}/{start}/{end}")
+	public ResponseEntity<Map<Date, StatsIntentionDto>> getNumberOfIntentionsInAPeriod(
+		Principal user,
+		@PathVariable int increment,
+		@PathVariable Date start,
+		@PathVariable Date end
+	) {
+		return this.service.getNumberOfIntentionsInAPeriod(user, increment, start, end);
 	}
 }

@@ -5,12 +5,13 @@ import java.time.Clock;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.support.DaoSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,9 @@ import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.StatsIntentionDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
+import pt.feup.les.feupfood.exceptions.BadRequestParametersException;
 import pt.feup.les.feupfood.exceptions.DataIntegrityException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
@@ -597,6 +600,71 @@ public class RestaurantService {
 
         return ResponseEntity.ok(
             new ClientParser().parseReviewToReviewDto(review)
+        );
+    }
+
+    // stat methods
+    public ResponseEntity<Map<Date, StatsIntentionDto>> getNumberOfIntentionsInAPeriod(
+        Principal user,
+        int increment,
+        Date start,
+        Date end
+    ) {
+        if (start.after(end))
+            throw new BadRequestParametersException("End date is before start date");
+
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<Date, StatsIntentionDto> mapOfNumberOfIntentions = new HashMap<>();
+        List<AssignMenu> assignments;
+        StatsIntentionDto stats;
+
+        long msPerDay = 1000L * 60 * 60 * 24;
+
+        start.setTime(start.getTime() - (start.getTime() % msPerDay));
+        end.setTime(end.getTime() - (end.getTime() % msPerDay) + 60000L);
+
+        long incrementToDate = increment * msPerDay;
+
+        Date currentEndDate = new Date(start.getTime() + incrementToDate - 60000L);
+
+        // while the current date is before the end date
+        // keep inserting stats in the map
+        while(start.before(end)) {
+            if (currentEndDate.after(end))
+                currentEndDate.setTime(end.getTime());
+                
+            assignments = this.assignMenuRepository.findAllByDateBetweenAndRestaurant(start, currentEndDate, owner.getRestaurant());
+
+            // assignments.forEach(
+            //     assignment -> System.out.println(assignment + String.valueOf(assignment.getEatingIntentions().size()))
+            // );
+
+            stats = new StatsIntentionDto();
+
+            for (AssignMenu assignment : assignments) {
+                stats.addIntentionsGiven(assignment.getEatingIntentions().size());
+
+                for (EatIntention intention : assignment.getEatingIntentions())
+                    if (intention.getValidatedCode())
+                        stats.incrementIntentionsFulfilled();
+                    else
+                        stats.incrementIntentionsNotFulfilled();
+            }
+
+            mapOfNumberOfIntentions.put(
+                new Date(start.getTime()),
+                stats
+            );
+
+            // increment current date
+            start.setTime(start.getTime() + incrementToDate);
+            currentEndDate.setTime(currentEndDate.getTime() + incrementToDate);
+        }
+
+
+        return ResponseEntity.ok(
+            mapOfNumberOfIntentions
         );
     }
 
