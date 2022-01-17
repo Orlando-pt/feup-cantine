@@ -809,9 +809,9 @@ public class RestaurantController_RestTemplateIT {
         // make some reviews
         HttpHeaders headers = this.getStandardHeaders();
 
-        DAOUser client = this.userRepository.findById(4L).orElseThrow();
+        DAOUser client = this.userRepository.findByEmail("francisco@gmail.com").orElseThrow();
 
-        DAOUser restaurant = this.userRepository.findById(5L).orElseThrow();
+        DAOUser restaurant = this.userRepository.findByEmail(this.restaurantUser.getEmail()).orElseThrow();
 
         Review review1 = new Review();
         review1.setClassificationGrade(3);

@@ -251,6 +251,6 @@ public class RestaurantController {
 		@PathVariable Long id,
 		@RequestBody RestaurantAnswerReviewDto answerDto
 	) {
-		return this.service.restaurantUpdatesAnswerToReview(user, id, answerDto);
+		return this.service.restaurantAnswerToReview(user, id, answerDto);
 	}
 }

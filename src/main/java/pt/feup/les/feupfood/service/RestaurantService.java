@@ -600,23 +600,6 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<GetClientReviewDto> restaurantUpdatesAnswerToReview(
-        Principal user,
-        Long reviewId,
-        RestaurantAnswerReviewDto dto
-    ) {
-        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
-
-        Review review = this.retrieveReview(owner.getRestaurant(), reviewId);
-
-        review.setAnswer(dto.getAnswer());
-        review = this.reviewRepository.save(review);
-
-        return ResponseEntity.ok(
-            new ClientParser().parseReviewToReviewDto(review)
-        );
-    }
-
     // auxiliar methods
     private DAOUser retrieveRestaurantOwner(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(
