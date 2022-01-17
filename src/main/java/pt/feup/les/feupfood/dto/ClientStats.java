@@ -11,6 +11,7 @@ public class ClientStats {
     public ClientStats() {
         this.moneySaved = 0.0;
         this.intentionsGiven = 0;
+        this.intentionsNotFulfilled = 0;
     }
 
     public void addMoney(double money) {
