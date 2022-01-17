@@ -255,9 +255,149 @@ public class DatabaseRunner implements ApplicationRunner {
         assignmentForToday.setRestaurant(restaurantObject);
         assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
 
+        AssignMenu assignmentForTodayDinner = new AssignMenu();
+        assignmentForTodayDinner.setDate(new Date(System.currentTimeMillis()));
+        assignmentForTodayDinner.setMenu(menu);
+        assignmentForTodayDinner.setRestaurant(restaurantObject);
+        assignmentForTodayDinner.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignmentForTomorrow = new AssignMenu();
+        assignmentForTomorrow.setDate(
+            new Date(System.currentTimeMillis() + oneDay)
+        );
+        assignmentForTomorrow.setMenu(menu);
+        assignmentForTomorrow.setRestaurant(restaurantObject);
+        assignmentForTomorrow.setSchedule(ScheduleEnum.LUNCH);
+
+        // assignments for 2 days come
+        AssignMenu assignment2Days = new AssignMenu();
+        assignment2Days.setDate(
+            new Date(System.currentTimeMillis() + (2 * oneDay))
+        );
+        assignment2Days.setMenu(menu);
+        assignment2Days.setRestaurant(restaurantObject);
+        assignment2Days.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignment2DaysDinner = new AssignMenu();
+        assignment2DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (2 * oneDay))
+        );
+        assignment2DaysDinner.setMenu(menu);
+        assignment2DaysDinner.setRestaurant(restaurantObject);
+        assignment2DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
+        // assignments for 3 days come
+        AssignMenu assignment3DaysDinner = new AssignMenu();
+        assignment3DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (3 * oneDay))
+        );
+        assignment3DaysDinner.setMenu(menu);
+        assignment3DaysDinner.setRestaurant(restaurantObject);
+        assignment3DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
+        // assignments for 4 days come
+        AssignMenu assignment4DaysLunch = new AssignMenu();
+        assignment4DaysLunch.setDate(
+            new Date(System.currentTimeMillis() + (4 * oneDay))
+        );
+        assignment4DaysLunch.setMenu(menu);
+        assignment4DaysLunch.setRestaurant(restaurantObject);
+        assignment4DaysLunch.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignment4DaysDinner = new AssignMenu();
+        assignment4DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (4 * oneDay))
+        );
+        assignment4DaysDinner.setMenu(menu);
+        assignment4DaysDinner.setRestaurant(restaurantObject);
+        assignment4DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
+        // assignments for 5 days come
+        AssignMenu assignment5DaysLunch = new AssignMenu();
+        assignment5DaysLunch.setDate(
+            new Date(System.currentTimeMillis() + (5 * oneDay))
+        );
+        assignment5DaysLunch.setMenu(menu);
+        assignment5DaysLunch.setRestaurant(restaurantObject);
+        assignment5DaysLunch.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignment5DaysDinner = new AssignMenu();
+        assignment5DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (5 * oneDay))
+        );
+        assignment5DaysDinner.setMenu(menu);
+        assignment5DaysDinner.setRestaurant(restaurantObject);
+        assignment5DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
+        // assignments for 6 days come
+        AssignMenu assignment6DaysLunch = new AssignMenu();
+        assignment6DaysLunch.setDate(
+            new Date(System.currentTimeMillis() + (6 * oneDay))
+        );
+        assignment6DaysLunch.setMenu(menu);
+        assignment6DaysLunch.setRestaurant(restaurantObject);
+        assignment6DaysLunch.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignment6DaysDinner = new AssignMenu();
+        assignment6DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (6 * oneDay))
+        );
+        assignment6DaysDinner.setMenu(menu);
+        assignment6DaysDinner.setRestaurant(restaurantObject);
+        assignment6DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
+        // assignments for 7 days come
+        AssignMenu assignment7DaysLunch = new AssignMenu();
+        assignment7DaysLunch.setDate(
+            new Date(System.currentTimeMillis() + (7 * oneDay))
+        );
+        assignment7DaysLunch.setMenu(menu);
+        assignment7DaysLunch.setRestaurant(restaurantObject);
+        assignment7DaysLunch.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignment7DaysDinner = new AssignMenu();
+        assignment7DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (7 * oneDay))
+        );
+        assignment7DaysDinner.setMenu(menu);
+        assignment7DaysDinner.setRestaurant(restaurantObject);
+        assignment7DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
+        // assignments for 8 days come
+        AssignMenu assignment8DaysLunch = new AssignMenu();
+        assignment8DaysLunch.setDate(
+            new Date(System.currentTimeMillis() + (8 * oneDay))
+        );
+        assignment8DaysLunch.setMenu(menu);
+        assignment8DaysLunch.setRestaurant(restaurantObject);
+        assignment8DaysLunch.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignment8DaysDinner = new AssignMenu();
+        assignment8DaysDinner.setDate(
+            new Date(System.currentTimeMillis() + (8 * oneDay))
+        );
+        assignment8DaysDinner.setMenu(menu);
+        assignment8DaysDinner.setRestaurant(restaurantObject);
+        assignment8DaysDinner.setSchedule(ScheduleEnum.DINNER);
+
         this.assignMenuRepository.save(assignment);
         this.assignMenuRepository.save(assignment2);
         this.assignMenuRepository.save(assignmentForToday);
+        this.assignMenuRepository.save(assignmentForTodayDinner);
+        this.assignMenuRepository.save(assignmentForTomorrow);
+        this.assignMenuRepository.save(assignment2Days);
+        this.assignMenuRepository.save(assignment2DaysDinner);
+        this.assignMenuRepository.save(assignment3DaysDinner);
+        this.assignMenuRepository.save(assignment4DaysLunch);
+        this.assignMenuRepository.save(assignment4DaysDinner);
+        this.assignMenuRepository.save(assignment5DaysLunch);
+        this.assignMenuRepository.save(assignment5DaysDinner);
+        this.assignMenuRepository.save(assignment6DaysLunch);
+        this.assignMenuRepository.save(assignment6DaysDinner);
+        this.assignMenuRepository.save(assignment7DaysLunch);
+        this.assignMenuRepository.save(assignment7DaysDinner);
+        this.assignMenuRepository.save(assignment8DaysLunch);
+        this.assignMenuRepository.save(assignment8DaysDinner);
 
         EatIntention eatIntention = new EatIntention();
         eatIntention.setAssignment(assignment);
