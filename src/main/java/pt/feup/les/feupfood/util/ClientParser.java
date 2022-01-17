@@ -3,7 +3,7 @@ package pt.feup.les.feupfood.util;
 import java.util.stream.Collectors;
 
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
-import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
 import pt.feup.les.feupfood.model.DAOUser;
@@ -22,8 +22,8 @@ public class ClientParser {
         return profileDto;
     }
 
-    public GetPutClientReviewDto parseReviewToReviewDto(Review review) {
-        var reviewDto = new GetPutClientReviewDto();
+    public GetClientReviewDto parseReviewToReviewDto(Review review) {
+        var reviewDto = new GetClientReviewDto();
         reviewDto.setId(review.getId());
         reviewDto.setClientId(review.getClient().getId());
         reviewDto.setClientFullName(review.getClient().getFullName());
@@ -32,6 +32,7 @@ public class ClientParser {
         reviewDto.setClassificationGrade(review.getClassificationGrade());
         reviewDto.setComment(review.getComment());
         reviewDto.setAnswer(review.getAnswer());
+        reviewDto.setTimestamp(review.getTimestamp());
         return reviewDto;
     }
 

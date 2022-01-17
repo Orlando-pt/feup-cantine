@@ -20,7 +20,7 @@ import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
-import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
@@ -558,7 +558,7 @@ public class RestaurantService {
     }
 
     // review methods
-    public ResponseEntity<List<GetPutClientReviewDto>> getRestaurantReviews(
+    public ResponseEntity<List<GetClientReviewDto>> getRestaurantReviews(
         Principal user
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
@@ -572,7 +572,7 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<GetPutClientReviewDto> getRestaurantReview(
+    public ResponseEntity<GetClientReviewDto> getRestaurantReview(
         Principal user,
         Long reviewId
     ) {
@@ -583,7 +583,7 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<GetPutClientReviewDto> restaurantAnswerToReview(
+    public ResponseEntity<GetClientReviewDto> restaurantAnswerToReview(
         Principal user,
         Long reviewId,
         RestaurantAnswerReviewDto dto
@@ -600,7 +600,7 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<GetPutClientReviewDto> restaurantUpdatesAnswerToReview(
+    public ResponseEntity<GetClientReviewDto> restaurantUpdatesAnswerToReview(
         Principal user,
         Long reviewId,
         RestaurantAnswerReviewDto dto
@@ -693,7 +693,7 @@ public class RestaurantService {
         );
 
         if (!review.getRestaurant().equals(restaurant))
-            throw new ResourceNotFoundException("Review not owned.");
+            throw new ResourceNotOwnedException("Review not owned.");
 
         return review;
     }

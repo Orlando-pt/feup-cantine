@@ -1,11 +1,6 @@
 package pt.feup.les.feupfood.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class GetPutClientReviewDto implements ResponseInterfaceDto {
+public class PutClientReviewDto {
     private Long id;
     private Long clientId;
     private String clientFullName;

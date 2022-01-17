@@ -50,13 +50,13 @@ public class ClientController {
 
     // review endpoints
     @GetMapping("review")
-    public ResponseEntity<List<GetPutClientReviewDto>> getClientReviews(Principal user) {
+    public ResponseEntity<List<GetClientReviewDto>> getClientReviews(Principal user) {
 
         return this.clientService.getUserReviewsFromClient(user);
     }
 
     @GetMapping("review/restaurant/{id}")
-    public ResponseEntity<List<GetPutClientReviewDto>> getClientReviewsByRestaurantId(@PathVariable Long id) {
+    public ResponseEntity<List<GetClientReviewDto>> getClientReviewsByRestaurantId(@PathVariable Long id) {
 
         return this.clientService.getReviewsFromRestaurantByRestaurantId(id);
     }

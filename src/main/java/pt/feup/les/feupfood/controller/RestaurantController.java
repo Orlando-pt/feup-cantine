@@ -21,7 +21,7 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
-import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
@@ -222,14 +222,14 @@ public class RestaurantController {
 
 	// review endpoints
 	@GetMapping("review")
-	public ResponseEntity<List<GetPutClientReviewDto>> getAllRestaurantReviews(
+	public ResponseEntity<List<GetClientReviewDto>> getAllRestaurantReviews(
 		Principal user
 	) {
 		return this.service.getRestaurantReviews(user);
 	}
 
 	@GetMapping("review/{id}")
-	public ResponseEntity<GetPutClientReviewDto> getRestaurantReview(
+	public ResponseEntity<GetClientReviewDto> getRestaurantReview(
 		Principal user,
 		@PathVariable Long id
 	) {
@@ -237,7 +237,7 @@ public class RestaurantController {
 	}
 
 	@PutMapping("review/answer/{id}")
-	public ResponseEntity<GetPutClientReviewDto> restaurantAnswersToReview(
+	public ResponseEntity<GetClientReviewDto> restaurantAnswersToReview(
 		Principal user,
 		@PathVariable Long id,
 		@RequestBody RestaurantAnswerReviewDto answerDto
@@ -246,7 +246,7 @@ public class RestaurantController {
 	}
 
 	@PutMapping("review/{id}")
-	public ResponseEntity<GetPutClientReviewDto> updateRestaurantAnswertToReview(
+	public ResponseEntity<GetClientReviewDto> updateRestaurantAnswertToReview(
 		Principal user,
 		@PathVariable Long id,
 		@RequestBody RestaurantAnswerReviewDto answerDto

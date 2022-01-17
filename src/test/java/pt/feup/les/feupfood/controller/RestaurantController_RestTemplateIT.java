@@ -1,6 +1,7 @@
 package pt.feup.les.feupfood.controller;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -24,12 +25,14 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.JwtRequest;
 import pt.feup.les.feupfood.dto.JwtResponse;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
+import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
@@ -38,10 +41,12 @@ import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.MealTypeEnum;
 import pt.feup.les.feupfood.model.Menu;
+import pt.feup.les.feupfood.model.Review;
 import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
+import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -66,6 +71,9 @@ public class RestaurantController_RestTemplateIT {
 
     @Autowired
     private MenuRepository menuRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     private RegisterUserDto restaurantUser;
     private String token;
@@ -794,6 +802,124 @@ public class RestaurantController_RestTemplateIT {
             getCurrentAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
+    }
+
+    @Test
+    void answerToReviewsTest() {
+        // make some reviews
+        HttpHeaders headers = this.getStandardHeaders();
+
+        DAOUser client = this.userRepository.findById(4L).orElseThrow();
+
+        DAOUser restaurant = this.userRepository.findById(5L).orElseThrow();
+
+        Review review1 = new Review();
+        review1.setClassificationGrade(3);
+        review1.setClient(client);
+        review1.setComment("Eaten better.");
+        review1.setRestaurant(restaurant.getRestaurant());
+        review1.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        
+        Review review2 = new Review();
+        review2.setClassificationGrade(4);
+        review2.setClient(client);
+        review2.setComment("Today the food was better");
+        review2.setRestaurant(restaurant.getRestaurant());
+        review2.setTimestamp(new Timestamp(System.currentTimeMillis()));
+
+        review1 = this.reviewRepository.save(review1);
+        review2 = this.reviewRepository.save(review2);
+
+        var getReviewsOfRestaurant = this.restTemplate.exchange(
+            "/api/restaurant/review",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientReviewDto[].class
+        );
+
+        Assertions.assertThat(
+            getReviewsOfRestaurant.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getReviewsOfRestaurant.getBody()
+        ).extracting(GetClientReviewDto::getId).contains(
+            review1.getId(),
+            review2.getId()
+        );
+
+        RestaurantAnswerReviewDto answerDto = new RestaurantAnswerReviewDto();
+        answerDto.setAnswer("Where have you eaten better? Tell me now!");
+
+        var addAnswerToComment = this.restTemplate.exchange(
+            "/api/restaurant/review/answer/" + review1.getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(answerDto, headers),
+            GetClientReviewDto.class
+        );
+
+        Assertions.assertThat(
+            addAnswerToComment.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            addAnswerToComment.getBody().getAnswer()
+        ).isEqualTo(answerDto.getAnswer());
+
+        answerDto.setAnswer("Can you please tell where have you eaten better? So that we can improve.");
+        var updateAnswerToComment = this.restTemplate.exchange(
+            "/api/restaurant/review/" + review1.getId(),
+            HttpMethod.PUT,
+            new HttpEntity<>(answerDto, headers),
+            GetClientReviewDto.class
+        );
+
+        Assertions.assertThat(
+            updateAnswerToComment.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            updateAnswerToComment.getBody().getAnswer()
+        ).isEqualTo(answerDto.getAnswer());
+
+        var getReviewWithId = this.restTemplate.exchange(
+            "/api/restaurant/review/" + review2.getId(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientReviewDto.class
+        );
+
+        Assertions.assertThat(
+            getReviewWithId.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getReviewWithId.getBody().getId()
+        ).isEqualTo(review2.getId());
+
+        // access one review that does not exist
+        var accessignReviewNotExistent = this.restTemplate.exchange(
+            "/api/restaurant/review/" + 101L,
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientReviewDto.class
+        );
+
+        Assertions.assertThat(
+            accessignReviewNotExistent.getStatusCode()
+        ).isEqualTo(HttpStatus.NOT_FOUND);
+
+        // answer to review not owned
+        var answeringNotOwnedReview = this.restTemplate.exchange(
+            "/api/restaurant/review/" + 1L,
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientReviewDto.class
+        );
+
+        Assertions.assertThat(
+            answeringNotOwnedReview.getStatusCode()
+        ).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     private void registerRestaurant() {

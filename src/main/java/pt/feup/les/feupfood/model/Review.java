@@ -2,6 +2,8 @@ package pt.feup.les.feupfood.model;
 
 import lombok.*;
 
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 
 @Entity
@@ -31,6 +33,8 @@ public class Review {
     String comment;
 
     String answer;
+
+    Timestamp timestamp;
 
     public void setClassificationGrade(int classificationGrade) {
         if (classificationGrade > 0 && classificationGrade <= 5)

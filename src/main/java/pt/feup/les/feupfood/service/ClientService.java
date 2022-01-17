@@ -12,7 +12,7 @@ import pt.feup.les.feupfood.dto.AddEatIntention;
 import pt.feup.les.feupfood.dto.ClientStats;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
-import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.IsFavoriteDto;
 import pt.feup.les.feupfood.dto.PriceRangeDto;
@@ -40,6 +40,7 @@ import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -109,6 +110,7 @@ public class ClientService {
         review.setClassificationGrade(clientReviewDto.getClassificationGrade());
         review.setComment(clientReviewDto.getComment());
         review.setRestaurant(reviewedRestaurant);
+        review.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
         review = this.reviewRepository.save(review);
 
@@ -123,7 +125,7 @@ public class ClientService {
         return ResponseEntity.ok(new ClientParser().parseReviewToReviewDto(review));
     }
 
-    public ResponseEntity<List<GetPutClientReviewDto>> getUserReviewsFromClient(Principal user) {
+    public ResponseEntity<List<GetClientReviewDto>> getUserReviewsFromClient(Principal user) {
 
         DAOUser reviewer = this.retrieveUser(user.getName());
 
@@ -162,7 +164,7 @@ public class ClientService {
         return ResponseEntity.ok(this.restaurantRepository.findAll().stream().map(clientParser::parseRestaurantToRestaurantDto).collect(Collectors.toList()));
     }
 
-    public ResponseEntity<List<GetPutClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
+    public ResponseEntity<List<GetClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
         Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
 
         return ResponseEntity.ok(this.getAllReviewsFromRestaurant(reviewedRestaurant));
@@ -456,12 +458,12 @@ public class ClientService {
         return this.eatIntentionRepository.findById(intentionId).orElseThrow(() -> new ResourceNotFoundException("Eating intention not found with id: " + intentionId));
     }
     
-    private List<GetPutClientReviewDto> getAllReviewsFromClient(DAOUser client) {
+    private List<GetClientReviewDto> getAllReviewsFromClient(DAOUser client) {
         ClientParser clientParser = new ClientParser();
         return client.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }
 
-    private List<GetPutClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
+    private List<GetClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
         ClientParser clientParser = new ClientParser();
         return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }

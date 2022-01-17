@@ -141,15 +141,15 @@ public class ClientController_RestTemplateIT {
         reviewDto2.setClassificationGrade(2);
         reviewDto2.setComment("Very bad food!");
 
-        var addReview = this.restTemplate.exchange("/api/client/review/restaurant/" + getRestaurantId.getBody()[0].getId(), HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
+        var addReview = this.restTemplate.exchange("/api/client/review/restaurant/" + getRestaurantId.getBody()[0].getId(), HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetClientReviewDto.class);
 
         var addReview2 = this.restTemplate.exchange("/api/client/review/restaurant/" + getRestaurantId.getBody()[0].getId(),
-                HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetPutClientReviewDto.class);
+                HttpMethod.POST, new HttpEntity<>(reviewDto, headers), GetClientReviewDto.class);
 
         Assertions.assertThat(addReview.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(addReview2.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        var getReviews = this.restTemplate.exchange("/api/client/review", HttpMethod.GET, new HttpEntity<>(headers), GetPutClientReviewDto[].class);
+        var getReviews = this.restTemplate.exchange("/api/client/review", HttpMethod.GET, new HttpEntity<>(headers), GetClientReviewDto[].class);
         
         Assertions.assertThat(getReviews.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -179,9 +179,9 @@ public class ClientController_RestTemplateIT {
                 "/api/client/review/restaurant/" + id,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
-                GetPutClientReviewDto[].class);
+                GetClientReviewDto[].class);
         
-        GetPutClientReviewDto expectedReview = new GetPutClientReviewDto();
+        GetClientReviewDto expectedReview = new GetClientReviewDto();
         expectedReview.setClassificationGrade(2);
         expectedReview.setClientFullName("Francisco Bastos");
         expectedReview.setClientId(4L);
