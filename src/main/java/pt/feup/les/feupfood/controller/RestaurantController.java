@@ -246,7 +246,7 @@ public class RestaurantController {
 	}
 
 	@PutMapping("review/{id}")
-	public ResponseEntity<GetClientReviewDto> updateRestaurantAnswertToReview(
+	public ResponseEntity<GetClientReviewDto> updateRestaurantAnswerToReview(
 		Principal user,
 		@PathVariable Long id,
 		@RequestBody RestaurantAnswerReviewDto answerDto
