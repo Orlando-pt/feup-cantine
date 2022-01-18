@@ -1137,6 +1137,59 @@ public class RestaurantController_RestTemplateIT {
         this.eatIntentionRepository.save(thirdDayLunch2);
         this.eatIntentionRepository.save(thirdDayDinner);
 
+        // add reviews
+        // first day
+        Review reviewFirstDay = new Review();
+        reviewFirstDay.setClient(client1);
+        reviewFirstDay.setRestaurant(restaurant.getRestaurant());
+        reviewFirstDay.setComment("The food was wonderful. Congratulations on the nicest cuisine in Porto.");
+        reviewFirstDay.setTimestamp(new Timestamp(1641049200000L));
+        reviewFirstDay.setClassificationGrade(5);
+
+        Review reviewFirstDayClient2 = new Review();
+        reviewFirstDayClient2.setClient(client2);
+        reviewFirstDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewFirstDayClient2.setComment("Like very much");
+        reviewFirstDayClient2.setTimestamp(new Timestamp(1641049200000L));
+        reviewFirstDayClient2.setClassificationGrade(5);
+
+        // second day
+        Review reviewSecondDay = new Review();
+        reviewSecondDay.setClient(client1);
+        reviewSecondDay.setRestaurant(restaurant.getRestaurant());
+        reviewSecondDay.setComment("Still very good, but today the waitress was bit angry with something.");
+        reviewSecondDay.setTimestamp(new Timestamp(1641135600000L));
+        reviewSecondDay.setClassificationGrade(5);
+
+        Review reviewSecondDayClient2 = new Review();
+        reviewSecondDayClient2.setClient(client2);
+        reviewSecondDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewSecondDayClient2.setComment("I will lower my classification because of the waitress's posture. She was very rude today.");
+        reviewSecondDayClient2.setTimestamp(new Timestamp(1641135600000L));
+        reviewSecondDayClient2.setClassificationGrade(4);
+
+        // third day
+        Review reviewThirdDay = new Review();
+        reviewThirdDay.setClient(client1);
+        reviewThirdDay.setRestaurant(restaurant.getRestaurant());
+        reviewThirdDay.setComment("Today the waitress was just unberable.");
+        reviewThirdDay.setTimestamp(new Timestamp(1641222000000L));
+        reviewThirdDay.setClassificationGrade(2);
+
+        Review reviewThirdDayClient2 = new Review();
+        reviewThirdDayClient2.setClient(client2);
+        reviewThirdDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewThirdDayClient2.setComment("The waitress threw me a spoon.");
+        reviewThirdDayClient2.setTimestamp(new Timestamp(1641222000000L));
+        reviewThirdDayClient2.setClassificationGrade(1);
+
+        this.reviewRepository.save(reviewFirstDay);
+        this.reviewRepository.save(reviewFirstDayClient2);
+        this.reviewRepository.save(reviewSecondDay);
+        this.reviewRepository.save(reviewSecondDayClient2);
+        this.reviewRepository.save(reviewThirdDay);
+        this.reviewRepository.save(reviewThirdDayClient2);
+
         ParameterizedTypeReference<HashMap<Date, StatsIntentionDto>> statIntentionResponse = new ParameterizedTypeReference<HashMap<Date, StatsIntentionDto>>() {};
 
         var getIntentionStats = this.restTemplate.exchange(
@@ -1182,6 +1235,25 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             getNumberOfFavoritedClients.getBody()
         ).isEqualTo(2);
+
+        ParameterizedTypeReference<HashMap<Date, Float>> popularityResponse = new ParameterizedTypeReference<HashMap<Date, Float>>() {};
+
+        var getPopularity = this.restTemplate.exchange(
+            "/api/restaurant/stats/popularity/1/Jan 01 2022/Jan 05 2022",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            popularityResponse
+        );
+
+        System.out.println(getPopularity);
+
+        Assertions.assertThat(
+            getPopularity.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getPopularity.getBody().values()
+        ).contains(5.0f, 4.75f);
     }
 
     private void registerRestaurant() {

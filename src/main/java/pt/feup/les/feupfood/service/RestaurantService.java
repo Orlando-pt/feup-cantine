@@ -690,13 +690,19 @@ public class RestaurantService {
 
         Timestamp startTimestamp = new Timestamp(start.getTime());
         Timestamp endTimestamp = new Timestamp(end.getTime());
-        Timestamp currentEndTimestamp = new Timestamp(start.getTime() + incrementToDate);
+        // Timestamp currentEndTimestamp = new Timestamp(start.getTime() + incrementToDate);
+        Timestamp currentEndTimestamp = new Timestamp(start.getTime());
 
         List<Review> reviews;
 
-        // while the current date is before the end date
+        // while the current date is different from the end date
         // keep inserting stats in the map
-        while(true) {
+        while(!currentEndTimestamp.equals(endTimestamp)) {
+            // increment current date
+            currentEndTimestamp.setTime(currentEndTimestamp.getTime() + incrementToDate);
+
+            // if the current end date is after the end date
+            // then put the current end date equal to the stipulated end date
             if (currentEndTimestamp.after(end))
                 currentEndTimestamp.setTime(end.getTime());
                 
@@ -711,12 +717,6 @@ public class RestaurantService {
                     (subtotal, classification) -> subtotal + classification
                 ).floatValue() / reviews.size()
             );
-
-            if (currentEndTimestamp.equals(endTimestamp))
-                break;
-
-            // increment current date
-            currentEndTimestamp.setTime(currentEndTimestamp.getTime() + incrementToDate);
         }
 
         return ResponseEntity.ok(popularityMap);
