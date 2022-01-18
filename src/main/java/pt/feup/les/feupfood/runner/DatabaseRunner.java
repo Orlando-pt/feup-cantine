@@ -255,7 +255,6 @@ public class DatabaseRunner implements ApplicationRunner {
         assignmentForToday.setRestaurant(restaurantObject);
         assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
 
-<<<<<<< HEAD
         AssignMenu previousAssignment = new AssignMenu();
         previousAssignment.setDate(new Date(System.currentTimeMillis() - (2 * oneDay)));
         previousAssignment.setMenu(menu);
@@ -267,7 +266,6 @@ public class DatabaseRunner implements ApplicationRunner {
         previousAssignment2.setMenu(menu);
         previousAssignment2.setRestaurant(restaurantObject);
         previousAssignment2.setSchedule(ScheduleEnum.DINNER);
-=======
         AssignMenu assignmentForTodayDinner = new AssignMenu();
         assignmentForTodayDinner.setDate(new Date(System.currentTimeMillis()));
         assignmentForTodayDinner.setMenu(menu);
@@ -392,15 +390,12 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment8DaysDinner.setMenu(menu);
         assignment8DaysDinner.setRestaurant(restaurantObject);
         assignment8DaysDinner.setSchedule(ScheduleEnum.DINNER);
->>>>>>> feature/restaurant_verifies_code_automatically
 
         this.assignMenuRepository.save(assignment);
         this.assignMenuRepository.save(assignment2);
         this.assignMenuRepository.save(assignmentForToday);
-<<<<<<< HEAD
         this.assignMenuRepository.save(previousAssignment);
         this.assignMenuRepository.save(previousAssignment2);
-=======
         this.assignMenuRepository.save(assignmentForTodayDinner);
         this.assignMenuRepository.save(assignmentForTomorrow);
         this.assignMenuRepository.save(assignment2Days);
@@ -416,7 +411,6 @@ public class DatabaseRunner implements ApplicationRunner {
         this.assignMenuRepository.save(assignment7DaysDinner);
         this.assignMenuRepository.save(assignment8DaysLunch);
         this.assignMenuRepository.save(assignment8DaysDinner);
->>>>>>> feature/restaurant_verifies_code_automatically
 
         EatIntention eatIntention = new EatIntention();
         eatIntention.setAssignment(assignment);
