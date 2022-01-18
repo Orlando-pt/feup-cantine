@@ -410,6 +410,16 @@ public class RestaurantService {
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
+        // verify if the assignment was alreay made for this date
+        List<AssignMenu> dayAssignments = this.assignMenuRepository.findByDateAndRestaurant(assignmentDto.getDate(), owner.getRestaurant());
+
+        dayAssignments.forEach(
+            assignment -> {
+                if (assignment.getSchedule() == assignmentDto.getSchedule())
+                    throw new DataIntegrityException("There is already one assignment for the current schedule.");
+            }
+        );
+
         AssignMenu assignment = new AssignMenu();
         assignment.setDate(assignmentDto.getDate());
         assignment.setSchedule(assignmentDto.getSchedule());

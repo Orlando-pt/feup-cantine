@@ -564,6 +564,17 @@ public class RestaurantController_RestTemplateIT {
             createAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
+        var repeatTheCreationOfAssignment = this.restTemplate.exchange(
+            "/api/restaurant/assignment",
+            HttpMethod.POST,
+            new HttpEntity<>(assignemntDto, headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            repeatTheCreationOfAssignment.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
         // update assignment
         assignemntDto.setSchedule(ScheduleEnum.DINNER);
         assignemntDto.setMenu(response2.getBody().getId());
