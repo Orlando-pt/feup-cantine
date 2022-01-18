@@ -1,5 +1,7 @@
 package pt.feup.les.feupfood.repository;
 
+import java.sql.Timestamp;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ public class ReviewRepositoryTest {
     private DAOUser client1;
 
     private Review reviewClient1;
+    private Review reviewClient1SecondReview;
 
     public ReviewRepositoryTest() {
         this.restaurantAlzira = new Restaurant();
@@ -71,6 +74,14 @@ public class ReviewRepositoryTest {
         this.reviewClient1.setClassificationGrade(5);
         this.reviewClient1.setClient(this.client1);
         this.reviewClient1.setRestaurant(this.restaurantAlzira);
+        this.reviewClient1.setTimestamp(new Timestamp(1641081600000L)); // 2022-01-02
+
+        this.reviewClient1SecondReview = new Review();
+        this.reviewClient1SecondReview.setComment("The food was even greater");
+        this.reviewClient1SecondReview.setClassificationGrade(5);
+        this.reviewClient1SecondReview.setClient(this.client1);
+        this.reviewClient1SecondReview.setRestaurant(this.restaurantAlzira);
+        this.reviewClient1SecondReview.setTimestamp(new Timestamp(1641340800000L)); // 2022-01-02
 
         this.restaurantAlzira.addReview(this.reviewClient1);
         this.client1.addReview(this.reviewClient1);
@@ -87,8 +98,23 @@ public class ReviewRepositoryTest {
         this.entityManager.persist(this.restaurantAlzira);
         this.entityManager.persist(this.restaurantDeolinda);
         this.entityManager.persist(this.reviewClient1);
+        this.entityManager.persist(this.reviewClient1SecondReview);
 
         this.entityManager.flush();
+    }
+
+    @Test
+    void testFindBetweenTimestamps() {
+        for (Review review : this.reviewRepository.findAll())
+            System.out.println(review);
+
+        Assertions.assertThat(
+            this.reviewRepository.findAllByTimestampBetweenAndRestaurant(
+                new Timestamp(1641081000000L),
+                new Timestamp(1641168000000L),                   // 2022-01-03
+                this.restaurantAlzira
+            )
+        ).contains(this.reviewClient1).doesNotContain(this.reviewClient1SecondReview);
     }
 
     @Test
@@ -97,7 +123,7 @@ public class ReviewRepositoryTest {
                 this.reviewRepository.findAllByRestaurant(
                         this.restaurantAlzira
                 )
-        ).hasSize(1).contains(this.reviewClient1);
+        ).hasSize(2).contains(this.reviewClient1, this.reviewClient1SecondReview);
     }
 
     @Test
@@ -106,6 +132,6 @@ public class ReviewRepositoryTest {
                 this.reviewRepository.findAllByClient(
                         this.client1
                 )
-        ).hasSize(1).contains(this.reviewClient1);
+        ).hasSize(2).contains(this.reviewClient1, this.reviewClient1SecondReview);
     }
 }

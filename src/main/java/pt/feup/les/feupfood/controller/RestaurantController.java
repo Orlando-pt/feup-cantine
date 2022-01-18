@@ -274,4 +274,14 @@ public class RestaurantController {
 	) {
 		return this.service.getRestaurantFavoritedClients(user);
 	}
+
+	@GetMapping("stats/popularity/{increment}/{start}/{end}")
+	public ResponseEntity<Map<Date, Float>> getRestaurantPopularity(
+		Principal user,
+		@PathVariable int increment,
+		@PathVariable Date start,
+		@PathVariable Date end
+	) {
+		return this.service.getPopularityOfRestaurant(user, increment, start, end);
+	}
 }

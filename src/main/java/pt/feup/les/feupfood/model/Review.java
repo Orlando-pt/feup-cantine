@@ -34,6 +34,7 @@ public class Review {
 
     String answer;
 
+    @Basic
     Timestamp timestamp;
 
     public void setClassificationGrade(int classificationGrade) {

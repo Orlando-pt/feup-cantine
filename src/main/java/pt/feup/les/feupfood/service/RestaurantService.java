@@ -1,6 +1,7 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -78,6 +79,9 @@ public class RestaurantService {
 
     @Autowired
     private Clock clock;
+
+
+    private final static long MS_PER_DAY = 1000L * 60 * 60 * 24;
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
@@ -619,12 +623,10 @@ public class RestaurantService {
         List<AssignMenu> assignments;
         StatsIntentionDto stats;
 
-        long msPerDay = 1000L * 60 * 60 * 24;
+        start.setTime(start.getTime() - (start.getTime() % MS_PER_DAY));
+        end.setTime(end.getTime() - (end.getTime() % MS_PER_DAY) + 60000L);
 
-        start.setTime(start.getTime() - (start.getTime() % msPerDay));
-        end.setTime(end.getTime() - (end.getTime() % msPerDay) + 60000L);
-
-        long incrementToDate = increment * msPerDay;
+        long incrementToDate = increment * MS_PER_DAY;
 
         Date currentEndDate = new Date(start.getTime() + incrementToDate - 60000L);
 
@@ -672,6 +674,52 @@ public class RestaurantService {
         return ResponseEntity.ok(
             owner.getRestaurant().getFavoritedClients().size()
         );
+    }
+
+    public ResponseEntity<Map<Date, Float>> getPopularityOfRestaurant(
+        Principal user,
+        int increment,
+        Date start,
+        Date end
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<Date, Float> popularityMap = new HashMap<>();
+
+        long incrementToDate = increment * MS_PER_DAY;
+
+        Timestamp startTimestamp = new Timestamp(start.getTime());
+        Timestamp endTimestamp = new Timestamp(end.getTime());
+        Timestamp currentEndTimestamp = new Timestamp(start.getTime() + incrementToDate);
+
+        List<Review> reviews;
+
+        // while the current date is before the end date
+        // keep inserting stats in the map
+        while(true) {
+            if (currentEndTimestamp.after(end))
+                currentEndTimestamp.setTime(end.getTime());
+                
+            reviews = this.reviewRepository.findAllByTimestampBetweenAndRestaurant(startTimestamp, currentEndTimestamp, owner.getRestaurant());
+
+            popularityMap.put(
+                new Date(currentEndTimestamp.getTime() - incrementToDate),
+                reviews.stream().map(
+                    review -> review.getClassificationGrade()
+                ).reduce(
+                    0,
+                    (subtotal, classification) -> subtotal + classification
+                ).floatValue() / reviews.size()
+            );
+
+            if (currentEndTimestamp.equals(endTimestamp))
+                break;
+
+            // increment current date
+            currentEndTimestamp.setTime(currentEndTimestamp.getTime() + incrementToDate);
+        }
+
+        return ResponseEntity.ok(popularityMap);
     }
 
     // auxiliar methods
