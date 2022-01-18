@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -1072,7 +1070,7 @@ public class RestaurantController_RestTemplateIT {
         firstDayIntentionLunch2.setAssignment(assignment1);
         firstDayIntentionLunch2.setClient(client2);
         firstDayIntentionLunch2.setCode("123456788");
-        firstDayIntentionLunch2.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionLunch2.setMeals(Set.of(menu.getMeals().get(3)));
         firstDayIntentionLunch2.setValidatedCode(false);
 
         EatIntention firstDayIntentionDinner1 = new EatIntention();
@@ -1094,7 +1092,7 @@ public class RestaurantController_RestTemplateIT {
         secondDayIntention.setAssignment(assignment3);
         secondDayIntention.setClient(client2);
         secondDayIntention.setCode("123456785");
-        secondDayIntention.setMeals(Set.of(menu.getMeals().get(0)));
+        secondDayIntention.setMeals(Set.of(menu.getMeals().get(3)));
         secondDayIntention.setValidatedCode(true);
         // one the second day only the clint1 went to eat at the cantine for dinner
         EatIntention secondDayIntentionDinner = new EatIntention();
@@ -1116,7 +1114,7 @@ public class RestaurantController_RestTemplateIT {
         thirdDayLunch2.setAssignment(assignment5);
         thirdDayLunch2.setClient(client2);
         thirdDayLunch2.setCode("123456782");
-        thirdDayLunch2.setMeals(Set.of(menu.getMeals().get(0)));
+        thirdDayLunch2.setMeals(Set.of(menu.getMeals().get(3)));
         thirdDayLunch2.setValidatedCode(true);
 
         // but only client 1 went for dinner
@@ -1245,8 +1243,6 @@ public class RestaurantController_RestTemplateIT {
             popularityResponse
         );
 
-        System.out.println(getPopularity);
-
         Assertions.assertThat(
             getPopularity.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
@@ -1254,6 +1250,29 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             getPopularity.getBody().values()
         ).contains(5.0f, 4.75f);
+
+        var getPopularityErrorEndDateInferiorToStartDate = this.restTemplate.exchange(
+            "/api/restaurant/stats/popularity/1/Jan 02 2022/Jan 01 2022",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            getPopularityErrorEndDateInferiorToStartDate.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        var getMostEatenMeals = this.restTemplate.exchange(
+            "/api/restaurant/stats/favorite-meals/3",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            getMostEatenMeals.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
     }
 
     private void registerRestaurant() {

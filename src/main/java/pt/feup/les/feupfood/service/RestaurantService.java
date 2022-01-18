@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -682,6 +683,9 @@ public class RestaurantService {
         Date start,
         Date end
     ) {
+        if (start.after(end))
+            throw new BadRequestParametersException("End date is before start date");
+            
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
         Map<Date, Float> popularityMap = new HashMap<>();
@@ -720,6 +724,40 @@ public class RestaurantService {
         }
 
         return ResponseEntity.ok(popularityMap);
+    }
+
+    public ResponseEntity<Map<GetPutMealDto, Integer>> getMostFrequentMeals(
+        Principal user,
+        int numberOfMeals
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<GetPutMealDto, Integer> favoriteMealsMap = new HashMap<>();
+        List<Meal> meals = this.mealRepository.findByRestaurant(owner.getRestaurant());
+
+        RestaurantParser parser = new RestaurantParser();
+
+        meals = meals.stream().sorted(
+            new Comparator<Meal>() {
+
+                @Override
+                public int compare(Meal meal1, Meal meal2) {
+                    return meal2.getEatingIntentions().size() - meal1.getEatingIntentions().size();
+                }
+                
+            }
+        ).collect(Collectors.toList());
+
+        if (numberOfMeals < meals.size())
+            meals = meals.subList(0, numberOfMeals);
+
+        meals.forEach(
+            meal -> favoriteMealsMap.put(
+                parser.parseMealtoMealDto(meal),
+                meal.getEatingIntentions().size()
+            )
+        );
+        return ResponseEntity.ok(favoriteMealsMap);
     }
 
     // auxiliar methods

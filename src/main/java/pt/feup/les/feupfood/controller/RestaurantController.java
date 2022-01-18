@@ -284,4 +284,12 @@ public class RestaurantController {
 	) {
 		return this.service.getPopularityOfRestaurant(user, increment, start, end);
 	}
+
+	@GetMapping("stats/favorite-meals/{quantity}")
+	public ResponseEntity<Map<GetPutMealDto, Integer>> getRestaurantFavoriteMeals(
+		Principal user,
+		@PathVariable int quantity
+	) {
+		return this.service.getMostFrequentMeals(user, quantity);
+	}
 }
