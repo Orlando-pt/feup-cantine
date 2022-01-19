@@ -869,7 +869,7 @@ public class RestaurantController_RestTemplateIT {
         answerDto.setAnswer("Where have you eaten better? Tell me now!");
 
         var addAnswerToComment = this.restTemplate.exchange(
-            "/api/restaurant/review/answer/" + review1.getId(),
+            "/api/restaurant/review/" + review1.getId(),
             HttpMethod.PUT,
             new HttpEntity<>(answerDto, headers),
             GetClientReviewDto.class
@@ -881,22 +881,6 @@ public class RestaurantController_RestTemplateIT {
 
         Assertions.assertThat(
             addAnswerToComment.getBody().getAnswer()
-        ).isEqualTo(answerDto.getAnswer());
-
-        answerDto.setAnswer("Can you please tell where have you eaten better? So that we can improve.");
-        var updateAnswerToComment = this.restTemplate.exchange(
-            "/api/restaurant/review/" + review1.getId(),
-            HttpMethod.PUT,
-            new HttpEntity<>(answerDto, headers),
-            GetClientReviewDto.class
-        );
-
-        Assertions.assertThat(
-            updateAnswerToComment.getStatusCode()
-        ).isEqualTo(HttpStatus.OK);
-
-        Assertions.assertThat(
-            updateAnswerToComment.getBody().getAnswer()
         ).isEqualTo(answerDto.getAnswer());
 
         var getReviewWithId = this.restTemplate.exchange(
