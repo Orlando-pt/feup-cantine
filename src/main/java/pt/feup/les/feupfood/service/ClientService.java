@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 
 import pt.feup.les.feupfood.dto.AddClientReviewDto;
 import pt.feup.les.feupfood.dto.AddEatIntention;
+import pt.feup.les.feupfood.dto.ClientStats;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
-import pt.feup.les.feupfood.dto.GetPutClientReviewDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.IsFavoriteDto;
 import pt.feup.les.feupfood.dto.PriceRangeDto;
@@ -39,6 +40,7 @@ import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +66,9 @@ public class ClientService {
 
     @Autowired
     private EatIntentionRepository eatIntentionRepository;
+
+    @Autowired
+    private RestaurantService restaurantService;
 
     private static final String RESOURCE_NOT_OWNED_INTENTION_EXCEPTION = "Intention does not belong to the authenticated user.";
 
@@ -105,6 +110,7 @@ public class ClientService {
         review.setClassificationGrade(clientReviewDto.getClassificationGrade());
         review.setComment(clientReviewDto.getComment());
         review.setRestaurant(reviewedRestaurant);
+        review.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
         review = this.reviewRepository.save(review);
 
@@ -119,7 +125,7 @@ public class ClientService {
         return ResponseEntity.ok(new ClientParser().parseReviewToReviewDto(review));
     }
 
-    public ResponseEntity<List<GetPutClientReviewDto>> getUserReviewsFromClient(Principal user) {
+    public ResponseEntity<List<GetClientReviewDto>> getUserReviewsFromClient(Principal user) {
 
         DAOUser reviewer = this.retrieveUser(user.getName());
 
@@ -158,7 +164,7 @@ public class ClientService {
         return ResponseEntity.ok(this.restaurantRepository.findAll().stream().map(clientParser::parseRestaurantToRestaurantDto).collect(Collectors.toList()));
     }
 
-    public ResponseEntity<List<GetPutClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
+    public ResponseEntity<List<GetClientReviewDto>> getReviewsFromRestaurantByRestaurantId(Long id) {
         Restaurant reviewedRestaurant = this.retrieveRestaurant(id);
 
         return ResponseEntity.ok(this.getAllReviewsFromRestaurant(reviewedRestaurant));
@@ -183,6 +189,37 @@ public class ClientService {
             restaurant.getAssignments().stream()
                 .map(parser::parseAssignmentToAssignmentDto)
                 .collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurantForNDays(
+        Long restaurantId,
+        int days
+    ) {
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        Date now = new Date(System.currentTimeMillis());
+
+        Date future = new Date(now.getTime() + days * 1000 * 60 * 60 * 24);
+
+        RestaurantParser parser = new RestaurantParser();
+        return ResponseEntity.ok(
+            this.assignMenuRepository.findAllByDateBetweenAndRestaurant(
+                now, future, restaurant
+            ).stream().map(parser::parseAssignmentToAssignmentDto)
+                .collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<GetAssignmentDto> getCurrentAssignmentOfRestaurant(
+        Long restaurantId
+    ) {
+        Restaurant restaurant = this.retrieveRestaurant(restaurantId);
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseAssignmentToAssignmentDto(
+                this.restaurantService.getCurrentAssignment(restaurant)
+            )
         );
     }
 
@@ -375,6 +412,35 @@ public class ClientService {
         );
     }
 
+    // stats methods
+    public ResponseEntity<ClientStats> getMoneySaved(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        ClientStats stats = new ClientStats();
+
+        Date now = new Date(System.currentTimeMillis());
+
+        List<EatIntention> intentionsGiven = this.eatIntentionRepository.findByClient(client);
+
+        intentionsGiven.forEach(
+            intention -> {
+                if (intention.getValidatedCode()) {
+                    stats.incrementIntentionsGiven();
+
+                    stats.addMoney(intention.getAssignment().getMenu().getDiscount().doubleValue());
+                } else {
+                    // increment on the intentions not fulfilled if the date of the intention is before today
+                    if (intention.getAssignment().getDate().before(now))
+                        stats.incrementIntentionsNotFulfilled();
+                }
+            }
+        );
+
+        return ResponseEntity.ok(stats);
+    }
+
     // auxiliar methods
     private DAOUser retrieveUser(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
@@ -392,12 +458,12 @@ public class ClientService {
         return this.eatIntentionRepository.findById(intentionId).orElseThrow(() -> new ResourceNotFoundException("Eating intention not found with id: " + intentionId));
     }
     
-    private List<GetPutClientReviewDto> getAllReviewsFromClient(DAOUser client) {
+    private List<GetClientReviewDto> getAllReviewsFromClient(DAOUser client) {
         ClientParser clientParser = new ClientParser();
         return client.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }
 
-    private List<GetPutClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
+    private List<GetClientReviewDto> getAllReviewsFromRestaurant(Restaurant restaurant) {
         ClientParser clientParser = new ClientParser();
         return restaurant.getReviews().stream().map(clientParser::parseReviewToReviewDto).collect(Collectors.toList());
     }

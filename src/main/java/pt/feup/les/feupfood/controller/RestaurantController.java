@@ -21,11 +21,13 @@ import pt.feup.les.feupfood.dto.AddAssignmentDto;
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
+import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.service.RestaurantService;
@@ -170,12 +172,27 @@ public class RestaurantController {
 		return this.service.verifyCode(user, id, code);
 	}
 
-	@GetMapping("assignment/days/{id}")
+	@GetMapping("assignment/verify-code/{code}")
+	public ResponseEntity<VerifyCodeDto> verifyCodeAutomatically(
+		Principal user,
+		@PathVariable String code
+	) {
+		return this.service.verifyCodeAutomatically(user, code);
+	}
+
+	@GetMapping("assignment/days/{n}")
 	public ResponseEntity<List<GetAssignmentDto>> getAssignmentsForNDays(
 		Principal user,
-		@PathVariable int id
+		@PathVariable int n
 	) {
-		return this.service.getAssignmentsNextNDays(user, id);
+		return this.service.getAssignmentsNextNDays(user, n);
+	}
+
+	@GetMapping("assignment/now")
+	public ResponseEntity<GetAssignmentDto> getCurrentAssignment(
+		Principal user
+	) {
+		return this.service.getCurrentAssignment(user);
 	}
 
 	@PostMapping("assignment")
@@ -203,4 +220,28 @@ public class RestaurantController {
 		return this.service.deleteAssignment(user, id);
 	}
 
+	// review endpoints
+	@GetMapping("review")
+	public ResponseEntity<List<GetClientReviewDto>> getAllRestaurantReviews(
+		Principal user
+	) {
+		return this.service.getRestaurantReviews(user);
+	}
+
+	@GetMapping("review/{id}")
+	public ResponseEntity<GetClientReviewDto> getRestaurantReview(
+		Principal user,
+		@PathVariable Long id
+	) {
+		return this.service.getRestaurantReview(user, id);
+	}
+
+	@PutMapping("review/{id}")
+	public ResponseEntity<GetClientReviewDto> updateRestaurantAnswerToReview(
+		Principal user,
+		@PathVariable Long id,
+		@RequestBody RestaurantAnswerReviewDto answerDto
+	) {
+		return this.service.restaurantAnswerToReview(user, id, answerDto);
+	}
 }

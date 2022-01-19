@@ -1,13 +1,16 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.time.Clock;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DaoSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,11 +20,14 @@ import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.AddMenuDto;
 import pt.feup.les.feupfood.dto.ExceptionResponseDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
+import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
 import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
+import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
+import pt.feup.les.feupfood.exceptions.DataIntegrityException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
 import pt.feup.les.feupfood.exceptions.VerificationCodeException;
@@ -31,12 +37,16 @@ import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Menu;
 import pt.feup.les.feupfood.model.Restaurant;
+import pt.feup.les.feupfood.model.Review;
+import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MealRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
 import pt.feup.les.feupfood.repository.RestaurantRepository;
+import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
+import pt.feup.les.feupfood.util.ClientParser;
 import pt.feup.les.feupfood.util.RestaurantParser;
 
 @Service
@@ -59,6 +69,12 @@ public class RestaurantService {
 
     @Autowired
     private EatIntentionRepository eatIntentionRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private Clock clock;
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
@@ -217,6 +233,7 @@ public class RestaurantService {
         menu.setAdditionalInformation(menuDto.getAdditionalInformation());
         menu.setStartPrice(menuDto.getStartPrice());
         menu.setEndPrice(menuDto.getEndPrice());
+        menu.setDiscount(menuDto.getDiscount());
         menu.setRestaurant(daoUser.getRestaurant());
 
         // add meals referent to the menu
@@ -350,6 +367,7 @@ public class RestaurantService {
         menu.setEndPrice(menuDto.getEndPrice());
         menu.setName(menuDto.getName());
         menu.setStartPrice(menuDto.getStartPrice());
+        menu.setDiscount(menuDto.getDiscount());
         
         
         return ResponseEntity.ok(
@@ -489,8 +507,35 @@ public class RestaurantService {
         this.eatIntentionRepository.save(intention);
 
         return ResponseEntity.ok(new RestaurantParser().parseUserToVerifyCodeDto(
-            intention.getClient()
+            intention.getClient(), intention.getMeals()
         ));
+    }
+
+    public ResponseEntity<VerifyCodeDto> verifyCodeAutomatically(
+        Principal user,
+        String code
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        AssignMenu currentAssignment = this.getCurrentAssignment(owner.getRestaurant());
+
+        return this.verifyCode(
+            user,
+            currentAssignment.getId(),
+            code
+        );
+    }
+
+    public ResponseEntity<GetAssignmentDto> getCurrentAssignment(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        return ResponseEntity.ok(
+            new RestaurantParser().parseAssignmentToAssignmentDto(
+                this.getCurrentAssignment(owner.getRestaurant())
+            )
+        );
     }
 
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsNextNDays(
@@ -509,6 +554,49 @@ public class RestaurantService {
                 now, future, owner.getRestaurant()
             ).stream().map(parser::parseAssignmentToAssignmentDto)
                 .collect(Collectors.toList())
+        );
+    }
+
+    // review methods
+    public ResponseEntity<List<GetClientReviewDto>> getRestaurantReviews(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        ClientParser parser = new ClientParser();
+        return ResponseEntity.ok(
+            this.reviewRepository.findAllByRestaurant(owner.getRestaurant())
+                .stream().map(
+                    parser::parseReviewToReviewDto
+                ).collect(Collectors.toList())
+        );
+    }
+
+    public ResponseEntity<GetClientReviewDto> getRestaurantReview(
+        Principal user,
+        Long reviewId
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        return ResponseEntity.ok(
+            new ClientParser().parseReviewToReviewDto(this.retrieveReview(owner.getRestaurant(), reviewId))
+        );
+    }
+
+    public ResponseEntity<GetClientReviewDto> restaurantAnswerToReview(
+        Principal user,
+        Long reviewId,
+        RestaurantAnswerReviewDto dto
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Review review = this.retrieveReview(owner.getRestaurant(), reviewId);
+
+        review.setAnswer(dto.getAnswer());
+        review = this.reviewRepository.save(review);
+
+        return ResponseEntity.ok(
+            new ClientParser().parseReviewToReviewDto(review)
         );
     }
 
@@ -580,5 +668,49 @@ public class RestaurantService {
             throw new ResourceNotOwnedException("Assignment not owned.");
 
         return assignment;
+    }
+
+    private Review retrieveReview(Restaurant restaurant, Long reviewId) {
+        Review review = this.reviewRepository.findById(reviewId).orElseThrow(
+            () -> new ResourceNotFoundException("No review found with id: " + reviewId)
+        );
+
+        if (!review.getRestaurant().equals(restaurant))
+            throw new ResourceNotOwnedException("Review not owned.");
+
+        return review;
+    }
+
+    protected AssignMenu getCurrentAssignment(Restaurant restaurant) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(this.clock.millis());
+
+        Date now = calendar.getTime();
+
+        List<AssignMenu> assignments = this.assignMenuRepository.findByDateAndRestaurant(now, restaurant);
+
+        if (assignments.isEmpty())
+            throw new ResourceNotFoundException("No assignments were found for today.");
+
+        if (assignments.size() == 1)
+            return assignments.get(0);
+
+        if (assignments.size() != 2)
+            throw new DataIntegrityException("There are more than two assignments for today.");
+
+        // else it means there are two assignments for this day
+        // we need to see which one is more appropriate for the time being
+        
+        // dinner will be after 5pm
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 16)
+            return assignments.stream().filter(
+                    assignment -> assignment.getSchedule() == ScheduleEnum.DINNER
+                ).collect(Collectors.toList()).get(0);
+
+        // if the code gets here it means its before 5pm
+        // in that can we can suppose that the meal is lunch
+        return assignments.stream().filter(
+                assignment -> assignment.getSchedule() == ScheduleEnum.LUNCH
+            ).collect(Collectors.toList()).get(0);
     }
 }

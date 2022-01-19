@@ -114,6 +114,7 @@ public class MenuRepositoryTest {
         this.menu1.setName("Monday morning");
         this.menu1.setStartPrice(5.11);
         this.menu1.setEndPrice(11.50);
+        this.menu1.setDiscount(0.30);
         this.menu1.addMeal(this.meal1);
         this.menu1.setRestaurant(this.restaurant1);
         this.restaurant1.addMenu(this.menu1);
@@ -122,6 +123,7 @@ public class MenuRepositoryTest {
         this.menu2.setName("Monday afternoon");
         this.menu2.setStartPrice(3.50);
         this.menu2.setEndPrice(10.50);
+        this.menu2.setDiscount(0.30);
         this.menu2.addMeal(this.meal2);
         this.menu2.addMeal(this.meal3);
         this.menu2.setRestaurant(this.restaurant1);

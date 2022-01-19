@@ -50,13 +50,13 @@ public class ClientController {
 
     // review endpoints
     @GetMapping("review")
-    public ResponseEntity<List<GetPutClientReviewDto>> getClientReviews(Principal user) {
+    public ResponseEntity<List<GetClientReviewDto>> getClientReviews(Principal user) {
 
         return this.clientService.getUserReviewsFromClient(user);
     }
 
     @GetMapping("review/restaurant/{id}")
-    public ResponseEntity<List<GetPutClientReviewDto>> getClientReviewsByRestaurantId(@PathVariable Long id) {
+    public ResponseEntity<List<GetClientReviewDto>> getClientReviewsByRestaurantId(@PathVariable Long id) {
 
         return this.clientService.getReviewsFromRestaurantByRestaurantId(id);
     }
@@ -95,6 +95,21 @@ public class ClientController {
     @GetMapping("restaurant/{id}/assignment")
     public ResponseEntity<List<GetAssignmentDto>> getRestaurantAssignments(@PathVariable Long id) {
         return this.clientService.getAssignmentsOfRestaurant(id);
+    }
+
+    @GetMapping("restaurant/{id}/assignment/{n}")
+    public ResponseEntity<List<GetAssignmentDto>> getRestaurantAssignmentsForNDays(
+        @PathVariable Long id,
+        @PathVariable int n
+    ) {
+        return this.clientService.getAssignmentsOfRestaurantForNDays(id, n);
+    }
+
+    @GetMapping("restaurant/{id}/assignment/now")
+    public ResponseEntity<GetAssignmentDto> getRestaurantCurrentAssignment(
+        @PathVariable Long id
+    ) {
+        return this.clientService.getCurrentAssignmentOfRestaurant(id);
     }
 
     @GetMapping("home")
@@ -173,6 +188,14 @@ public class ClientController {
         @PathVariable Long id
     ) {
         return this.clientService.removeEatIntention(user, id);
+    }
+
+    // stat endpoints
+    @GetMapping("stats/money-saved")
+    public ResponseEntity<ClientStats> getMoneySaved(
+        Principal user
+    ) {
+        return this.clientService.getMoneySaved(user);
     }
 
 }

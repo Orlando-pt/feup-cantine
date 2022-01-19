@@ -32,6 +32,9 @@ public class Menu {
 
     private Double endPrice;
 
+    @Column(nullable = false)
+    private Double discount;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "menu_meals",
         joinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "id"),

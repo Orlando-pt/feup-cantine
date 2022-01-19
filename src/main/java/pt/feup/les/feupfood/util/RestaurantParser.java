@@ -1,6 +1,10 @@
 package pt.feup.les.feupfood.util;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import pt.feup.les.feupfood.dto.AddMealDto;
 import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetPutMealDto;
@@ -59,6 +63,7 @@ public class RestaurantParser {
         menuDto.setAdditionalInformation(menu.getAdditionalInformation());
         menuDto.setStartPrice(menu.getStartPrice());
         menuDto.setEndPrice(menu.getEndPrice());
+        menuDto.setDiscount(menu.getDiscount());
         
         this.addMeals(menuDto, menu.getMeals());
         return menuDto;
@@ -72,15 +77,23 @@ public class RestaurantParser {
         assignmentDto.setSchedule(assignment.getSchedule());
         assignmentDto.setMenu(parseMenutoMenuDto(assignment.getMenu()));
         assignmentDto.setNumberOfIntentions(assignment.getEatingIntentions().size());
+        assignmentDto.setAvailable(
+            this.verifyAvailabilityOfAssignment(assignment.getDate())
+        );
 
         return assignmentDto;
     }
 
-    public VerifyCodeDto parseUserToVerifyCodeDto(DAOUser user) {
+    public VerifyCodeDto parseUserToVerifyCodeDto(DAOUser user, Set<Meal> meals) {
         VerifyCodeDto dto = new VerifyCodeDto();
 
         dto.setFullName(user.getFullName());
         dto.setProfileImageUrl(user.getProfileImageUrl());
+        dto.setMeals(
+            meals.stream().map(
+                this::parseMealtoMealDto
+            ).collect(Collectors.toSet())
+        );
 
         return dto;
     }
@@ -110,5 +123,15 @@ public class RestaurantParser {
                     );
             }
         );
+    }
+
+    private boolean verifyAvailabilityOfAssignment(Date assignmentDate) {
+        long oneDay = 1000L * 60 * 60 * 24;
+        Date tomorrow = new Date(System.currentTimeMillis() + oneDay);
+
+        if (tomorrow.after(assignmentDate))
+            return false;
+
+        return true;
     }
 }

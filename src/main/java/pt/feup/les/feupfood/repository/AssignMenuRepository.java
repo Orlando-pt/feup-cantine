@@ -13,5 +13,5 @@ public interface AssignMenuRepository extends JpaRepository<AssignMenu, Long> {
 
     List<AssignMenu> findByRestaurant(Restaurant restaurant);
     List<AssignMenu> findAllByDateBetweenAndRestaurant(Date startDate, Date endDate, Restaurant restaurant);
-    List<AssignMenu> findByDate(Date date);
+    List<AssignMenu> findByDateAndRestaurant(Date date, Restaurant restaurant);
 }
