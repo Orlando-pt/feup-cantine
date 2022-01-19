@@ -1053,6 +1053,7 @@ public class RestaurantController_RestTemplateIT {
         assignment5 = this.assignMenuRepository.save(assignment5);
         assignment6 = this.assignMenuRepository.save(assignment6);
 
+        // add intentions
         // in the first day of the year both eaten on dinner and lunch
         EatIntention firstDayIntentionLunch1 = new EatIntention();
         firstDayIntentionLunch1.setAssignment(assignment1);

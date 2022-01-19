@@ -144,7 +144,21 @@ public class DatabaseRunner implements ApplicationRunner {
         client.setProfileImageUrl("https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
         client.setRole("ROLE_USER_CLIENT");
         client.setTerms(true);
+        
+        DAOUser client2 = new DAOUser();
+        client2.setEmail("mariafernades@gmail.com");
+        client2.setPassword(
+            this.bcryptEncoder.encode(
+                password
+            )
+        );
+        client2.setFullName("Maria Fernandes");
+        client2.setProfileImageUrl("https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
+        client2.setRole("ROLE_USER_CLIENT");
+        client2.setTerms(true);
+
         this.userRepository.save(client);
+        this.userRepository.save(client2);
         
         // add review
         Review franciscosReview = new Review();
@@ -253,13 +267,13 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment.setRestaurant(restaurantObject);
         assignment.setSchedule(ScheduleEnum.LUNCH);
 
-        AssignMenu assignment2 = new AssignMenu();
-        assignment2.setDate(
+        AssignMenu assignment2RealData = new AssignMenu();
+        assignment2RealData.setDate(
             new Date(System.currentTimeMillis() + oneDay)
         );
-        assignment2.setMenu(menu);
-        assignment2.setRestaurant(restaurantObject);
-        assignment2.setSchedule(ScheduleEnum.DINNER);
+        assignment2RealData.setMenu(menu);
+        assignment2RealData.setRestaurant(restaurantObject);
+        assignment2RealData.setSchedule(ScheduleEnum.DINNER);
 
         AssignMenu assignmentForToday = new AssignMenu();
         assignmentForToday.setDate(new Date(System.currentTimeMillis()));
@@ -404,7 +418,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment8DaysDinner.setSchedule(ScheduleEnum.DINNER);
 
         this.assignMenuRepository.save(assignment);
-        this.assignMenuRepository.save(assignment2);
+        this.assignMenuRepository.save(assignment2RealData);
         this.assignMenuRepository.save(assignmentForToday);
         this.assignMenuRepository.save(previousAssignment);
         this.assignMenuRepository.save(previousAssignment2);
@@ -448,6 +462,190 @@ public class DatabaseRunner implements ApplicationRunner {
         this.eatIntentionRepository.save(eatIntention);
         this.eatIntentionRepository.save(previousEatIntention);
         this.eatIntentionRepository.save(previousEatIntention2);
+
+
+        // data to verify stats
+        long firstDayOfTheYear = 1640995200000L;
+        AssignMenu assignment1 = new AssignMenu();
+        assignment1.setDate(new Date(firstDayOfTheYear)); // 2022/01/01
+        assignment1.setMenu(menu);
+        assignment1.setRestaurant(restaurant.getRestaurant());
+        assignment1.setSchedule(ScheduleEnum.LUNCH);
+        
+        AssignMenu assignment2 = new AssignMenu();
+        assignment2.setDate(new Date(firstDayOfTheYear)); // 2022/01/01
+        assignment2.setMenu(menu);
+        assignment2.setRestaurant(restaurant.getRestaurant());
+        assignment2.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignment3 = new AssignMenu();
+        assignment3.setDate(new Date(firstDayOfTheYear + oneDay)); // 2022/01/02
+        assignment3.setMenu(menu);
+        assignment3.setRestaurant(restaurant.getRestaurant());
+        assignment3.setSchedule(ScheduleEnum.LUNCH);
+        
+        AssignMenu assignment4 = new AssignMenu();
+        assignment4.setDate(new Date(firstDayOfTheYear + oneDay)); // 2022/01/01
+        assignment4.setMenu(menu);
+        assignment4.setRestaurant(restaurant.getRestaurant());
+        assignment4.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignment5 = new AssignMenu();
+        assignment5.setDate(new Date(firstDayOfTheYear + (2 * oneDay))); // 2022/01/03
+        assignment5.setMenu(menu);
+        assignment5.setRestaurant(restaurant.getRestaurant());
+        assignment5.setSchedule(ScheduleEnum.LUNCH);
+        
+        AssignMenu assignment6 = new AssignMenu();
+        assignment6.setDate(new Date(firstDayOfTheYear + (2 * oneDay))); // 2022/01/03
+        assignment6.setMenu(menu);
+        assignment6.setRestaurant(restaurant.getRestaurant());
+        assignment6.setSchedule(ScheduleEnum.DINNER);
+
+        assignment1 = this.assignMenuRepository.save(assignment1);
+        assignment2 = this.assignMenuRepository.save(assignment2);
+        assignment3 = this.assignMenuRepository.save(assignment3);
+        assignment4 = this.assignMenuRepository.save(assignment4);
+        assignment5 = this.assignMenuRepository.save(assignment5);
+        assignment6 = this.assignMenuRepository.save(assignment6);
+
+        // add intentions
+        // in the first day of the year both eaten on dinner and lunch
+        EatIntention firstDayIntentionLunch1 = new EatIntention();
+        firstDayIntentionLunch1.setAssignment(assignment1);
+        firstDayIntentionLunch1.setClient(client);
+        firstDayIntentionLunch1.setCode("123456789");
+        firstDayIntentionLunch1.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionLunch1.setValidatedCode(true);
+
+        EatIntention firstDayIntentionLunch2 = new EatIntention();
+        firstDayIntentionLunch2.setAssignment(assignment1);
+        firstDayIntentionLunch2.setClient(client2);
+        firstDayIntentionLunch2.setCode("123456788");
+        firstDayIntentionLunch2.setMeals(Set.of(menu.getMeals().get(3)));
+        firstDayIntentionLunch2.setValidatedCode(false);
+
+        EatIntention firstDayIntentionDinner1 = new EatIntention();
+        firstDayIntentionDinner1.setAssignment(assignment2);
+        firstDayIntentionDinner1.setClient(client);
+        firstDayIntentionDinner1.setCode("123456787");
+        firstDayIntentionDinner1.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionDinner1.setValidatedCode(true);
+
+        EatIntention firstDayIntentionDinner2 = new EatIntention();
+        firstDayIntentionDinner2.setAssignment(assignment2);
+        firstDayIntentionDinner2.setClient(client2);
+        firstDayIntentionDinner2.setCode("123456786");
+        firstDayIntentionDinner2.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionDinner2.setValidatedCode(true);
+
+        // one the second day only the clint2 went to eat at the cantine for lunch
+        EatIntention secondDayIntention = new EatIntention();
+        secondDayIntention.setAssignment(assignment3);
+        secondDayIntention.setClient(client2);
+        secondDayIntention.setCode("123456785");
+        secondDayIntention.setMeals(Set.of(menu.getMeals().get(3)));
+        secondDayIntention.setValidatedCode(true);
+        // one the second day only the clint1 went to eat at the cantine for dinner
+        EatIntention secondDayIntentionDinner = new EatIntention();
+        secondDayIntentionDinner.setAssignment(assignment4);
+        secondDayIntentionDinner.setClient(client);
+        secondDayIntentionDinner.setCode("123456784");
+        secondDayIntentionDinner.setMeals(Set.of(menu.getMeals().get(0)));
+        secondDayIntentionDinner.setValidatedCode(true);
+
+        // on the third day both dinner at lunch
+        EatIntention thirdDayLunch1 = new EatIntention();
+        thirdDayLunch1.setAssignment(assignment5);
+        thirdDayLunch1.setClient(client);
+        thirdDayLunch1.setCode("123456783");
+        thirdDayLunch1.setMeals(Set.of(menu.getMeals().get(0)));
+        thirdDayLunch1.setValidatedCode(true);
+
+        EatIntention thirdDayLunch2 = new EatIntention();
+        thirdDayLunch2.setAssignment(assignment5);
+        thirdDayLunch2.setClient(client2);
+        thirdDayLunch2.setCode("123456782");
+        thirdDayLunch2.setMeals(Set.of(menu.getMeals().get(3)));
+        thirdDayLunch2.setValidatedCode(true);
+
+        // but only client 1 went for dinner
+        EatIntention thirdDayDinner = new EatIntention();
+        thirdDayDinner.setAssignment(assignment6);
+        thirdDayDinner.setClient(client);
+        thirdDayDinner.setCode("123456781");
+        thirdDayDinner.setMeals(Set.of(menu.getMeals().get(0)));
+        thirdDayDinner.setValidatedCode(true);
+
+        this.eatIntentionRepository.save(firstDayIntentionLunch1);
+        this.eatIntentionRepository.save(firstDayIntentionLunch2);
+        this.eatIntentionRepository.save(firstDayIntentionDinner1);
+        this.eatIntentionRepository.save(firstDayIntentionDinner2);
+        this.eatIntentionRepository.save(secondDayIntention);
+        this.eatIntentionRepository.save(secondDayIntentionDinner);
+        this.eatIntentionRepository.save(thirdDayLunch1);
+        this.eatIntentionRepository.save(thirdDayLunch2);
+        this.eatIntentionRepository.save(thirdDayDinner);
+
+        // add reviews
+        // first day
+        Review reviewFirstDay = new Review();
+        reviewFirstDay.setClient(client);
+        reviewFirstDay.setRestaurant(restaurant.getRestaurant());
+        reviewFirstDay.setComment("The food was wonderful. Congratulations on the nicest cuisine in Porto.");
+        reviewFirstDay.setTimestamp(new Timestamp(1641049200000L));
+        reviewFirstDay.setClassificationGrade(5);
+
+        Review reviewFirstDayClient2 = new Review();
+        reviewFirstDayClient2.setClient(client2);
+        reviewFirstDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewFirstDayClient2.setComment("Like very much");
+        reviewFirstDayClient2.setTimestamp(new Timestamp(1641049200000L));
+        reviewFirstDayClient2.setClassificationGrade(5);
+
+        // second day
+        Review reviewSecondDay = new Review();
+        reviewSecondDay.setClient(client);
+        reviewSecondDay.setRestaurant(restaurant.getRestaurant());
+        reviewSecondDay.setComment("Still very good, but today the waitress was bit angry with something.");
+        reviewSecondDay.setTimestamp(new Timestamp(1641135600000L));
+        reviewSecondDay.setClassificationGrade(5);
+
+        Review reviewSecondDayClient2 = new Review();
+        reviewSecondDayClient2.setClient(client2);
+        reviewSecondDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewSecondDayClient2.setComment("I will lower my classification because of the waitress's posture. She was very rude today.");
+        reviewSecondDayClient2.setTimestamp(new Timestamp(1641135600000L));
+        reviewSecondDayClient2.setClassificationGrade(4);
+
+        // third day
+        Review reviewThirdDay = new Review();
+        reviewThirdDay.setClient(client);
+        reviewThirdDay.setRestaurant(restaurant.getRestaurant());
+        reviewThirdDay.setComment("Today the waitress was just unberable.");
+        reviewThirdDay.setTimestamp(new Timestamp(1641222000000L));
+        reviewThirdDay.setClassificationGrade(2);
+
+        Review reviewThirdDayClient2 = new Review();
+        reviewThirdDayClient2.setClient(client2);
+        reviewThirdDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewThirdDayClient2.setComment("The waitress threw me a spoon.");
+        reviewThirdDayClient2.setTimestamp(new Timestamp(1641222000000L));
+        reviewThirdDayClient2.setClassificationGrade(1);
+
+        this.reviewRepository.save(reviewFirstDay);
+        this.reviewRepository.save(reviewFirstDayClient2);
+        this.reviewRepository.save(reviewSecondDay);
+        this.reviewRepository.save(reviewSecondDayClient2);
+        this.reviewRepository.save(reviewThirdDay);
+        this.reviewRepository.save(reviewThirdDayClient2);
+
+        client.addFavoriteRestaurant(restaurant.getRestaurant());
+        client2.addFavoriteRestaurant(restaurant.getRestaurant());
+
+        this.userRepository.save(client);
+        this.userRepository.save(client2);
+
     }
     
 }
