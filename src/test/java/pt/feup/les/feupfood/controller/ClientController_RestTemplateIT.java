@@ -182,20 +182,14 @@ public class ClientController_RestTemplateIT {
                 GetClientReviewDto[].class);
         
         GetClientReviewDto expectedReview = new GetClientReviewDto();
-        expectedReview.setClassificationGrade(2);
-        expectedReview.setClientFullName("Francisco Bastos");
-        expectedReview.setClientId(4L);
-        expectedReview.setId(2L);
-        expectedReview.setClientProfileImageUrl("https://media.istockphoto.com/photos/strong-" + 
-        "real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
-        expectedReview.setRestaurantId(1L);
         expectedReview.setComment("Who does not like a meal of rice with potato sauce");
 
         Assertions.assertThat(getReviewsByRestaurantId.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         Assertions.assertThat(
             getReviewsByRestaurantId.getBody()
-        ).contains(expectedReview);
+        ).extracting(GetClientReviewDto::getComment)
+            .contains(expectedReview.getComment());
     }
     
     @Test

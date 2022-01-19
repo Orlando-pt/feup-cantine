@@ -150,7 +150,7 @@ public class DatabaseRunner implements ApplicationRunner {
         Review franciscosReview = new Review();
         franciscosReview.setClassificationGrade(5);
         franciscosReview.setClient(client);
-        franciscosReview.setComment("The meat is simple delicious!");
+        franciscosReview.setComment("The meat is simply delicious!");
         franciscosReview.setRestaurant(restaurantAdelaide);
         franciscosReview.setTimestamp(new Timestamp(System.currentTimeMillis()));
         this.reviewRepository.save(franciscosReview);
