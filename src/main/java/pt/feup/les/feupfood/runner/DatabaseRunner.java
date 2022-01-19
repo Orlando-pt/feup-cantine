@@ -1,6 +1,7 @@
 package pt.feup.les.feupfood.runner;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
@@ -151,14 +152,25 @@ public class DatabaseRunner implements ApplicationRunner {
         franciscosReview.setClient(client);
         franciscosReview.setComment("The meat is simple delicious!");
         franciscosReview.setRestaurant(restaurantAdelaide);
+        franciscosReview.setTimestamp(new Timestamp(System.currentTimeMillis()));
         this.reviewRepository.save(franciscosReview);
 
         Review feupCantineReview = new Review();
         feupCantineReview.setClassificationGrade(2);
         feupCantineReview.setClient(client);
         feupCantineReview.setComment("Who does not like a meal of rice with potato sauce");
+        feupCantineReview.setAnswer("We are very sorry. We will try to do better next time.");
         feupCantineReview.setRestaurant(restaurantObject);
+        feupCantineReview.setTimestamp(new Timestamp(System.currentTimeMillis()));
         this.reviewRepository.save(feupCantineReview);
+
+        Review feupCantineReview2 = new Review();
+        feupCantineReview2.setClassificationGrade(3);
+        feupCantineReview2.setClient(client);
+        feupCantineReview2.setComment("Today was a bit better.");
+        feupCantineReview2.setRestaurant(restaurantObject);
+        feupCantineReview2.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        this.reviewRepository.save(feupCantineReview2);
 
         // add meals
         Meal meat = new Meal();

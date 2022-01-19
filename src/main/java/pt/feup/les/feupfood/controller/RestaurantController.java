@@ -236,15 +236,6 @@ public class RestaurantController {
 		return this.service.getRestaurantReview(user, id);
 	}
 
-	@PutMapping("review/answer/{id}")
-	public ResponseEntity<GetClientReviewDto> restaurantAnswersToReview(
-		Principal user,
-		@PathVariable Long id,
-		@RequestBody RestaurantAnswerReviewDto answerDto
-	) {
-		return this.service.restaurantAnswerToReview(user, id, answerDto);
-	}
-
 	@PutMapping("review/{id}")
 	public ResponseEntity<GetClientReviewDto> updateRestaurantAnswerToReview(
 		Principal user,
