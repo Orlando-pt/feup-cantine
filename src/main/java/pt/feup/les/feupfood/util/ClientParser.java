@@ -109,11 +109,9 @@ public class ClientParser {
                     )
                 ).collect(Collectors.toList())
                 .get(0)
-                .getAssignment()
-                .getMenu()
                 .getMeals()
                 .stream().map(
-                    meal -> meal.getId()
+                    Meal::getId
                 ).collect(Collectors.toList());
 
             this.checkIfMealsAreInsideList(assignmentDto, mealIds);
