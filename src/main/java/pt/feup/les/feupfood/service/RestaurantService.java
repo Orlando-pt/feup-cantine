@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -630,7 +630,7 @@ public class RestaurantService {
 
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
-        Map<Date, StatsIntentionDto> mapOfNumberOfIntentions = new HashMap<>();
+        Map<Date, StatsIntentionDto> mapOfNumberOfIntentions = new LinkedHashMap<>();
         List<AssignMenu> assignments;
         StatsIntentionDto stats;
 
@@ -698,7 +698,7 @@ public class RestaurantService {
             
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
-        Map<Date, Float> popularityMap = new HashMap<>();
+        Map<Date, Float> popularityMap = new LinkedHashMap<>();
 
         long incrementToDate = increment * MS_PER_DAY;
 
@@ -742,7 +742,7 @@ public class RestaurantService {
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
-        Map<GetPutMealDto, Integer> favoriteMealsMap = new HashMap<>();
+        Map<GetPutMealDto, Integer> favoriteMealsMap = new LinkedHashMap<>();
         List<Meal> meals = this.mealRepository.findByRestaurant(owner.getRestaurant());
 
         RestaurantParser parser = new RestaurantParser();
