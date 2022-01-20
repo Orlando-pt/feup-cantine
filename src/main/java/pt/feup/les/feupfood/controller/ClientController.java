@@ -93,8 +93,11 @@ public class ClientController {
     }
 
     @GetMapping("restaurant/{id}/assignment")
-    public ResponseEntity<List<GetAssignmentDto>> getRestaurantAssignments(@PathVariable Long id) {
-        return this.clientService.getAssignmentsOfRestaurant(id);
+    public ResponseEntity<List<GetAssignmentDto>> getRestaurantAssignments(
+        Principal user,
+        @PathVariable Long id
+    ) {
+        return this.clientService.getAssignmentsOfRestaurant(user, id);
     }
 
     @GetMapping("restaurant/{id}/assignment/{n}")

@@ -179,15 +179,20 @@ public class ClientService {
 
     // restaurant operations (get assignments)
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurant(
+        Principal user,
         Long restaurantId
     ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
         Restaurant restaurant = this.retrieveRestaurant(restaurantId);
 
-        RestaurantParser parser = new RestaurantParser();
+        ClientParser parser = new ClientParser();
         
         return ResponseEntity.ok(
             restaurant.getAssignments().stream()
-                .map(parser::parseAssignmentToAssignmentDto)
+                .map(
+                    assignment -> parser.parseAssignmentToAssignmentDto(assignment, client)
+                )
                 .collect(Collectors.toList())
         );
     }
