@@ -62,12 +62,10 @@ public class ClientParser {
     }
 
     public GetClientEatIntention parseEatIntentionToDto(EatIntention intention) {
-        RestaurantParser restaurantParser = new RestaurantParser();
-
         GetClientEatIntention intentionDto = new GetClientEatIntention();
         intentionDto.setId(intention.getId());
         intentionDto.setAssignment(
-            restaurantParser.parseAssignmentToAssignmentDto(intention.getAssignment())
+            this.restaurantParser.parseAssignmentToAssignmentDto(intention.getAssignment())
         );
 
         intentionDto.setMeals(
