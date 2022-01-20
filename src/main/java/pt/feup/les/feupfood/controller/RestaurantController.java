@@ -259,11 +259,11 @@ public class RestaurantController {
 		return this.service.getNumberOfIntentionsInAPeriod(user, increment, start, end);
 	}
 
-	@GetMapping("stats/favorite")
-	public ResponseEntity<Integer> getRestaurantFavoritedClients(
+	@GetMapping("stats/general")
+	public ResponseEntity<Map<String, Number>> getRestaurantFavoritedClients(
 		Principal user
 	) {
-		return this.service.getRestaurantFavoritedClients(user);
+		return this.service.getGeneralStats(user);
 	}
 
 	@GetMapping("stats/popularity/{increment}/{start}/{end}")

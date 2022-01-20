@@ -677,16 +677,6 @@ public class RestaurantService {
         );
     }
 
-    public ResponseEntity<Integer> getRestaurantFavoritedClients(
-        Principal user
-    ) {
-        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
-
-        return ResponseEntity.ok(
-            owner.getRestaurant().getFavoritedClients().size()
-        );
-    }
-
     public ResponseEntity<Map<Date, Float>> getPopularityOfRestaurant(
         Principal user,
         int increment,
@@ -768,6 +758,58 @@ public class RestaurantService {
             )
         );
         return ResponseEntity.ok(favoriteMealsMap);
+    }
+
+    public ResponseEntity<Map<String, Number>> getGeneralStats(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<String, Number> generalStatsMap = new LinkedHashMap<>();
+
+        generalStatsMap.put("totalReviewsReceived", owner.getRestaurant().getReviews().size());
+        generalStatsMap.put(
+            "totalReviewsResponded",
+            (int) owner.getRestaurant().getReviews().stream()
+                .filter(
+                    review -> review.getAnswer() != null && !review.getAnswer().isEmpty()
+                ).count()
+        );
+        generalStatsMap.put(
+            "totalIntentsReceived",
+            owner.getRestaurant().getAssignments().stream()
+                .map(
+                    assignment -> assignment.getEatingIntentions().size()
+                ).reduce(
+                    0, (subtotal, intentions) -> subtotal + intentions
+                ).intValue()
+        );
+        generalStatsMap.put(
+            "moneyOffered",
+            owner.getRestaurant().getAssignments().stream()
+                .map(assignment -> assignment.getMenu().getDiscount() * assignment.getEatingIntentions().size())
+                .reduce(
+                    0.0, (subTotal, moneySaved) -> subTotal + moneySaved
+                ).doubleValue()
+        );
+        generalStatsMap.put(
+            "assignmentsCreated",
+            owner.getRestaurant().getAssignments().size()
+        );
+        generalStatsMap.put(
+            "menusCreated",
+            owner.getRestaurant().getMenus().size()
+        );
+        generalStatsMap.put(
+            "mealsCreated",
+            owner.getRestaurant().getMeals().size()
+        );
+        generalStatsMap.put(
+            "favorited",
+            owner.getRestaurant().getFavoritedClients().size()
+        );
+
+        return ResponseEntity.ok(generalStatsMap);
     }
 
     // auxiliar methods

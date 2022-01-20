@@ -1137,6 +1137,7 @@ public class RestaurantController_RestTemplateIT {
         reviewFirstDay.setClient(client1);
         reviewFirstDay.setRestaurant(restaurant.getRestaurant());
         reviewFirstDay.setComment("The food was wonderful. Congratulations on the nicest cuisine in Porto.");
+        reviewFirstDay.setAnswer("We are very glad to ear that! Thank you.");
         reviewFirstDay.setTimestamp(new Timestamp(1641049200000L));
         reviewFirstDay.setClassificationGrade(5);
 
@@ -1214,20 +1215,24 @@ public class RestaurantController_RestTemplateIT {
 
         this.userRepository.save(client1);
         this.userRepository.save(client2);
+
+        ParameterizedTypeReference<HashMap<String, Number>> generalResponse = new ParameterizedTypeReference<HashMap<String, Number>>() {};
     
-        var getNumberOfFavoritedClients = this.restTemplate.exchange(
-            "/api/restaurant/stats/favorite",
+        var getGeneralStats = this.restTemplate.exchange(
+            "/api/restaurant/stats/general",
             HttpMethod.GET,
             new HttpEntity<>(headers),
-            Integer.class
+            generalResponse
         );
 
         Assertions.assertThat(
-            getNumberOfFavoritedClients.getStatusCode()
+            getGeneralStats.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
+        System.out.println(getGeneralStats);
+
         Assertions.assertThat(
-            getNumberOfFavoritedClients.getBody()
+            getGeneralStats.getBody().get("favorited")
         ).isEqualTo(2);
 
         ParameterizedTypeReference<HashMap<Date, Float>> popularityResponse = new ParameterizedTypeReference<HashMap<Date, Float>>() {};
