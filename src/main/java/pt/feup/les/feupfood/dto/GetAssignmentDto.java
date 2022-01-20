@@ -16,5 +16,6 @@ public class GetAssignmentDto implements ResponseInterfaceDto{
     private GetPutMenuDto menu;
     private int numberOfIntentions;
     private Boolean available;
+    private Boolean purchased;
     
 }

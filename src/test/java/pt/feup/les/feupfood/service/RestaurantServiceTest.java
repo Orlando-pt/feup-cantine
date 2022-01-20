@@ -719,6 +719,7 @@ public class RestaurantServiceTest {
         this.mealDtoResponse.setId(this.meal1.getId());
         this.mealDtoResponse.setMealType(this.meal1.getMealType());
         this.mealDtoResponse.setNutritionalInformation(this.meal1.getNutritionalInformation());
+        this.mealDtoResponse.setChoosen(false);
 
         this.menu = new Menu();
         this.menu.setAdditionalInformation("additionalInformation");

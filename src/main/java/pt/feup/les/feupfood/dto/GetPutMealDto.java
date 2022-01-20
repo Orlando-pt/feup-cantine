@@ -13,4 +13,5 @@ public class GetPutMealDto implements ResponseInterfaceDto{
     private String description;
     private String nutritionalInformation;
     private int numberOfIntentions;
+    private Boolean choosen;
 }

@@ -69,26 +69,32 @@ public class RestaurantParserTest {
         var meat = new GetPutMealDto();
         meat.setMealType(MealTypeEnum.MEAT);
         meat.setId(1L);
+        meat.setChoosen(false);
 
         var fish = new GetPutMealDto();
         fish.setMealType(MealTypeEnum.FISH);
         fish.setId(2L);
+        fish.setChoosen(false);
 
         var diet = new GetPutMealDto();
         diet.setMealType(MealTypeEnum.DIET);
         diet.setId(3L);
+        diet.setChoosen(false);
 
         var vegetarian = new GetPutMealDto();
         vegetarian.setMealType(MealTypeEnum.VEGETARIAN);
         vegetarian.setId(4L);
+        vegetarian.setChoosen(false);
 
         var desert = new GetPutMealDto();
         desert.setMealType(MealTypeEnum.DESERT);
         desert.setId(5L);
+        desert.setChoosen(false);
 
         var nullMeal = new GetPutMealDto();
         nullMeal.setMealType(null);
         nullMeal.setId(1L);
+        nullMeal.setChoosen(false);
 
         expectedMenuDto.setMeatMeal(meat);
         expectedMenuDto.setFishMeal(fish);
