@@ -426,6 +426,18 @@ public class ClientService {
         );
     }
 
+    public ResponseEntity<GetClientEatIntention> getNextEatIntention(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        List<EatIntention> intentions = client.getEatingIntentions().stream()
+                        .sorted(
+                            intention -> 
+                        ).collect(Collectors.toList());
+
+    }
+
     // stats methods
     public ResponseEntity<ClientStats> getMoneySaved(
         Principal user
