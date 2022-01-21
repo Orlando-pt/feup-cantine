@@ -782,7 +782,7 @@ public class RestaurantService {
                     assignment -> assignment.getEatingIntentions().size()
                 ).reduce(
                     0, (subtotal, intentions) -> subtotal + intentions
-                ).intValue()
+                )
         );
         generalStatsMap.put(
             "moneyOffered",
@@ -790,7 +790,7 @@ public class RestaurantService {
                 .map(assignment -> assignment.getMenu().getDiscount() * assignment.getEatingIntentions().size())
                 .reduce(
                     0.0, (subTotal, moneySaved) -> subTotal + moneySaved
-                ).doubleValue()
+                )
         );
         generalStatsMap.put(
             "assignmentsCreated",
