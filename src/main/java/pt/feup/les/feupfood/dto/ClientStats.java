@@ -7,6 +7,8 @@ public class ClientStats {
     private double moneySaved;
     private int intentionsGiven;
     private int intentionsNotFulfilled;
+    private int numberOfReviews;
+    private int numberOfFavoritRestaurants;
 
     public ClientStats() {
         this.moneySaved = 0.0;

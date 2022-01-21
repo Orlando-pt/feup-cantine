@@ -490,6 +490,10 @@ public class ClientService {
             }
         );
 
+        stats.setNumberOfReviews(client.getReviews().size());
+
+        stats.setNumberOfFavoritRestaurants(client.getClientFavoriteRestaurants().size());
+
         return ResponseEntity.ok(stats);
     }
 
