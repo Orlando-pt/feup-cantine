@@ -1,7 +1,9 @@
 package pt.feup.les.feupfood.controller;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.StatsIntentionDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.service.RestaurantService;
 
@@ -243,5 +246,41 @@ public class RestaurantController {
 		@RequestBody RestaurantAnswerReviewDto answerDto
 	) {
 		return this.service.restaurantAnswerToReview(user, id, answerDto);
+	}
+
+	// stats endpoints
+	@GetMapping("stats/intention/{increment}/{start}/{end}")
+	public ResponseEntity<Map<Date, StatsIntentionDto>> getNumberOfIntentionsInAPeriod(
+		Principal user,
+		@PathVariable int increment,
+		@PathVariable Date start,
+		@PathVariable Date end
+	) {
+		return this.service.getNumberOfIntentionsInAPeriod(user, increment, start, end);
+	}
+
+	@GetMapping("stats/general")
+	public ResponseEntity<Map<String, Number>> getRestaurantFavoritedClients(
+		Principal user
+	) {
+		return this.service.getGeneralStats(user);
+	}
+
+	@GetMapping("stats/popularity/{increment}/{start}/{end}")
+	public ResponseEntity<Map<Date, Float>> getRestaurantPopularity(
+		Principal user,
+		@PathVariable int increment,
+		@PathVariable Date start,
+		@PathVariable Date end
+	) {
+		return this.service.getPopularityOfRestaurant(user, increment, start, end);
+	}
+
+	@GetMapping("stats/favorite-meals/{quantity}")
+	public ResponseEntity<Map<GetPutMealDto, Integer>> getRestaurantFavoriteMeals(
+		Principal user,
+		@PathVariable int quantity
+	) {
+		return this.service.getMostFrequentMeals(user, quantity);
 	}
 }

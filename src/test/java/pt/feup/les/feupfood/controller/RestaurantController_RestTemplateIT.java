@@ -4,6 +4,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
@@ -15,6 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -34,6 +39,7 @@ import pt.feup.les.feupfood.dto.RegisterUserDto;
 import pt.feup.les.feupfood.dto.RegisterUserResponseDto;
 import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.StatsIntentionDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.model.AssignMenu;
@@ -558,6 +564,17 @@ public class RestaurantController_RestTemplateIT {
             createAssignment.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
 
+        var repeatTheCreationOfAssignment = this.restTemplate.exchange(
+            "/api/restaurant/assignment",
+            HttpMethod.POST,
+            new HttpEntity<>(assignemntDto, headers),
+            GetAssignmentDto.class
+        );
+
+        Assertions.assertThat(
+            repeatTheCreationOfAssignment.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
         // update assignment
         assignemntDto.setSchedule(ScheduleEnum.DINNER);
         assignemntDto.setMenu(response2.getBody().getId());
@@ -904,6 +921,359 @@ public class RestaurantController_RestTemplateIT {
         Assertions.assertThat(
             answeringNotOwnedReview.getStatusCode()
         ).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void statsTest() {
+        HttpHeaders headers = this.getStandardHeaders();
+
+        // create clients
+        DAOUser client1 = new DAOUser();
+        client1.setBiography("different biography");
+        client1.setTerms(true);
+        client1.setFullName("Antonio Alves");
+        client1.setPassword("passwordMuitoSecreta");
+        client1.setRole("ROLE_USER_CLIENT");
+        client1.setEmail("idontknowme@mail.com");
+        
+        DAOUser client2 = new DAOUser();
+        client2.setBiography("another biography");
+        client2.setTerms(true);
+        client2.setFullName("Maria Fernanda");
+        client2.setPassword("passwordMuitoSecreta2");
+        client2.setRole("ROLE_USER_CLIENT");
+        client2.setEmail("nandinha@mail.com");
+
+        client1 = this.userRepository.save(client1);
+        client2 = this.userRepository.save(client2);
+
+        DAOUser restaurant = this.userRepository.findByEmail(this.restaurantUser.getEmail()).orElseThrow();
+
+        // add meals
+        var mealDto = new AddMealDto();
+        mealDto.setDescription("Spagheti with atum");
+        mealDto.setMealType(MealTypeEnum.FISH);
+        mealDto.setNutritionalInformation("Tuna is very healthy.");
+
+        var meal1 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto, headers),
+            GetPutMealDto.class
+        );
+
+        Assertions.assertThat(
+            meal1.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var mealDto2 = new AddMealDto();
+        mealDto2.setDescription("Rice with carrots");
+        mealDto2.setMealType(MealTypeEnum.VEGETARIAN);
+        mealDto2.setNutritionalInformation("Tuna is very healthy.");
+
+        var meal2 = this.restTemplate.exchange(
+            "/api/restaurant/meal",
+            HttpMethod.POST,
+            new HttpEntity<>(mealDto2, headers),
+            GetPutMealDto.class
+        );
+
+        Assertions.assertThat(
+            meal2.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+        // add menu
+        var menuDto = new AddMenuDto();
+        menuDto.setAdditionalInformation("something else");
+        menuDto.setEndPrice(10.0);
+        menuDto.setName("Monday morning for this week");
+        menuDto.setStartPrice(4.5);
+        menuDto.setDiscount(0.30);
+
+        menuDto.setFishMeal(meal1.getBody().getId());
+        menuDto.setDesertMeal(meal2.getBody().getId());
+        menuDto.setVegetarianMeal(meal2.getBody().getId());
+        menuDto.setMeatMeal(meal1.getBody().getId());
+        menuDto.setDietMeal(meal2.getBody().getId());
+        
+        var menuResponse = this.restTemplate.exchange(
+            "/api/restaurant/menu",
+            HttpMethod.POST,
+            new HttpEntity<>(menuDto, headers),
+            GetPutMenuDto.class
+        );
+
+        Assertions.assertThat(
+            menuResponse.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Menu menu = this.menuRepository.findFirstByRestaurant(restaurant.getRestaurant(), Sort.by(Direction.DESC, "startPrice"));
+
+        long firstDayOfTheYear = 1640995200000L;
+        long oneDay = 1000L * 60 * 60 * 24;
+        AssignMenu assignment1 = new AssignMenu();
+        assignment1.setDate(new Date(firstDayOfTheYear)); // 2022/01/01
+        assignment1.setMenu(menu);
+        assignment1.setRestaurant(restaurant.getRestaurant());
+        assignment1.setSchedule(ScheduleEnum.LUNCH);
+        
+        AssignMenu assignment2 = new AssignMenu();
+        assignment2.setDate(new Date(firstDayOfTheYear)); // 2022/01/01
+        assignment2.setMenu(menu);
+        assignment2.setRestaurant(restaurant.getRestaurant());
+        assignment2.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignment3 = new AssignMenu();
+        assignment3.setDate(new Date(firstDayOfTheYear + oneDay)); // 2022/01/02
+        assignment3.setMenu(menu);
+        assignment3.setRestaurant(restaurant.getRestaurant());
+        assignment3.setSchedule(ScheduleEnum.LUNCH);
+        
+        AssignMenu assignment4 = new AssignMenu();
+        assignment4.setDate(new Date(firstDayOfTheYear + oneDay)); // 2022/01/01
+        assignment4.setMenu(menu);
+        assignment4.setRestaurant(restaurant.getRestaurant());
+        assignment4.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignment5 = new AssignMenu();
+        assignment5.setDate(new Date(firstDayOfTheYear + (2 * oneDay))); // 2022/01/03
+        assignment5.setMenu(menu);
+        assignment5.setRestaurant(restaurant.getRestaurant());
+        assignment5.setSchedule(ScheduleEnum.LUNCH);
+        
+        AssignMenu assignment6 = new AssignMenu();
+        assignment6.setDate(new Date(firstDayOfTheYear + (2 * oneDay))); // 2022/01/03
+        assignment6.setMenu(menu);
+        assignment6.setRestaurant(restaurant.getRestaurant());
+        assignment6.setSchedule(ScheduleEnum.DINNER);
+
+        assignment1 = this.assignMenuRepository.save(assignment1);
+        assignment2 = this.assignMenuRepository.save(assignment2);
+        assignment3 = this.assignMenuRepository.save(assignment3);
+        assignment4 = this.assignMenuRepository.save(assignment4);
+        assignment5 = this.assignMenuRepository.save(assignment5);
+        assignment6 = this.assignMenuRepository.save(assignment6);
+
+        // add intentions
+        // in the first day of the year both eaten on dinner and lunch
+        EatIntention firstDayIntentionLunch1 = new EatIntention();
+        firstDayIntentionLunch1.setAssignment(assignment1);
+        firstDayIntentionLunch1.setClient(client1);
+        firstDayIntentionLunch1.setCode("123456789");
+        firstDayIntentionLunch1.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionLunch1.setValidatedCode(true);
+
+        EatIntention firstDayIntentionLunch2 = new EatIntention();
+        firstDayIntentionLunch2.setAssignment(assignment1);
+        firstDayIntentionLunch2.setClient(client2);
+        firstDayIntentionLunch2.setCode("123456788");
+        firstDayIntentionLunch2.setMeals(Set.of(menu.getMeals().get(3)));
+        firstDayIntentionLunch2.setValidatedCode(false);
+
+        EatIntention firstDayIntentionDinner1 = new EatIntention();
+        firstDayIntentionDinner1.setAssignment(assignment2);
+        firstDayIntentionDinner1.setClient(client1);
+        firstDayIntentionDinner1.setCode("123456787");
+        firstDayIntentionDinner1.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionDinner1.setValidatedCode(true);
+
+        EatIntention firstDayIntentionDinner2 = new EatIntention();
+        firstDayIntentionDinner2.setAssignment(assignment2);
+        firstDayIntentionDinner2.setClient(client2);
+        firstDayIntentionDinner2.setCode("123456786");
+        firstDayIntentionDinner2.setMeals(Set.of(menu.getMeals().get(0)));
+        firstDayIntentionDinner2.setValidatedCode(true);
+
+        // one the second day only the clint2 went to eat at the cantine for lunch
+        EatIntention secondDayIntention = new EatIntention();
+        secondDayIntention.setAssignment(assignment3);
+        secondDayIntention.setClient(client2);
+        secondDayIntention.setCode("123456785");
+        secondDayIntention.setMeals(Set.of(menu.getMeals().get(3)));
+        secondDayIntention.setValidatedCode(true);
+        // one the second day only the clint1 went to eat at the cantine for dinner
+        EatIntention secondDayIntentionDinner = new EatIntention();
+        secondDayIntentionDinner.setAssignment(assignment4);
+        secondDayIntentionDinner.setClient(client1);
+        secondDayIntentionDinner.setCode("123456784");
+        secondDayIntentionDinner.setMeals(Set.of(menu.getMeals().get(0)));
+        secondDayIntentionDinner.setValidatedCode(true);
+
+        // on the third day both dinner at lunch
+        EatIntention thirdDayLunch1 = new EatIntention();
+        thirdDayLunch1.setAssignment(assignment5);
+        thirdDayLunch1.setClient(client1);
+        thirdDayLunch1.setCode("123456783");
+        thirdDayLunch1.setMeals(Set.of(menu.getMeals().get(0)));
+        thirdDayLunch1.setValidatedCode(true);
+
+        EatIntention thirdDayLunch2 = new EatIntention();
+        thirdDayLunch2.setAssignment(assignment5);
+        thirdDayLunch2.setClient(client2);
+        thirdDayLunch2.setCode("123456782");
+        thirdDayLunch2.setMeals(Set.of(menu.getMeals().get(3)));
+        thirdDayLunch2.setValidatedCode(true);
+
+        // but only client 1 went for dinner
+        EatIntention thirdDayDinner = new EatIntention();
+        thirdDayDinner.setAssignment(assignment6);
+        thirdDayDinner.setClient(client1);
+        thirdDayDinner.setCode("123456781");
+        thirdDayDinner.setMeals(Set.of(menu.getMeals().get(0)));
+        thirdDayDinner.setValidatedCode(true);
+
+        this.eatIntentionRepository.save(firstDayIntentionLunch1);
+        this.eatIntentionRepository.save(firstDayIntentionLunch2);
+        this.eatIntentionRepository.save(firstDayIntentionDinner1);
+        this.eatIntentionRepository.save(firstDayIntentionDinner2);
+        this.eatIntentionRepository.save(secondDayIntention);
+        this.eatIntentionRepository.save(secondDayIntentionDinner);
+        this.eatIntentionRepository.save(thirdDayLunch1);
+        this.eatIntentionRepository.save(thirdDayLunch2);
+        this.eatIntentionRepository.save(thirdDayDinner);
+
+        // add reviews
+        // first day
+        Review reviewFirstDay = new Review();
+        reviewFirstDay.setClient(client1);
+        reviewFirstDay.setRestaurant(restaurant.getRestaurant());
+        reviewFirstDay.setComment("The food was wonderful. Congratulations on the nicest cuisine in Porto.");
+        reviewFirstDay.setAnswer("We are very glad to ear that! Thank you.");
+        reviewFirstDay.setTimestamp(new Timestamp(1641049200000L));
+        reviewFirstDay.setClassificationGrade(5);
+
+        Review reviewFirstDayClient2 = new Review();
+        reviewFirstDayClient2.setClient(client2);
+        reviewFirstDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewFirstDayClient2.setComment("Like very much");
+        reviewFirstDayClient2.setTimestamp(new Timestamp(1641049200000L));
+        reviewFirstDayClient2.setClassificationGrade(5);
+
+        // second day
+        Review reviewSecondDay = new Review();
+        reviewSecondDay.setClient(client1);
+        reviewSecondDay.setRestaurant(restaurant.getRestaurant());
+        reviewSecondDay.setComment("Still very good, but today the waitress was bit angry with something.");
+        reviewSecondDay.setTimestamp(new Timestamp(1641135600000L));
+        reviewSecondDay.setClassificationGrade(5);
+
+        Review reviewSecondDayClient2 = new Review();
+        reviewSecondDayClient2.setClient(client2);
+        reviewSecondDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewSecondDayClient2.setComment("I will lower my classification because of the waitress's posture. She was very rude today.");
+        reviewSecondDayClient2.setTimestamp(new Timestamp(1641135600000L));
+        reviewSecondDayClient2.setClassificationGrade(4);
+
+        // third day
+        Review reviewThirdDay = new Review();
+        reviewThirdDay.setClient(client1);
+        reviewThirdDay.setRestaurant(restaurant.getRestaurant());
+        reviewThirdDay.setComment("Today the waitress was just unberable.");
+        reviewThirdDay.setTimestamp(new Timestamp(1641222000000L));
+        reviewThirdDay.setClassificationGrade(2);
+
+        Review reviewThirdDayClient2 = new Review();
+        reviewThirdDayClient2.setClient(client2);
+        reviewThirdDayClient2.setRestaurant(restaurant.getRestaurant());
+        reviewThirdDayClient2.setComment("The waitress threw me a spoon.");
+        reviewThirdDayClient2.setTimestamp(new Timestamp(1641222000000L));
+        reviewThirdDayClient2.setClassificationGrade(1);
+
+        this.reviewRepository.save(reviewFirstDay);
+        this.reviewRepository.save(reviewFirstDayClient2);
+        this.reviewRepository.save(reviewSecondDay);
+        this.reviewRepository.save(reviewSecondDayClient2);
+        this.reviewRepository.save(reviewThirdDay);
+        this.reviewRepository.save(reviewThirdDayClient2);
+
+        ParameterizedTypeReference<HashMap<Date, StatsIntentionDto>> statIntentionResponse = new ParameterizedTypeReference<HashMap<Date, StatsIntentionDto>>() {};
+
+        var getIntentionStats = this.restTemplate.exchange(
+            "/api/restaurant/stats/intention/1/Jan 01 2022/Jan 03 2022",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            statIntentionResponse
+        );
+
+        Assertions.assertThat(
+            getIntentionStats.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        var getIntentionErrorEndDateInferiorToStartDate = this.restTemplate.exchange(
+            "/api/restaurant/stats/intention/1/Jan 02 2022/Jan 01 2022",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            getIntentionErrorEndDateInferiorToStartDate.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // test get clients that favorited the restaurant
+        client1.addFavoriteRestaurant(restaurant.getRestaurant());
+        client2.addFavoriteRestaurant(restaurant.getRestaurant());
+
+        this.userRepository.save(client1);
+        this.userRepository.save(client2);
+
+        ParameterizedTypeReference<HashMap<String, Number>> generalResponse = new ParameterizedTypeReference<HashMap<String, Number>>() {};
+    
+        var getGeneralStats = this.restTemplate.exchange(
+            "/api/restaurant/stats/general",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            generalResponse
+        );
+
+        Assertions.assertThat(
+            getGeneralStats.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        System.out.println(getGeneralStats);
+
+        Assertions.assertThat(
+            getGeneralStats.getBody().get("favorited")
+        ).isEqualTo(2);
+
+        ParameterizedTypeReference<HashMap<Date, Float>> popularityResponse = new ParameterizedTypeReference<HashMap<Date, Float>>() {};
+
+        var getPopularity = this.restTemplate.exchange(
+            "/api/restaurant/stats/popularity/1/Jan 01 2022/Jan 05 2022",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            popularityResponse
+        );
+
+        Assertions.assertThat(
+            getPopularity.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getPopularity.getBody().values()
+        ).contains(5.0f, 4.75f);
+
+        var getPopularityErrorEndDateInferiorToStartDate = this.restTemplate.exchange(
+            "/api/restaurant/stats/popularity/1/Jan 02 2022/Jan 01 2022",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            getPopularityErrorEndDateInferiorToStartDate.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        var getMostEatenMeals = this.restTemplate.exchange(
+            "/api/restaurant/stats/favorite-meals/3",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            String.class
+        );
+
+        Assertions.assertThat(
+            getMostEatenMeals.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
     }
 
     private void registerRestaurant() {

@@ -1,16 +1,19 @@
 package pt.feup.les.feupfood.service;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.support.DaoSupport;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,9 @@ import pt.feup.les.feupfood.dto.GetPutMenuDto;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.RestaurantAnswerReviewDto;
 import pt.feup.les.feupfood.dto.RestaurantProfileDto;
+import pt.feup.les.feupfood.dto.StatsIntentionDto;
 import pt.feup.les.feupfood.dto.VerifyCodeDto;
+import pt.feup.les.feupfood.exceptions.BadRequestParametersException;
 import pt.feup.les.feupfood.exceptions.DataIntegrityException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
@@ -75,6 +80,9 @@ public class RestaurantService {
 
     @Autowired
     private Clock clock;
+
+
+    private final static long MS_PER_DAY = 1000L * 60 * 60 * 24;
 
     // profile methods
     public ResponseEntity<RestaurantProfileDto> getRestaurantProfile(
@@ -402,6 +410,16 @@ public class RestaurantService {
     ) {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
+        // verify if the assignment was alreay made for this date
+        List<AssignMenu> dayAssignments = this.assignMenuRepository.findByDateAndRestaurant(assignmentDto.getDate(), owner.getRestaurant());
+
+        dayAssignments.forEach(
+            assignment -> {
+                if (assignment.getSchedule() == assignmentDto.getSchedule())
+                    throw new DataIntegrityException("There is already one assignment for the current schedule.");
+            }
+        );
+
         AssignMenu assignment = new AssignMenu();
         assignment.setDate(assignmentDto.getDate());
         assignment.setSchedule(assignmentDto.getSchedule());
@@ -598,6 +616,200 @@ public class RestaurantService {
         return ResponseEntity.ok(
             new ClientParser().parseReviewToReviewDto(review)
         );
+    }
+
+    // stat methods
+    public ResponseEntity<Map<Date, StatsIntentionDto>> getNumberOfIntentionsInAPeriod(
+        Principal user,
+        int increment,
+        Date start,
+        Date end
+    ) {
+        if (start.after(end))
+            throw new BadRequestParametersException("End date is before start date");
+
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<Date, StatsIntentionDto> mapOfNumberOfIntentions = new LinkedHashMap<>();
+        List<AssignMenu> assignments;
+        StatsIntentionDto stats;
+
+        start.setTime(start.getTime() - (start.getTime() % MS_PER_DAY));
+        end.setTime(end.getTime() - (end.getTime() % MS_PER_DAY) + 60000L);
+
+        long incrementToDate = increment * MS_PER_DAY;
+
+        Date currentEndDate = new Date(start.getTime() + incrementToDate - 60000L);
+
+        // while the current date is before the end date
+        // keep inserting stats in the map
+        while(start.before(end)) {
+            if (currentEndDate.after(end))
+                currentEndDate.setTime(end.getTime());
+                
+            assignments = this.assignMenuRepository.findAllByDateBetweenAndRestaurant(start, currentEndDate, owner.getRestaurant());
+
+            stats = new StatsIntentionDto();
+
+            for (AssignMenu assignment : assignments) {
+                stats.addIntentionsGiven(assignment.getEatingIntentions().size());
+
+                for (EatIntention intention : assignment.getEatingIntentions())
+                    if (intention.getValidatedCode())
+                        stats.incrementIntentionsFulfilled();
+                    else
+                        stats.incrementIntentionsNotFulfilled();
+            }
+
+            mapOfNumberOfIntentions.put(
+                new Date(start.getTime()),
+                stats
+            );
+
+            // increment current date
+            start.setTime(start.getTime() + incrementToDate);
+            currentEndDate.setTime(currentEndDate.getTime() + incrementToDate);
+        }
+
+
+        return ResponseEntity.ok(
+            mapOfNumberOfIntentions
+        );
+    }
+
+    public ResponseEntity<Map<Date, Float>> getPopularityOfRestaurant(
+        Principal user,
+        int increment,
+        Date start,
+        Date end
+    ) {
+        if (start.after(end))
+            throw new BadRequestParametersException("End date is before start date");
+            
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<Date, Float> popularityMap = new LinkedHashMap<>();
+
+        long incrementToDate = increment * MS_PER_DAY;
+
+        Timestamp startTimestamp = new Timestamp(start.getTime());
+        Timestamp endTimestamp = new Timestamp(end.getTime());
+        // Timestamp currentEndTimestamp = new Timestamp(start.getTime() + incrementToDate);
+        Timestamp currentEndTimestamp = new Timestamp(start.getTime());
+
+        List<Review> reviews;
+
+        // while the current date is different from the end date
+        // keep inserting stats in the map
+        while(!currentEndTimestamp.equals(endTimestamp)) {
+            // increment current date
+            currentEndTimestamp.setTime(currentEndTimestamp.getTime() + incrementToDate);
+
+            // if the current end date is after the end date
+            // then put the current end date equal to the stipulated end date
+            if (currentEndTimestamp.after(end))
+                currentEndTimestamp.setTime(end.getTime());
+                
+            reviews = this.reviewRepository.findAllByTimestampBetweenAndRestaurant(startTimestamp, currentEndTimestamp, owner.getRestaurant());
+
+            popularityMap.put(
+                new Date(currentEndTimestamp.getTime() - incrementToDate),
+                reviews.stream().map(
+                    review -> review.getClassificationGrade()
+                ).reduce(
+                    0,
+                    (subtotal, classification) -> subtotal + classification
+                ).floatValue() / reviews.size()
+            );
+        }
+
+        return ResponseEntity.ok(popularityMap);
+    }
+
+    public ResponseEntity<Map<GetPutMealDto, Integer>> getMostFrequentMeals(
+        Principal user,
+        int numberOfMeals
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<GetPutMealDto, Integer> favoriteMealsMap = new LinkedHashMap<>();
+        List<Meal> meals = this.mealRepository.findByRestaurant(owner.getRestaurant());
+
+        RestaurantParser parser = new RestaurantParser();
+
+        meals = meals.stream().sorted(
+            new Comparator<Meal>() {
+
+                @Override
+                public int compare(Meal meal1, Meal meal2) {
+                    return meal2.getEatingIntentions().size() - meal1.getEatingIntentions().size();
+                }
+                
+            }
+        ).collect(Collectors.toList());
+
+        if (numberOfMeals < meals.size())
+            meals = meals.subList(0, numberOfMeals);
+
+        meals.forEach(
+            meal -> favoriteMealsMap.put(
+                parser.parseMealtoMealDto(meal),
+                meal.getEatingIntentions().size()
+            )
+        );
+        return ResponseEntity.ok(favoriteMealsMap);
+    }
+
+    public ResponseEntity<Map<String, Number>> getGeneralStats(
+        Principal user
+    ) {
+        DAOUser owner = this.retrieveRestaurantOwner(user.getName());
+
+        Map<String, Number> generalStatsMap = new LinkedHashMap<>();
+
+        generalStatsMap.put("totalReviewsReceived", owner.getRestaurant().getReviews().size());
+        generalStatsMap.put(
+            "totalReviewsResponded",
+            (int) owner.getRestaurant().getReviews().stream()
+                .filter(
+                    review -> review.getAnswer() != null && !review.getAnswer().isEmpty()
+                ).count()
+        );
+        generalStatsMap.put(
+            "totalIntentsReceived",
+            owner.getRestaurant().getAssignments().stream()
+                .map(
+                    assignment -> assignment.getEatingIntentions().size()
+                ).reduce(
+                    0, (subtotal, intentions) -> subtotal + intentions
+                )
+        );
+        generalStatsMap.put(
+            "moneyOffered",
+            owner.getRestaurant().getAssignments().stream()
+                .map(assignment -> assignment.getMenu().getDiscount() * assignment.getEatingIntentions().size())
+                .reduce(
+                    0.0, (subTotal, moneySaved) -> subTotal + moneySaved
+                )
+        );
+        generalStatsMap.put(
+            "assignmentsCreated",
+            owner.getRestaurant().getAssignments().size()
+        );
+        generalStatsMap.put(
+            "menusCreated",
+            owner.getRestaurant().getMenus().size()
+        );
+        generalStatsMap.put(
+            "mealsCreated",
+            owner.getRestaurant().getMeals().size()
+        );
+        generalStatsMap.put(
+            "favorited",
+            owner.getRestaurant().getFavoritedClients().size()
+        );
+
+        return ResponseEntity.ok(generalStatsMap);
     }
 
     // auxiliar methods

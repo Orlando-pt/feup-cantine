@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.MealTypeEnum;
+import pt.feup.les.feupfood.model.Restaurant;
 
 @Repository
 public interface MealRepository extends JpaRepository<Meal, Long> {
 
     List<Meal> findMealsByMealType(MealTypeEnum mealType);
+    List<Meal> findByRestaurant(Restaurant restaurant);
     
 }
