@@ -433,9 +433,16 @@ public class ClientService {
 
         List<EatIntention> intentions = client.getEatingIntentions().stream()
                         .sorted(
-                            intention -> 
+                            (intention1, intention2) -> intention1.getAssignment().getDate()
+                                                            .compareTo(intention2.getAssignment().getDate())
                         ).collect(Collectors.toList());
 
+        if (intentions.isEmpty())
+            return ResponseEntity.ok(new GetClientEatIntention());
+
+        return ResponseEntity.ok(
+            new ClientParser().parseEatIntentionToDto(intentions.get(0))
+        );
     }
 
     // stats methods
