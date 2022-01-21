@@ -36,6 +36,8 @@ public class RestaurantParser {
         mealDto.setMealType(meal.getMealType());
         mealDto.setNutritionalInformation(meal.getNutritionalInformation());
         mealDto.setNumberOfIntentions(meal.getEatingIntentions().size());
+
+        mealDto.setChoosen(false);
         return mealDto;
     }
 
@@ -80,6 +82,8 @@ public class RestaurantParser {
         assignmentDto.setAvailable(
             this.verifyAvailabilityOfAssignment(assignment.getDate())
         );
+
+        assignmentDto.setPurchased(false);
 
         return assignmentDto;
     }

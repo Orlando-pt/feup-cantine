@@ -179,46 +179,60 @@ public class ClientService {
 
     // restaurant operations (get assignments)
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurant(
+        Principal user,
         Long restaurantId
     ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
         Restaurant restaurant = this.retrieveRestaurant(restaurantId);
 
-        RestaurantParser parser = new RestaurantParser();
+        ClientParser parser = new ClientParser();
         
         return ResponseEntity.ok(
             restaurant.getAssignments().stream()
-                .map(parser::parseAssignmentToAssignmentDto)
+                .map(
+                    assignment -> parser.parseAssignmentToAssignmentDto(assignment, client)
+                )
                 .collect(Collectors.toList())
         );
     }
 
     public ResponseEntity<List<GetAssignmentDto>> getAssignmentsOfRestaurantForNDays(
+        Principal user,
         Long restaurantId,
         int days
     ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
         Restaurant restaurant = this.retrieveRestaurant(restaurantId);
 
         Date now = new Date(System.currentTimeMillis());
 
         Date future = new Date(now.getTime() + days * 1000 * 60 * 60 * 24);
 
-        RestaurantParser parser = new RestaurantParser();
+        ClientParser parser = new ClientParser();
         return ResponseEntity.ok(
             this.assignMenuRepository.findAllByDateBetweenAndRestaurant(
                 now, future, restaurant
-            ).stream().map(parser::parseAssignmentToAssignmentDto)
+            ).stream().map(
+                assignment -> parser.parseAssignmentToAssignmentDto(assignment, client)
+            )
                 .collect(Collectors.toList())
         );
     }
 
     public ResponseEntity<GetAssignmentDto> getCurrentAssignmentOfRestaurant(
+        Principal user,
         Long restaurantId
     ) {
+        DAOUser client = this.retrieveUser(user.getName());
         Restaurant restaurant = this.retrieveRestaurant(restaurantId);
 
         return ResponseEntity.ok(
-            new RestaurantParser().parseAssignmentToAssignmentDto(
-                this.restaurantService.getCurrentAssignment(restaurant)
+
+            new ClientParser().parseAssignmentToAssignmentDto(
+                this.restaurantService.getCurrentAssignment(restaurant),
+                client
             )
         );
     }

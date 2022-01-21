@@ -1,17 +1,27 @@
 package pt.feup.les.feupfood.util;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import pt.feup.les.feupfood.dto.GetAssignmentDto;
 import pt.feup.les.feupfood.dto.GetClientEatIntention;
 import pt.feup.les.feupfood.dto.GetClientReviewDto;
 import pt.feup.les.feupfood.dto.GetRestaurantDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
+import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
+import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
 
 public class ClientParser {
+
+    private RestaurantParser restaurantParser;
+
+    public ClientParser() {
+        this.restaurantParser = new RestaurantParser();
+    }
 
     public UpdateProfileDto parseUserProfile(DAOUser user) {
         UpdateProfileDto profileDto = new UpdateProfileDto();
@@ -52,12 +62,10 @@ public class ClientParser {
     }
 
     public GetClientEatIntention parseEatIntentionToDto(EatIntention intention) {
-        RestaurantParser restaurantParser = new RestaurantParser();
-
         GetClientEatIntention intentionDto = new GetClientEatIntention();
         intentionDto.setId(intention.getId());
         intentionDto.setAssignment(
-            restaurantParser.parseAssignmentToAssignmentDto(intention.getAssignment())
+            this.restaurantParser.parseAssignmentToAssignmentDto(intention.getAssignment())
         );
 
         intentionDto.setMeals(
@@ -69,6 +77,75 @@ public class ClientParser {
         intentionDto.setCode(intention.getCode());
         intentionDto.setValidatedCode(intention.getValidatedCode());
 
+        intentionDto.getAssignment().setPurchased(true);
+        
+        List<Long> mealIds = intention.getMeals().stream()
+                                .map(Meal::getId)
+                                .collect(Collectors.toList());
+
+        this.checkIfMealsAreInsideList(intentionDto.getAssignment(), mealIds);
+
         return intentionDto;
+    }
+
+    public GetAssignmentDto parseAssignmentToAssignmentDto(AssignMenu assignment, DAOUser client) {
+        GetAssignmentDto assignmentDto = this.restaurantParser.parseAssignmentToAssignmentDto(assignment);
+
+        assignmentDto.setPurchased(
+            client.getEatingIntentions().stream()
+                .anyMatch(
+                    intention -> intention.getAssignment().getId().equals(
+                        assignmentDto.getId()
+                    )
+                )
+        );
+
+        if (assignmentDto.getPurchased()) {
+            // verify which meals were choosen
+            List<Long> mealIds = client.getEatingIntentions()
+                .stream().filter(
+                    intention -> intention.getAssignment().getId().equals(
+                        assignmentDto.getId()
+                    )
+                ).collect(Collectors.toList())
+                .get(0)
+                .getMeals()
+                .stream().map(
+                    Meal::getId
+                ).collect(Collectors.toList());
+
+            this.checkIfMealsAreInsideList(assignmentDto, mealIds);
+        }
+
+        return assignmentDto;
+    }
+
+    private GetAssignmentDto checkIfMealsAreInsideList(GetAssignmentDto assignmentDto, List<Long> mealIds){
+        assignmentDto.getMenu().getDesertMeal().setChoosen(
+            mealIds.contains(
+                assignmentDto.getMenu().getDesertMeal().getId()
+            )
+        );
+        assignmentDto.getMenu().getDietMeal().setChoosen(
+            mealIds.contains(
+                assignmentDto.getMenu().getDietMeal().getId()
+            )
+        );
+        assignmentDto.getMenu().getFishMeal().setChoosen(
+            mealIds.contains(
+                assignmentDto.getMenu().getFishMeal().getId()
+            )
+        );
+        assignmentDto.getMenu().getMeatMeal().setChoosen(
+            mealIds.contains(
+                assignmentDto.getMenu().getMeatMeal().getId()
+            )
+        );
+        assignmentDto.getMenu().getVegetarianMeal().setChoosen(
+            mealIds.contains(
+                assignmentDto.getMenu().getVegetarianMeal().getId()
+            )
+        );
+        return assignmentDto;
     }
 }

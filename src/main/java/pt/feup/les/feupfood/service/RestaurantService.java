@@ -694,7 +694,6 @@ public class RestaurantService {
 
         Timestamp startTimestamp = new Timestamp(start.getTime());
         Timestamp endTimestamp = new Timestamp(end.getTime());
-        // Timestamp currentEndTimestamp = new Timestamp(start.getTime() + incrementToDate);
         Timestamp currentEndTimestamp = new Timestamp(start.getTime());
 
         List<Review> reviews;
@@ -738,14 +737,7 @@ public class RestaurantService {
         RestaurantParser parser = new RestaurantParser();
 
         meals = meals.stream().sorted(
-            new Comparator<Meal>() {
-
-                @Override
-                public int compare(Meal meal1, Meal meal2) {
-                    return meal2.getEatingIntentions().size() - meal1.getEatingIntentions().size();
-                }
-                
-            }
+                (meal1, meal2) -> meal2.getEatingIntentions().size() - meal1.getEatingIntentions().size()
         ).collect(Collectors.toList());
 
         if (numberOfMeals < meals.size())
