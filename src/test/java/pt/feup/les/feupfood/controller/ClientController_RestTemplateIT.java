@@ -628,9 +628,7 @@ public class ClientController_RestTemplateIT {
 
         Assertions.assertThat(
             getIntentionsToCome.getBody()
-        ).hasSize(2)
-            .extracting(GetClientEatIntention::getId)
-            .contains(13L, 17L);
+        ).hasSize(2);
     }
 
     private void registerClient() {
