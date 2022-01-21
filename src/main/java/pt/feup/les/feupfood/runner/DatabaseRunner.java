@@ -265,7 +265,7 @@ public class DatabaseRunner implements ApplicationRunner {
         );
         assignment.setMenu(menu);
         assignment.setRestaurant(restaurantObject);
-        assignment.setSchedule(ScheduleEnum.LUNCH);
+        assignment.setSchedule(ScheduleEnum.DINNER);
 
         AssignMenu assignment2RealData = new AssignMenu();
         assignment2RealData.setDate(
@@ -330,7 +330,7 @@ public class DatabaseRunner implements ApplicationRunner {
         );
         assignment3DaysDinner.setMenu(menu);
         assignment3DaysDinner.setRestaurant(restaurantObject);
-        assignment3DaysDinner.setSchedule(ScheduleEnum.DINNER);
+        assignment3DaysDinner.setSchedule(ScheduleEnum.LUNCH);
 
         // assignments for 4 days come
         AssignMenu assignment4DaysLunch = new AssignMenu();
