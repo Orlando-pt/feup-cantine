@@ -614,6 +614,23 @@ public class ClientController_RestTemplateIT {
         Assertions.assertThat(
             getNextIntention.getBody().getAssignment().getSchedule()
         ).isEqualTo(ScheduleEnum.LUNCH);
+
+        var getIntentionsToCome = this.restTemplate.exchange(
+            "/api/client/intention/from-today",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention[].class
+        );
+
+        Assertions.assertThat(
+            getIntentionsToCome.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getIntentionsToCome.getBody()
+        ).hasSize(2)
+            .extracting(GetClientEatIntention::getId)
+            .contains(13L, 17L);
     }
 
     private void registerClient() {

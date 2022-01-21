@@ -37,7 +37,6 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.ClientParser;
-import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.security.SecureRandom;
@@ -409,6 +408,27 @@ public class ClientService {
                 .map(parser::parseEatIntentionToDto)
                 .collect(Collectors.toList())
         );
+    }
+
+    public ResponseEntity<List<GetClientEatIntention>> getEatIntentionFromToday(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        Date now = new Date(System.currentTimeMillis());
+        ClientParser parser = new ClientParser();
+
+        return ResponseEntity.ok(
+            client.getEatingIntentions().stream()
+                .filter(
+                    intention -> intention.getAssignment().getDate().after(now)
+                ).map(
+                    parser::parseEatIntentionToDto
+                ).collect(
+                    Collectors.toList()
+                )
+        );
+
     }
 
     public ResponseEntity<GetClientEatIntention> getEatIntention(

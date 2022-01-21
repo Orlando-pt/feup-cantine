@@ -162,6 +162,13 @@ public class ClientController {
         return this.clientService.getEatIntentions(user);
     }
 
+    @GetMapping("intention/from-today")
+    public ResponseEntity<List<GetClientEatIntention>> getEatingIntentionsAfterToday(
+        Principal user
+    ) {
+        return this.clientService.getEatIntentionFromToday(user);
+    }
+
     @GetMapping("intention/{id}")
     public ResponseEntity<GetClientEatIntention> getEatingIntention(
         Principal user,
