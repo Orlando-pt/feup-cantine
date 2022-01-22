@@ -587,7 +587,11 @@ public class RestaurantService {
         ClientParser parser = new ClientParser();
         return ResponseEntity.ok(
             this.reviewRepository.findAllByRestaurant(owner.getRestaurant())
-                .stream().map(
+                .stream()
+                .sorted(
+                    (review1, review2) -> review2.getTimestamp().compareTo(review1.getTimestamp())
+                )
+                .map(
                     parser::parseReviewToReviewDto
                 ).collect(Collectors.toList())
         );

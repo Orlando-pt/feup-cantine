@@ -176,7 +176,7 @@ public class DatabaseRunner implements ApplicationRunner {
         feupCantineReview.setComment("Lamentável! Hoje o prato era arroz com molho de tomate.");
         feupCantineReview.setAnswer("Lamentamos imenso. Tentaremos melhorar.");
         feupCantineReview.setRestaurant(restaurantObject);
-        feupCantineReview.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        feupCantineReview.setTimestamp(new Timestamp(System.currentTimeMillis() - (1000L * 60 * 60 * 24)));
         this.reviewRepository.save(feupCantineReview);
 
         Review feupCantineReview2 = new Review();
