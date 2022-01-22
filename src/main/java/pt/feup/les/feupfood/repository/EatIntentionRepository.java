@@ -14,5 +14,5 @@ public interface EatIntentionRepository extends JpaRepository<EatIntention, Long
     
     List<EatIntention> findByClient(DAOUser client);
     List<EatIntention> findByCode(String code);
-    List<EatIntention> findByAssignment(AssignMenu assignment);
+    List<EatIntention> findByClientAndAssignment(DAOUser client, AssignMenu assignment);
 }

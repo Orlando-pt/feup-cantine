@@ -319,7 +319,13 @@ public class ClientService {
         AssignMenu assignment = this.retrieveAssingment(intentionDto.getAssignmentId());
         
         // check if the assignment was already made
-        List<EatIntention> intentionWasAlreadyMade = this.eatIntentionRepository.findByAssignment(assignment);
+        List<EatIntention> intentionWasAlreadyMade = this.eatIntentionRepository.findByClientAndAssignment(client, assignment);
+
+        // System.out.println(client);
+        // System.out.println(assignment);
+        // System.out.println();
+        // for (EatIntention intention : intentionWasAlreadyMade)
+        //     System.out.println(intention.getClient().toString() + intention.getAssignment().toString());
 
         if (!intentionWasAlreadyMade.isEmpty())
             throw new DataIntegrityException("One intention was already provided for assignment with id: " + assignment.getId());

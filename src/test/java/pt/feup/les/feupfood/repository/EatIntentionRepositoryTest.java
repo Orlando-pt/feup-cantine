@@ -72,7 +72,7 @@ public class EatIntentionRepositoryTest {
     @Test
     void testFindByAssignment() {
         Assertions.assertThat(
-            this.eatIntentionRepository.findByAssignment(this.assignment1)
+            this.eatIntentionRepository.findByClientAndAssignment(this.client1, this.assignment1)
         ).contains(this.intention);
     }
 

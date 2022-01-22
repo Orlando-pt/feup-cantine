@@ -429,6 +429,7 @@ public class ClientController_RestTemplateIT {
             addIntentionError.getStatusCode()
         ).isEqualTo(HttpStatus.BAD_REQUEST);
 
+        intentionDto.setAssignmentId(assignments.getBody()[7].getId());
         intentionDto.getMealsId().remove(200L);
         intentionDto.getMealsId().add(assignments.getBody()[0].getMenu().getMeatMeal().getId());
         var addIntention2 = this.restTemplate.exchange(
@@ -441,6 +442,17 @@ public class ClientController_RestTemplateIT {
         Assertions.assertThat(
             addIntention2.getStatusCode()
         ).isEqualTo(HttpStatus.OK);
+
+        var addDuplicatedIntention2 = this.restTemplate.exchange(
+            "/api/client/intention",
+            HttpMethod.POST,
+            new HttpEntity<>(intentionDto, headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            addDuplicatedIntention2.getStatusCode()
+        ).isEqualTo(HttpStatus.BAD_REQUEST);
         
         var intentions = this.restTemplate.exchange(
             "/api/client/intention",
