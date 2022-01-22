@@ -73,7 +73,7 @@ public class DatabaseRunner implements ApplicationRunner {
         this.userRepository.save(admin);
 
         DAOUser restaurant = new DAOUser();
-        restaurant.setEmail("orlando@gmail.com");
+        restaurant.setEmail("cantinaDeEngenharia@gmail.com");
         restaurant.setPassword(
             this.bcryptEncoder.encode(
                 password
@@ -87,20 +87,20 @@ public class DatabaseRunner implements ApplicationRunner {
 
         Restaurant restaurantObject = new Restaurant();
         restaurantObject.setOwner(restaurant);
-        restaurantObject.setLocation("On the corner");
-        restaurantObject.setCuisines("Portuguesa, Bar, Europeia, Contemporâneo, Pub, Cervejarias");
+        restaurantObject.setLocation("Rua Dr. Roberto Frias 4200-465 Porto");
+        restaurantObject.setCuisines("Portuguesa, Europeia, Contemporâneo");
         restaurantObject.setTypeMeals("Almoço, Jantar, Bebidas");
         restaurantObject.setMorningOpeningSchedule(
-            Time.valueOf("11:00:00")
+            Time.valueOf("11:30:00")
         );
         restaurantObject.setMorningClosingSchedule(
-            Time.valueOf("15:00:00")
+            Time.valueOf("14:00:00")
         );
         restaurantObject.setAfternoonOpeningSchedule(
             Time.valueOf("18:30:00")
         );
         restaurantObject.setAfternoonClosingSchedule(
-            Time.valueOf("22:30:00")
+            Time.valueOf("20:30:00")
         );
         restaurantObject = this.restaurantRepository.save(restaurantObject);
         
@@ -108,29 +108,30 @@ public class DatabaseRunner implements ApplicationRunner {
         this.userRepository.save(restaurant);
 
         DAOUser ownerRestaurant2 = new DAOUser();
-        ownerRestaurant2.setEmail("adelaide@gmail.com");
+        ownerRestaurant2.setEmail("grillDeEngenharia@gmail.com");
         ownerRestaurant2.setPassword(
             this.bcryptEncoder.encode(
                 password
             )
         );
-        ownerRestaurant2.setFullName("A tasquinha da Adelaide");
-        ownerRestaurant2.setProfileImageUrl("https://culinarybackstreets.com/wp-content/uploads/cb_lisbon_tascaalfama_rc_final.jpg");
+        ownerRestaurant2.setFullName("GRILL DE ENGENHARIA");
+        ownerRestaurant2.setProfileImageUrl("https://sigarra.up.pt/sasup/pt/imagens/SC-alimentacao-grill-engenharia-renovado.jpg");
         ownerRestaurant2.setRole("ROLE_USER_RESTAURANT");
         ownerRestaurant2.setTerms(true);
         ownerRestaurant2 = this.userRepository.save(ownerRestaurant2);
 
         Restaurant restaurantAdelaide = new Restaurant();
         restaurantAdelaide.setOwner(ownerRestaurant2);
-        restaurantAdelaide.setLocation("Porto, Paranhos, Some Place street");
-        restaurantAdelaide.setCuisines("Portuguesa, Bar, Pub, Cervejarias");
-        restaurantAdelaide.setTypeMeals("Almoço, Jantar, Bebidas, Lanches");
+        restaurantAdelaide.setLocation("Rua Dr. Roberto Frias 4200-465 Porto");
+        restaurantAdelaide.setCuisines("Grelhados");
+        restaurantAdelaide.setTypeMeals("Almoço, Jantar, Bebidas");
         restaurantAdelaide.setMorningOpeningSchedule(
-            Time.valueOf("09:00:00")
+            Time.valueOf("12:00:00")
         );
-        restaurantAdelaide.setAfternoonClosingSchedule(
-            Time.valueOf("23:30:00")
+        restaurantAdelaide.setMorningClosingSchedule(
+            Time.valueOf("14:00:00")
         );
+
         restaurantAdelaide = this.restaurantRepository.save(restaurantAdelaide);
         
         DAOUser client = new DAOUser();
@@ -141,19 +142,19 @@ public class DatabaseRunner implements ApplicationRunner {
             )
         );
         client.setFullName("Francisco Bastos");
-        client.setProfileImageUrl("https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
+        client.setProfileImageUrl("https://gitlab.com/uploads/-/system/user/avatar/10100350/avatar.png");
         client.setRole("ROLE_USER_CLIENT");
         client.setTerms(true);
         
         DAOUser client2 = new DAOUser();
-        client2.setEmail("mariafernades@gmail.com");
+        client2.setEmail("orlando@gmail.com");
         client2.setPassword(
             this.bcryptEncoder.encode(
                 password
             )
         );
-        client2.setFullName("Maria Fernandes");
-        client2.setProfileImageUrl("https://media.istockphoto.com/photos/strong-real-person-real-body-senior-man-proudly-flexing-muscles-picture-id638471524?s=612x612");
+        client2.setFullName("Orlando Macedo");
+        client2.setProfileImageUrl("https://orlandomacedo.info/images/urlando.jpg");
         client2.setRole("ROLE_USER_CLIENT");
         client2.setTerms(true);
 
@@ -164,7 +165,7 @@ public class DatabaseRunner implements ApplicationRunner {
         Review franciscosReview = new Review();
         franciscosReview.setClassificationGrade(5);
         franciscosReview.setClient(client);
-        franciscosReview.setComment("The meat is simply delicious!");
+        franciscosReview.setComment("A comida é deliciosa!");
         franciscosReview.setRestaurant(restaurantAdelaide);
         franciscosReview.setTimestamp(new Timestamp(System.currentTimeMillis()));
         this.reviewRepository.save(franciscosReview);
@@ -172,8 +173,8 @@ public class DatabaseRunner implements ApplicationRunner {
         Review feupCantineReview = new Review();
         feupCantineReview.setClassificationGrade(2);
         feupCantineReview.setClient(client);
-        feupCantineReview.setComment("Who does not like a meal of rice with potato sauce");
-        feupCantineReview.setAnswer("We are very sorry. We will try to do better next time.");
+        feupCantineReview.setComment("Lamentável! Hoje o prato era arroz com molho de tomate.");
+        feupCantineReview.setAnswer("Lamentamos imenso. Tentaremos melhorar.");
         feupCantineReview.setRestaurant(restaurantObject);
         feupCantineReview.setTimestamp(new Timestamp(System.currentTimeMillis()));
         this.reviewRepository.save(feupCantineReview);
@@ -181,44 +182,44 @@ public class DatabaseRunner implements ApplicationRunner {
         Review feupCantineReview2 = new Review();
         feupCantineReview2.setClassificationGrade(3);
         feupCantineReview2.setClient(client);
-        feupCantineReview2.setComment("Today was a bit better.");
+        feupCantineReview2.setComment("Devo admitir que fiquei surpreendido. Hoje a refeição estava minimamente apresentável.");
         feupCantineReview2.setRestaurant(restaurantObject);
         feupCantineReview2.setTimestamp(new Timestamp(System.currentTimeMillis()));
         this.reviewRepository.save(feupCantineReview2);
 
         // add meals
         Meal meat = new Meal();
-        meat.setDescription("Rice with turkey");
+        meat.setDescription("Pá de porco estufada com ervilhas e arroz de tomate");
         meat.setMealType(MealTypeEnum.MEAT);
-        meat.setNutritionalInformation("very good meat");
+        meat.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
         meat.setRestaurant(restaurantObject);
         meat = this.mealRepository.save(meat);
         
         Meal fish = new Meal();
-        fish.setDescription("Potatoes with sardines");
+        fish.setDescription("Lombinhos de escamudo gratinado com puré de batata");
         fish.setMealType(MealTypeEnum.FISH);
-        fish.setNutritionalInformation("nutritionalInformation1");
+        fish.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
         fish.setRestaurant(restaurantObject);
         fish = this.mealRepository.save(fish);
 
         Meal diet = new Meal();
-        diet.setDescription("A carrot");
+        diet.setDescription("Cozido simples de frango com batata e couve branca cozida");
         diet.setMealType(MealTypeEnum.DIET);
-        diet.setNutritionalInformation("nutritionalInformation2");
+        diet.setNutritionalInformation("Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2");
         diet.setRestaurant(restaurantObject);
         diet = this.mealRepository.save(diet);
 
         Meal vegetarian = new Meal();
-        vegetarian.setDescription("Rice with cogumelos");
+        vegetarian.setDescription("Rancho vegan (grão-de-bico, macarrão, couve branca, cenoura)");
         vegetarian.setMealType(MealTypeEnum.VEGETARIAN);
-        vegetarian.setNutritionalInformation("nutritionalInformation3");
+        vegetarian.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
         vegetarian.setRestaurant(restaurantObject);
         vegetarian = this.mealRepository.save(vegetarian);
 
         Meal desert = new Meal();
-        desert.setDescription("Chocolat mousse");
+        desert.setDescription("Mousse de chocolate");
         desert.setMealType(MealTypeEnum.DESERT);
-        desert.setNutritionalInformation("nutritionalInformation4");
+        desert.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
         desert.setRestaurant(restaurantObject);
         desert = this.mealRepository.save(desert);
 
@@ -229,11 +230,82 @@ public class DatabaseRunner implements ApplicationRunner {
         restaurantObject.addMeal(desert);
         restaurantObject = this.restaurantRepository.save(restaurantObject);
 
+        // add more meals to the engineer cantine
+        Meal meat2 = new Meal();
+        meat2.setDescription("Frango crocante com corn flakes com arroz de ervilhas");
+        meat2.setMealType(MealTypeEnum.MEAT);
+        meat2.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meat2.setRestaurant(restaurantObject);
+        meat2 = this.mealRepository.save(meat2);
+        
+        Meal fish2 = new Meal();
+        fish2.setDescription("Cavala assada com cebolada e batata cozida");
+        fish2.setMealType(MealTypeEnum.FISH);
+        fish2.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fish2.setRestaurant(restaurantObject);
+        fish2 = this.mealRepository.save(fish2);
+
+        Meal diet2 = new Meal();
+        diet2.setDescription("Perna de frango grelhada com massa espiral");
+        diet2.setMealType(MealTypeEnum.DIET);
+        diet2.setNutritionalInformation("Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2");
+        diet2.setRestaurant(restaurantObject);
+        diet2 = this.mealRepository.save(diet2);
+
+        Meal vegetarian2 = new Meal();
+        vegetarian2.setDescription("Hambúrguer de grão com esmagada de batata");
+        vegetarian2.setMealType(MealTypeEnum.VEGETARIAN);
+        vegetarian2.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarian2.setRestaurant(restaurantObject);
+        vegetarian2 = this.mealRepository.save(vegetarian2);
+
+        Meal desert2 = new Meal();
+        desert2.setDescription("Pêra assada");
+        desert2.setMealType(MealTypeEnum.DESERT);
+        desert2.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desert2.setRestaurant(restaurantObject);
+        desert2 = this.mealRepository.save(desert2);
+
+        Meal meat3 = new Meal();
+        meat3.setDescription("Canelones de carne de vaca");
+        meat3.setMealType(MealTypeEnum.MEAT);
+        meat3.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meat3.setRestaurant(restaurantObject);
+        meat3 = this.mealRepository.save(meat3);
+        
+        Meal fish3 = new Meal();
+        fish3.setDescription("Red fish assado à portuguesa com arroz");
+        fish3.setMealType(MealTypeEnum.FISH);
+        fish3.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fish3.setRestaurant(restaurantObject);
+        fish3 = this.mealRepository.save(fish3);
+
+        Meal diet3 = new Meal();
+        diet3.setDescription("Carapau grelhado com arroz");
+        diet3.setMealType(MealTypeEnum.DIET);
+        diet3.setNutritionalInformation("Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2");
+        diet3.setRestaurant(restaurantObject);
+        diet3 = this.mealRepository.save(diet3);
+
+        Meal vegetarian3 = new Meal();
+        vegetarian3.setDescription("Favas estufadas com coentros e batata cozida");
+        vegetarian3.setMealType(MealTypeEnum.VEGETARIAN);
+        vegetarian3.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarian3.setRestaurant(restaurantObject);
+        vegetarian3 = this.mealRepository.save(vegetarian3);
+
+        Meal desert3 = new Meal();
+        desert3.setDescription("Ananás");
+        desert3.setMealType(MealTypeEnum.DESERT);
+        desert3.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desert3.setRestaurant(restaurantObject);
+        desert3 = this.mealRepository.save(desert3);
+
         Menu menu = new Menu();
         menu.setName("Menu 1");
-        menu.setAdditionalInformation("additionalInformation");
-        menu.setEndPrice(3.0);
-        menu.setStartPrice(2.5);
+        menu.setAdditionalInformation("Dispõe ainda de sopa de curgete");
+        menu.setEndPrice(4.0);
+        menu.setStartPrice(2.75);
         menu.setDiscount(0.15);
         menu.addMeal(meat);
         menu.addMeal(fish);
@@ -243,19 +315,33 @@ public class DatabaseRunner implements ApplicationRunner {
         menu.setRestaurant(restaurantObject);
         menu = this.menuRepository.save(menu);
 
-        Menu menu2 = new Menu();
-        menu2.setName("Menu 2");
-        menu2.setAdditionalInformation("We put a small portion of sugar in ou food");
-        menu2.setEndPrice(5.4);
-        menu2.setStartPrice(1.25);
-        menu2.setDiscount(0.35);
-        menu2.addMeal(meat);
-        menu2.addMeal(fish);
-        menu2.addMeal(diet);
-        menu2.addMeal(vegetarian);
-        menu2.addMeal(desert);
-        menu2.setRestaurant(restaurantObject);
-        this.menuRepository.save(menu2);
+        Menu menu3 = new Menu();
+        menu3.setName("Menu 2");
+        menu3.setAdditionalInformation("Dispõe ainda de sopa de cebola com juliana de couve");
+        menu3.setEndPrice(4.0);
+        menu3.setStartPrice(2.75);
+        menu3.setDiscount(0.15);
+        menu3.addMeal(meat2);
+        menu3.addMeal(fish2);
+        menu3.addMeal(diet2);
+        menu3.addMeal(vegetarian2);
+        menu3.addMeal(desert2);
+        menu3.setRestaurant(restaurantObject);
+        menu3 = this.menuRepository.save(menu3);
+
+        Menu menu4 = new Menu();
+        menu4.setName("Menu 3");
+        menu4.setAdditionalInformation("Dispõe ainda de sopa de brócolos");
+        menu4.setEndPrice(4.0);
+        menu4.setStartPrice(2.75);
+        menu4.setDiscount(0.15);
+        menu4.addMeal(meat3);
+        menu4.addMeal(fish3);
+        menu4.addMeal(diet3);
+        menu4.addMeal(vegetarian3);
+        menu4.addMeal(desert3);
+        menu4.setRestaurant(restaurantObject);
+        menu4 = this.menuRepository.save(menu4);
         
         AssignMenu assignment = new AssignMenu();
         // set 3 days from now
@@ -271,13 +357,13 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment2RealData.setDate(
             new Date(System.currentTimeMillis() + oneDay)
         );
-        assignment2RealData.setMenu(menu);
+        assignment2RealData.setMenu(menu3);
         assignment2RealData.setRestaurant(restaurantObject);
         assignment2RealData.setSchedule(ScheduleEnum.DINNER);
 
         AssignMenu assignmentForToday = new AssignMenu();
         assignmentForToday.setDate(new Date(System.currentTimeMillis()));
-        assignmentForToday.setMenu(menu);
+        assignmentForToday.setMenu(menu4);
         assignmentForToday.setRestaurant(restaurantObject);
         assignmentForToday.setSchedule(ScheduleEnum.LUNCH);
 
@@ -289,12 +375,12 @@ public class DatabaseRunner implements ApplicationRunner {
 
         AssignMenu previousAssignment2 = new AssignMenu();
         previousAssignment2.setDate(new Date(System.currentTimeMillis() - (2 * oneDay)));
-        previousAssignment2.setMenu(menu);
+        previousAssignment2.setMenu(menu3);
         previousAssignment2.setRestaurant(restaurantObject);
         previousAssignment2.setSchedule(ScheduleEnum.DINNER);
         AssignMenu assignmentForTodayDinner = new AssignMenu();
         assignmentForTodayDinner.setDate(new Date(System.currentTimeMillis()));
-        assignmentForTodayDinner.setMenu(menu);
+        assignmentForTodayDinner.setMenu(menu4);
         assignmentForTodayDinner.setRestaurant(restaurantObject);
         assignmentForTodayDinner.setSchedule(ScheduleEnum.DINNER);
 
@@ -302,7 +388,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignmentForTomorrow.setDate(
             new Date(System.currentTimeMillis() + oneDay)
         );
-        assignmentForTomorrow.setMenu(menu);
+        assignmentForTomorrow.setMenu(menu3);
         assignmentForTomorrow.setRestaurant(restaurantObject);
         assignmentForTomorrow.setSchedule(ScheduleEnum.LUNCH);
 
@@ -311,7 +397,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment2Days.setDate(
             new Date(System.currentTimeMillis() + (2 * oneDay))
         );
-        assignment2Days.setMenu(menu);
+        assignment2Days.setMenu(menu4);
         assignment2Days.setRestaurant(restaurantObject);
         assignment2Days.setSchedule(ScheduleEnum.LUNCH);
 
@@ -328,7 +414,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment3DaysDinner.setDate(
             new Date(System.currentTimeMillis() + (3 * oneDay))
         );
-        assignment3DaysDinner.setMenu(menu);
+        assignment3DaysDinner.setMenu(menu3);
         assignment3DaysDinner.setRestaurant(restaurantObject);
         assignment3DaysDinner.setSchedule(ScheduleEnum.LUNCH);
 
@@ -337,7 +423,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment4DaysLunch.setDate(
             new Date(System.currentTimeMillis() + (4 * oneDay))
         );
-        assignment4DaysLunch.setMenu(menu);
+        assignment4DaysLunch.setMenu(menu4);
         assignment4DaysLunch.setRestaurant(restaurantObject);
         assignment4DaysLunch.setSchedule(ScheduleEnum.LUNCH);
 
@@ -354,7 +440,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment5DaysLunch.setDate(
             new Date(System.currentTimeMillis() + (5 * oneDay))
         );
-        assignment5DaysLunch.setMenu(menu);
+        assignment5DaysLunch.setMenu(menu3);
         assignment5DaysLunch.setRestaurant(restaurantObject);
         assignment5DaysLunch.setSchedule(ScheduleEnum.LUNCH);
 
@@ -362,7 +448,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment5DaysDinner.setDate(
             new Date(System.currentTimeMillis() + (5 * oneDay))
         );
-        assignment5DaysDinner.setMenu(menu);
+        assignment5DaysDinner.setMenu(menu4);
         assignment5DaysDinner.setRestaurant(restaurantObject);
         assignment5DaysDinner.setSchedule(ScheduleEnum.DINNER);
 
@@ -379,7 +465,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment6DaysDinner.setDate(
             new Date(System.currentTimeMillis() + (6 * oneDay))
         );
-        assignment6DaysDinner.setMenu(menu);
+        assignment6DaysDinner.setMenu(menu3);
         assignment6DaysDinner.setRestaurant(restaurantObject);
         assignment6DaysDinner.setSchedule(ScheduleEnum.DINNER);
 
@@ -388,7 +474,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment7DaysLunch.setDate(
             new Date(System.currentTimeMillis() + (7 * oneDay))
         );
-        assignment7DaysLunch.setMenu(menu);
+        assignment7DaysLunch.setMenu(menu4);
         assignment7DaysLunch.setRestaurant(restaurantObject);
         assignment7DaysLunch.setSchedule(ScheduleEnum.LUNCH);
 
@@ -405,7 +491,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment8DaysLunch.setDate(
             new Date(System.currentTimeMillis() + (8 * oneDay))
         );
-        assignment8DaysLunch.setMenu(menu);
+        assignment8DaysLunch.setMenu(menu3);
         assignment8DaysLunch.setRestaurant(restaurantObject);
         assignment8DaysLunch.setSchedule(ScheduleEnum.LUNCH);
 
@@ -413,7 +499,7 @@ public class DatabaseRunner implements ApplicationRunner {
         assignment8DaysDinner.setDate(
             new Date(System.currentTimeMillis() + (8 * oneDay))
         );
-        assignment8DaysDinner.setMenu(menu);
+        assignment8DaysDinner.setMenu(menu4);
         assignment8DaysDinner.setRestaurant(restaurantObject);
         assignment8DaysDinner.setSchedule(ScheduleEnum.DINNER);
 
