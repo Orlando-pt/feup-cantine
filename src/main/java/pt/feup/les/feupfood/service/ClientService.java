@@ -20,6 +20,7 @@ import pt.feup.les.feupfood.dto.PutClientEatIntention;
 import pt.feup.les.feupfood.dto.ResponseInterfaceDto;
 import pt.feup.les.feupfood.dto.UpdateProfileDto;
 import pt.feup.les.feupfood.exceptions.BadRequestParametersException;
+import pt.feup.les.feupfood.exceptions.DataIntegrityException;
 import pt.feup.les.feupfood.exceptions.ExceededDateForAssignmentException;
 import pt.feup.les.feupfood.exceptions.ResourceNotFoundException;
 import pt.feup.les.feupfood.exceptions.ResourceNotOwnedException;
@@ -316,6 +317,12 @@ public class ClientService {
         DAOUser client = this.retrieveUser(user.getName());
 
         AssignMenu assignment = this.retrieveAssingment(intentionDto.getAssignmentId());
+        
+        // check if the assignment was already made
+        List<EatIntention> intentionWasAlreadyMade = this.eatIntentionRepository.findByAssignment(assignment);
+
+        if (!intentionWasAlreadyMade.isEmpty())
+            throw new DataIntegrityException("One intention was already provided for assignment with id: " + assignment.getId());
 
         // verify if the operation is beeing made one day before the assignment
         this.verifyAddOrUpdateIntentionDate(assignment.getDate());

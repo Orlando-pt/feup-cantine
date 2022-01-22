@@ -69,6 +69,13 @@ public class EatIntentionRepositoryTest {
         ).contains(this.intention);
     }
 
+    @Test
+    void testFindByAssignment() {
+        Assertions.assertThat(
+            this.eatIntentionRepository.findByAssignment(this.assignment1)
+        ).contains(this.intention);
+    }
+
     private void generateData() {
 
         this.user1 = new DAOUser();
