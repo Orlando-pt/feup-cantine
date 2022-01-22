@@ -22,6 +22,7 @@ import pt.feup.les.feupfood.model.AssignMenu;
 import pt.feup.les.feupfood.model.DAOUser;
 import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
+import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
@@ -538,6 +539,7 @@ public class ClientController_RestTemplateIT {
         // test client stats
         AssignMenu assignment1 = this.assignMenuRepository.findById(13L).orElseThrow();
         AssignMenu assignment2 = this.assignMenuRepository.findById(14L).orElseThrow();
+        AssignMenu assignment19 = this.assignMenuRepository.findById(19L).orElseThrow();
 
         DAOUser client = this.userRepository.findByEmail(this.clientUser.getEmail()).orElseThrow();
 
@@ -573,6 +575,60 @@ public class ClientController_RestTemplateIT {
             getStatusOnMoneySaved.getBody()
         ).extracting(ClientStats::getIntentionsGiven)
             .isEqualTo(1);
+
+        var getNextIntention = this.restTemplate.exchange(
+            "/api/client/intention/next",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            getNextIntention.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getNextIntention.getBody().getAssignment().getSchedule()
+        ).isEqualTo(ScheduleEnum.DINNER);
+
+        EatIntention intentionForAFewDays = new EatIntention();
+        intentionForAFewDays.setAssignment(assignment19);
+        intentionForAFewDays.setClient(client);
+        intentionForAFewDays.setCode("989898988");
+        intentionForAFewDays.setValidatedCode(false);
+        intentionForAFewDays.setMeals(Set.of(assignment19.getMenu().getMeals().get(0)));
+
+        this.eatIntentionRepository.save(intentionForAFewDays);
+
+        getNextIntention = this.restTemplate.exchange(
+            "/api/client/intention/next",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention.class
+        );
+
+        Assertions.assertThat(
+            getNextIntention.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getNextIntention.getBody().getAssignment().getSchedule()
+        ).isEqualTo(ScheduleEnum.LUNCH);
+
+        var getIntentionsToCome = this.restTemplate.exchange(
+            "/api/client/intention/from-today",
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetClientEatIntention[].class
+        );
+
+        Assertions.assertThat(
+            getIntentionsToCome.getStatusCode()
+        ).isEqualTo(HttpStatus.OK);
+
+        Assertions.assertThat(
+            getIntentionsToCome.getBody()
+        ).hasSize(2);
     }
 
     private void registerClient() {

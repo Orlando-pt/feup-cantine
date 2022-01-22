@@ -29,6 +29,7 @@ import pt.feup.les.feupfood.model.EatIntention;
 import pt.feup.les.feupfood.model.Meal;
 import pt.feup.les.feupfood.model.Restaurant;
 import pt.feup.les.feupfood.model.Review;
+import pt.feup.les.feupfood.model.ScheduleEnum;
 import pt.feup.les.feupfood.repository.AssignMenuRepository;
 import pt.feup.les.feupfood.repository.EatIntentionRepository;
 import pt.feup.les.feupfood.repository.MenuRepository;
@@ -36,7 +37,6 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 import pt.feup.les.feupfood.util.ClientParser;
-import pt.feup.les.feupfood.util.RestaurantParser;
 
 import java.security.Principal;
 import java.security.SecureRandom;
@@ -410,6 +410,27 @@ public class ClientService {
         );
     }
 
+    public ResponseEntity<List<GetClientEatIntention>> getEatIntentionFromToday(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        Date now = new Date(System.currentTimeMillis());
+        ClientParser parser = new ClientParser();
+
+        return ResponseEntity.ok(
+            client.getEatingIntentions().stream()
+                .filter(
+                    intention -> intention.getAssignment().getDate().after(now)
+                ).map(
+                    parser::parseEatIntentionToDto
+                ).collect(
+                    Collectors.toList()
+                )
+        );
+
+    }
+
     public ResponseEntity<GetClientEatIntention> getEatIntention(
         Principal user,
         Long intentionId
@@ -423,6 +444,43 @@ public class ClientService {
         
         return ResponseEntity.ok(
             new ClientParser().parseEatIntentionToDto(intention)
+        );
+    }
+
+    public ResponseEntity<GetClientEatIntention> getNextEatIntention(
+        Principal user
+    ) {
+        DAOUser client = this.retrieveUser(user.getName());
+
+        // filter through only the next intentions
+        Date now = new Date(System.currentTimeMillis());
+
+        List<EatIntention> intentions = client.getEatingIntentions().stream()
+                        .filter(
+                            intention -> intention.getAssignment().getDate().after(now) &&
+                                            !intention.getValidatedCode()
+                        )
+                        .sorted(
+                            (intention1, intention2) -> intention1.getAssignment().getDate()
+                                                            .compareTo(intention2.getAssignment().getDate())
+                        ).collect(Collectors.toList());
+
+        if (intentions.isEmpty())
+            return ResponseEntity.ok(new GetClientEatIntention());
+
+        // check if the first 2 dates are the same
+        // if they are then we need to filter the lunch meal
+        ClientParser parser = new ClientParser();
+
+        if (intentions.size() != 1 &&
+            intentions.get(0).getAssignment().getDate()
+                .equals(intentions.get(1).getAssignment().getDate()))
+                return intentions.get(0).getAssignment().getSchedule() == ScheduleEnum.LUNCH ?
+                            ResponseEntity.ok(parser.parseEatIntentionToDto(intentions.get(0))) :
+                            ResponseEntity.ok(parser.parseEatIntentionToDto(intentions.get(1)));
+
+        return ResponseEntity.ok(
+            parser.parseEatIntentionToDto(intentions.get(0))
         );
     }
 
@@ -451,6 +509,10 @@ public class ClientService {
                 }
             }
         );
+
+        stats.setNumberOfReviews(client.getReviews().size());
+
+        stats.setNumberOfFavoritRestaurants(client.getClientFavoriteRestaurants().size());
 
         return ResponseEntity.ok(stats);
     }
