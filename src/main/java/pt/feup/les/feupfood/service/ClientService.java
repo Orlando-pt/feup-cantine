@@ -42,6 +42,7 @@ import pt.feup.les.feupfood.util.ClientParser;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -321,12 +322,6 @@ public class ClientService {
         // check if the assignment was already made
         List<EatIntention> intentionWasAlreadyMade = this.eatIntentionRepository.findByClientAndAssignment(client, assignment);
 
-        // System.out.println(client);
-        // System.out.println(assignment);
-        // System.out.println();
-        // for (EatIntention intention : intentionWasAlreadyMade)
-        //     System.out.println(intention.getClient().toString() + intention.getAssignment().toString());
-
         if (!intentionWasAlreadyMade.isEmpty())
             throw new DataIntegrityException("One intention was already provided for assignment with id: " + assignment.getId());
 
@@ -428,14 +423,28 @@ public class ClientService {
     ) {
         DAOUser client = this.retrieveUser(user.getName());
 
-        Date now = new Date(System.currentTimeMillis());
+        long currentTime = System.currentTimeMillis();
+        Date yesterday = new Date(currentTime - (currentTime % (1000L * 60 * 60 * 24)) - 10000);
+        Date today = new Date(currentTime);
+        Calendar now = Calendar.getInstance();
+
         ClientParser parser = new ClientParser();
 
         return ResponseEntity.ok(
             client.getEatingIntentions().stream()
                 .filter(
-                    intention -> intention.getAssignment().getDate().after(now)
-                ).map(
+                    intention -> intention.getAssignment().getDate().after(yesterday)
+                )
+                .filter(
+                    intention -> intention.getAssignment().getDate().before(today) &&
+                                    now.get(Calendar.HOUR_OF_DAY) < 17 &&
+                                    intention.getAssignment().getSchedule() == ScheduleEnum.LUNCH ||
+                                    intention.getAssignment().getDate().before(today) &&
+                                    now.get(Calendar.HOUR_OF_DAY) > 16 &&
+                                    intention.getAssignment().getSchedule() == ScheduleEnum.DINNER ||
+                                    intention.getAssignment().getDate().after(today)
+                )
+                .map(
                     parser::parseEatIntentionToDto
                 ).collect(
                     Collectors.toList()
@@ -466,11 +475,13 @@ public class ClientService {
         DAOUser client = this.retrieveUser(user.getName());
 
         // filter through only the next intentions
-        Date now = new Date(System.currentTimeMillis());
+        long currentTime = System.currentTimeMillis();
+        Date yesterday = new Date(currentTime - (currentTime % (1000L * 60 * 60 * 24)) - 10000);
+        Calendar now = Calendar.getInstance();
 
         List<EatIntention> intentions = client.getEatingIntentions().stream()
                         .filter(
-                            intention -> intention.getAssignment().getDate().after(now) &&
+                            intention -> intention.getAssignment().getDate().after(yesterday) &&
                                             !intention.getValidatedCode()
                         )
                         .sorted(
@@ -480,7 +491,7 @@ public class ClientService {
 
         if (intentions.isEmpty())
             return ResponseEntity.ok(new GetClientEatIntention());
-
+        
         // check if the first 2 dates are the same
         // if they are then we need to filter the lunch meal
         ClientParser parser = new ClientParser();
@@ -488,13 +499,23 @@ public class ClientService {
         if (intentions.size() != 1 &&
             intentions.get(0).getAssignment().getDate()
                 .equals(intentions.get(1).getAssignment().getDate()))
-                return intentions.get(0).getAssignment().getSchedule() == ScheduleEnum.LUNCH ?
-                            ResponseEntity.ok(parser.parseEatIntentionToDto(intentions.get(0))) :
-                            ResponseEntity.ok(parser.parseEatIntentionToDto(intentions.get(1)));
+                return now.get(Calendar.HOUR_OF_DAY) > 16 ?
+                    ResponseEntity.ok(parser.parseEatIntentionToDto(
+                        this.getEatingIntentionOfDay(intentions, ScheduleEnum.DINNER)
+                    )) :
+                    ResponseEntity.ok(parser.parseEatIntentionToDto(
+                        this.getEatingIntentionOfDay(intentions, ScheduleEnum.LUNCH)
+                    ));
 
         return ResponseEntity.ok(
             parser.parseEatIntentionToDto(intentions.get(0))
         );
+    }
+
+    private EatIntention getEatingIntentionOfDay(List<EatIntention> intentions, ScheduleEnum schedule) {
+        return intentions.get(0).getAssignment().getSchedule() == schedule ?
+                    intentions.get(0) :
+                    intentions.get(1);
     }
 
     // stats methods

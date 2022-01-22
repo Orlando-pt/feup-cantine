@@ -378,6 +378,7 @@ public class DatabaseRunner implements ApplicationRunner {
         previousAssignment2.setMenu(menu3);
         previousAssignment2.setRestaurant(restaurantObject);
         previousAssignment2.setSchedule(ScheduleEnum.DINNER);
+
         AssignMenu assignmentForTodayDinner = new AssignMenu();
         assignmentForTodayDinner.setDate(new Date(System.currentTimeMillis()));
         assignmentForTodayDinner.setMenu(menu4);
@@ -505,10 +506,10 @@ public class DatabaseRunner implements ApplicationRunner {
 
         this.assignMenuRepository.save(assignment);
         this.assignMenuRepository.save(assignment2RealData);
-        this.assignMenuRepository.save(assignmentForToday);
+        assignmentForToday = this.assignMenuRepository.save(assignmentForToday);
         this.assignMenuRepository.save(previousAssignment);
         this.assignMenuRepository.save(previousAssignment2);
-        this.assignMenuRepository.save(assignmentForTodayDinner);
+        assignmentForTodayDinner = this.assignMenuRepository.save(assignmentForTodayDinner);
         this.assignMenuRepository.save(assignmentForTomorrow);
         this.assignMenuRepository.save(assignment2Days);
         this.assignMenuRepository.save(assignment2DaysDinner);
@@ -731,6 +732,174 @@ public class DatabaseRunner implements ApplicationRunner {
 
         this.userRepository.save(client);
         this.userRepository.save(client2);
+
+        // add intention for today
+        EatIntention eatIntentionForToday = new EatIntention();
+        eatIntentionForToday.setAssignment(assignmentForToday);
+        eatIntentionForToday.setClient(client);
+        eatIntentionForToday.setCode("231222432");
+        eatIntentionForToday.setMeals(Set.of(
+            assignmentForToday.getMenu().getMeals().get(0)
+        ));
+        eatIntentionForToday.setValidatedCode(false);
+
+        EatIntention eatIntentionForTodayDinner = new EatIntention();
+        eatIntentionForTodayDinner.setAssignment(assignmentForTodayDinner);
+        eatIntentionForTodayDinner.setClient(client);
+        eatIntentionForTodayDinner.setCode("231333432");
+        eatIntentionForTodayDinner.setMeals(Set.of(
+            assignmentForTodayDinner.getMenu().getMeals().get(0)
+        ));
+        eatIntentionForTodayDinner.setValidatedCode(false);
+
+        this.eatIntentionRepository.save(eatIntentionForToday);
+        this.eatIntentionRepository.save(eatIntentionForTodayDinner);
+
+        // add meals for the grill cantine
+
+        // add meals
+        Meal meatGrill = new Meal();
+        meatGrill.setDescription("Novilho estufado com cenoura, ervilhas e esparguete salteado");
+        meatGrill.setMealType(MealTypeEnum.MEAT);
+        meatGrill.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meatGrill.setRestaurant(restaurantAdelaide);
+        meatGrill = this.mealRepository.save(meatGrill);
+        
+        Meal fishGrill = new Meal();
+        fishGrill.setDescription("Raia grelhada com molho verde e batata cozida");
+        fishGrill.setMealType(MealTypeEnum.FISH);
+        fishGrill.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fishGrill.setRestaurant(restaurantAdelaide);
+        fishGrill = this.mealRepository.save(fishGrill);
+
+        Meal vegetarianGrill = new Meal();
+        vegetarianGrill.setDescription("Gratinado de couve em camadas com soja e arroz");
+        vegetarianGrill.setMealType(MealTypeEnum.VEGETARIAN);
+        vegetarianGrill.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarianGrill.setRestaurant(restaurantAdelaide);
+        vegetarianGrill = this.mealRepository.save(vegetarianGrill);
+
+        Meal desertGrill = new Meal();
+        desertGrill.setDescription("Mousse de chocolate");
+        desertGrill.setMealType(MealTypeEnum.DESERT);
+        desertGrill.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desertGrill.setRestaurant(restaurantAdelaide);
+        desertGrill = this.mealRepository.save(desertGrill);
+
+        Menu menuGrill = new Menu();
+        menuGrill.setName("Menu 1");
+        menuGrill.setAdditionalInformation("Dispõe ainda de sopa de couve lombarda e feijão vermelho");
+        menuGrill.setEndPrice(5.0);
+        menuGrill.setStartPrice(3.75);
+        menuGrill.setDiscount(0.20);
+        menuGrill.addMeal(meatGrill);
+        menuGrill.addMeal(fishGrill);
+        menuGrill.addMeal(vegetarianGrill);
+        menuGrill.addMeal(desertGrill);
+        menuGrill.setRestaurant(restaurantAdelaide);
+        menuGrill = this.menuRepository.save(menuGrill);
+
+        AssignMenu assignmentGrill = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill.setDate(
+            new Date(System.currentTimeMillis() + (1 * oneDay))
+        );
+        assignmentGrill.setMenu(menuGrill);
+        assignmentGrill.setRestaurant(restaurantAdelaide);
+        assignmentGrill.setSchedule(ScheduleEnum.DINNER);
+        this.assignMenuRepository.save(assignmentGrill);
+
+        AssignMenu assignmentGrillDinner = new AssignMenu();
+        // set 3 days from now
+        assignmentGrillDinner.setDate(
+            new Date(System.currentTimeMillis() + (1 * oneDay))
+        );
+        assignmentGrillDinner.setMenu(menuGrill);
+        assignmentGrillDinner.setRestaurant(restaurantAdelaide);
+        assignmentGrillDinner.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignmentGrill2Lunch = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill2Lunch.setDate(
+            new Date(System.currentTimeMillis() + (2 * oneDay))
+        );
+        assignmentGrill2Lunch.setMenu(menuGrill);
+        assignmentGrill2Lunch.setRestaurant(restaurantAdelaide);
+        assignmentGrill2Lunch.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignmentGrill2Dinner = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill2Dinner.setDate(
+            new Date(System.currentTimeMillis() + (2 * oneDay))
+        );
+        assignmentGrill2Dinner.setMenu(menuGrill);
+        assignmentGrill2Dinner.setRestaurant(restaurantAdelaide);
+        assignmentGrill2Dinner.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignmentGrill3Lunch = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill3Lunch.setDate(
+            new Date(System.currentTimeMillis() + (3 * oneDay))
+        );
+        assignmentGrill3Lunch.setMenu(menuGrill);
+        assignmentGrill3Lunch.setRestaurant(restaurantAdelaide);
+        assignmentGrill3Lunch.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignmentGrill3Dinner = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill3Dinner.setDate(
+            new Date(System.currentTimeMillis() + (3 * oneDay))
+        );
+        assignmentGrill3Dinner.setMenu(menuGrill);
+        assignmentGrill3Dinner.setRestaurant(restaurantAdelaide);
+        assignmentGrill3Dinner.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignmentGrill4Lunch = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill4Lunch.setDate(
+            new Date(System.currentTimeMillis() + (4 * oneDay))
+        );
+        assignmentGrill4Lunch.setMenu(menuGrill);
+        assignmentGrill4Lunch.setRestaurant(restaurantAdelaide);
+        assignmentGrill4Lunch.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignmentGrill4Dinner = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill4Dinner.setDate(
+            new Date(System.currentTimeMillis() + (4 * oneDay))
+        );
+        assignmentGrill4Dinner.setMenu(menuGrill);
+        assignmentGrill4Dinner.setRestaurant(restaurantAdelaide);
+        assignmentGrill4Dinner.setSchedule(ScheduleEnum.LUNCH);
+
+        AssignMenu assignmentGrill5Lunch = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill5Lunch.setDate(
+            new Date(System.currentTimeMillis() + (5 * oneDay))
+        );
+        assignmentGrill5Lunch.setMenu(menuGrill);
+        assignmentGrill5Lunch.setRestaurant(restaurantAdelaide);
+        assignmentGrill5Lunch.setSchedule(ScheduleEnum.DINNER);
+
+        AssignMenu assignmentGrill5Dinner = new AssignMenu();
+        // set 3 days from now
+        assignmentGrill5Dinner.setDate(
+            new Date(System.currentTimeMillis() + (5 * oneDay))
+        );
+        assignmentGrill5Dinner.setMenu(menuGrill);
+        assignmentGrill5Dinner.setRestaurant(restaurantAdelaide);
+        assignmentGrill5Dinner.setSchedule(ScheduleEnum.LUNCH);
+
+        this.assignMenuRepository.save(assignmentGrill);
+        this.assignMenuRepository.save(assignmentGrillDinner);
+        this.assignMenuRepository.save(assignmentGrill2Dinner);
+        this.assignMenuRepository.save(assignmentGrill2Lunch);
+        this.assignMenuRepository.save(assignmentGrill3Dinner);
+        this.assignMenuRepository.save(assignmentGrill3Lunch);
+        this.assignMenuRepository.save(assignmentGrill4Dinner);
+        this.assignMenuRepository.save(assignmentGrill4Lunch);
+        this.assignMenuRepository.save(assignmentGrill5Dinner);
+        this.assignMenuRepository.save(assignmentGrill5Lunch);
 
     }
     
