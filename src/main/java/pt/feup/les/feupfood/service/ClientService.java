@@ -532,9 +532,8 @@ public class ClientService {
 
         intentionsGiven.forEach(
             intention -> {
+                stats.incrementIntentionsGiven();
                 if (intention.getValidatedCode()) {
-                    stats.incrementIntentionsGiven();
-
                     stats.addMoney(intention.getAssignment().getMenu().getDiscount().doubleValue());
                 } else {
                     // increment on the intentions not fulfilled if the date of the intention is before today

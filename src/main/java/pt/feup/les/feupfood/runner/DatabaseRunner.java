@@ -79,7 +79,7 @@ public class DatabaseRunner implements ApplicationRunner {
                 password
             )
         );
-        restaurant.setFullName("Engineering Canteen");
+        restaurant.setFullName("Cantina de Engenharia");
         restaurant.setProfileImageUrl("https://sigarra.up.pt/sasup/en/imagens/SC-alimentacao-cantina-engenharia.jpg");
         restaurant.setRole("ROLE_USER_RESTAURANT");
         restaurant.setTerms(true);
@@ -114,7 +114,7 @@ public class DatabaseRunner implements ApplicationRunner {
                 password
             )
         );
-        ownerRestaurant2.setFullName("GRILL DE ENGENHARIA");
+        ownerRestaurant2.setFullName("Grill de Engenharia");
         ownerRestaurant2.setProfileImageUrl("https://sigarra.up.pt/sasup/pt/imagens/SC-alimentacao-grill-engenharia-renovado.jpg");
         ownerRestaurant2.setRole("ROLE_USER_RESTAURANT");
         ownerRestaurant2.setTerms(true);

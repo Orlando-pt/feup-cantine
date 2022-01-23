@@ -76,6 +76,7 @@ public class ClientParser {
 
         intentionDto.setCode(intention.getCode());
         intentionDto.setValidatedCode(intention.getValidatedCode());
+        intentionDto.setRestaurant(intention.getAssignment().getRestaurant().getOwner().getFullName());
 
         intentionDto.getAssignment().setPurchased(true);
         
@@ -121,31 +122,40 @@ public class ClientParser {
     }
 
     private GetAssignmentDto checkIfMealsAreInsideList(GetAssignmentDto assignmentDto, List<Long> mealIds){
-        assignmentDto.getMenu().getDesertMeal().setChoosen(
-            mealIds.contains(
-                assignmentDto.getMenu().getDesertMeal().getId()
-            )
-        );
-        assignmentDto.getMenu().getDietMeal().setChoosen(
-            mealIds.contains(
-                assignmentDto.getMenu().getDietMeal().getId()
-            )
-        );
-        assignmentDto.getMenu().getFishMeal().setChoosen(
-            mealIds.contains(
-                assignmentDto.getMenu().getFishMeal().getId()
-            )
-        );
-        assignmentDto.getMenu().getMeatMeal().setChoosen(
-            mealIds.contains(
-                assignmentDto.getMenu().getMeatMeal().getId()
-            )
-        );
-        assignmentDto.getMenu().getVegetarianMeal().setChoosen(
-            mealIds.contains(
-                assignmentDto.getMenu().getVegetarianMeal().getId()
-            )
-        );
+        if (assignmentDto.getMenu().getDesertMeal() != null)
+            assignmentDto.getMenu().getDesertMeal().setChoosen(
+                mealIds.contains(
+                    assignmentDto.getMenu().getDesertMeal().getId()
+                )
+            );
+
+        if (assignmentDto.getMenu().getDietMeal() != null)
+            assignmentDto.getMenu().getDietMeal().setChoosen(
+                mealIds.contains(
+                    assignmentDto.getMenu().getDietMeal().getId()
+                )
+            );
+
+        if (assignmentDto.getMenu().getFishMeal() != null)
+            assignmentDto.getMenu().getFishMeal().setChoosen(
+                mealIds.contains(
+                    assignmentDto.getMenu().getFishMeal().getId()
+                )
+            );
+
+        if (assignmentDto.getMenu().getMeatMeal() != null)
+            assignmentDto.getMenu().getMeatMeal().setChoosen(
+                mealIds.contains(
+                    assignmentDto.getMenu().getMeatMeal().getId()
+                )
+            );
+
+        if (assignmentDto.getMenu().getVegetarianMeal() != null)
+            assignmentDto.getMenu().getVegetarianMeal().setChoosen(
+                mealIds.contains(
+                    assignmentDto.getMenu().getVegetarianMeal().getId()
+                )
+            );
         return assignmentDto;
     }
 }

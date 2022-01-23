@@ -12,4 +12,5 @@ public class GetClientEatIntention {
     private Set<GetPutMealDto> meals;
     private String code;
     private Boolean validatedCode;
+    private String restaurant;
 }
