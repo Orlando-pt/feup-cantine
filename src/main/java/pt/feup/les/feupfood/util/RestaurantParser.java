@@ -44,7 +44,6 @@ public class RestaurantParser {
     public GetRestaurantDto parseRestaurantToRestaurantDto(Restaurant restaurant) {
         var restaurantDto = new GetRestaurantDto();
         restaurantDto.setId(restaurant.getId());
-        // This condition might not be working
         restaurantDto.setFullName(restaurant.getOwner().getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
         restaurantDto.setCuisines(restaurant.getCuisines());
