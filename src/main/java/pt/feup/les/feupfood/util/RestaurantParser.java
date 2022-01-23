@@ -35,7 +35,6 @@ public class RestaurantParser {
         mealDto.setId(meal.getId());
         mealDto.setMealType(meal.getMealType());
         mealDto.setNutritionalInformation(meal.getNutritionalInformation());
-        mealDto.setNumberOfIntentions(meal.getEatingIntentions().size());
 
         mealDto.setChoosen(false);
         return mealDto;
@@ -44,7 +43,6 @@ public class RestaurantParser {
     public GetRestaurantDto parseRestaurantToRestaurantDto(Restaurant restaurant) {
         var restaurantDto = new GetRestaurantDto();
         restaurantDto.setId(restaurant.getId());
-        // This condition might not be working
         restaurantDto.setFullName(restaurant.getOwner().getFullName());
         restaurantDto.setLocation(restaurant.getLocation());
         restaurantDto.setCuisines(restaurant.getCuisines());
@@ -85,6 +83,8 @@ public class RestaurantParser {
 
         assignmentDto.setPurchased(false);
 
+        this.addMealIntentions(assignment, assignmentDto);
+
         return assignmentDto;
     }
 
@@ -100,6 +100,72 @@ public class RestaurantParser {
         );
 
         return dto;
+    }
+
+    private GetAssignmentDto addMealIntentions(AssignMenu assignment, GetAssignmentDto assignmentDto) {
+        if (assignmentDto.getMenu().getDesertMeal() != null)
+            assignmentDto.getMenu().getDesertMeal().setNumberOfIntentions(
+                (int) this.retrieveMeal(
+                    assignment.getMenu().getMeals(),
+                    MealTypeEnum.DESERT
+                ).getEatingIntentions().stream()
+                    .filter(
+                        intention -> intention.getAssignment().equals(assignment)
+                    ).count()
+            );
+
+        if (assignmentDto.getMenu().getDietMeal() != null)
+            assignmentDto.getMenu().getDietMeal().setNumberOfIntentions(
+                (int) this.retrieveMeal(
+                    assignment.getMenu().getMeals(),
+                    MealTypeEnum.DIET
+                ).getEatingIntentions().stream()
+                    .filter(
+                        intention -> intention.getAssignment().equals(assignment)
+                    ).count()
+            );
+
+        if (assignmentDto.getMenu().getFishMeal() != null)
+            assignmentDto.getMenu().getFishMeal().setNumberOfIntentions(
+                (int) this.retrieveMeal(
+                    assignment.getMenu().getMeals(),
+                    MealTypeEnum.FISH
+                ).getEatingIntentions().stream()
+                    .filter(
+                        intention -> intention.getAssignment().equals(assignment)
+                    ).count()
+            );
+
+        if (assignmentDto.getMenu().getMeatMeal() != null)
+            assignmentDto.getMenu().getMeatMeal().setNumberOfIntentions(
+                (int) this.retrieveMeal(
+                    assignment.getMenu().getMeals(),
+                    MealTypeEnum.MEAT
+                ).getEatingIntentions().stream()
+                    .filter(
+                        intention -> intention.getAssignment().equals(assignment)
+                    ).count()
+            );
+
+        if (assignmentDto.getMenu().getVegetarianMeal() != null)
+            assignmentDto.getMenu().getVegetarianMeal().setNumberOfIntentions(
+                (int) this.retrieveMeal(
+                    assignment.getMenu().getMeals(),
+                    MealTypeEnum.VEGETARIAN
+                ).getEatingIntentions().stream()
+                    .filter(
+                        intention -> intention.getAssignment().equals(assignment)
+                    ).count()
+            );
+        return assignmentDto;
+    }
+
+    private Meal retrieveMeal(List<Meal> meals, MealTypeEnum mealType) {
+        for (Meal meal : meals)
+            if (meal.getMealType() == mealType)
+                return meal;
+
+        return new Meal();
     }
 
     private void addMeals(GetPutMenuDto menuDto, List<Meal> meals) {

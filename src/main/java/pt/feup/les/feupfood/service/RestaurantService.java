@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -443,7 +442,11 @@ public class RestaurantService {
         DAOUser owner = this.retrieveRestaurantOwner(user.getName());
 
         return ResponseEntity.ok(
-            owner.getRestaurant().getAssignments().stream().map(
+            owner.getRestaurant().getAssignments().stream()
+            .sorted(
+                (assignment1, assignment2) -> assignment2.getDate().compareTo(assignment1.getDate())
+            )
+            .map(
                 assignment -> parser.parseAssignmentToAssignmentDto(assignment)
             ).collect(Collectors.toList())
         );
@@ -584,7 +587,11 @@ public class RestaurantService {
         ClientParser parser = new ClientParser();
         return ResponseEntity.ok(
             this.reviewRepository.findAllByRestaurant(owner.getRestaurant())
-                .stream().map(
+                .stream()
+                .sorted(
+                    (review1, review2) -> review2.getTimestamp().compareTo(review1.getTimestamp())
+                )
+                .map(
                     parser::parseReviewToReviewDto
                 ).collect(Collectors.toList())
         );

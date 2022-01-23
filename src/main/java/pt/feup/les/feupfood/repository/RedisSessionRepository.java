@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public class RedisSessionRepository {
 
 
-	private final long JWT_TOKEN_VALIDITY = 60L * 60L * 1000L;  // 1 hour timeout
+	private final long JWT_TOKEN_VALIDITY = 60L * 60 * 1000 * 24 * 7;  // 7 days timeout
 
     // @Autowired
     private RedisTemplate<String, String> redisTemplate;
