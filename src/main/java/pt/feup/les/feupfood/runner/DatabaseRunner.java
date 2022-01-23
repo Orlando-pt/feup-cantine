@@ -55,6 +55,12 @@ public class DatabaseRunner implements ApplicationRunner {
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
+    private final static String NUTRITIONAL_1 = "Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3";
+    private final static String NUTRITIONAL_2 = "Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7";
+    private final static String NUTRITIONAL_3 = "Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2";
+    private final static String NUTRITIONAL_4 = "Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1";
+    private final static String NUTRITIONAL_5 = "Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1";
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         String password = "password";
@@ -191,35 +197,35 @@ public class DatabaseRunner implements ApplicationRunner {
         Meal meat = new Meal();
         meat.setDescription("Pá de porco estufada com ervilhas e arroz de tomate");
         meat.setMealType(MealTypeEnum.MEAT);
-        meat.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meat.setNutritionalInformation(NUTRITIONAL_1);
         meat.setRestaurant(restaurantObject);
         meat = this.mealRepository.save(meat);
         
         Meal fish = new Meal();
         fish.setDescription("Lombinhos de escamudo gratinado com puré de batata");
         fish.setMealType(MealTypeEnum.FISH);
-        fish.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fish.setNutritionalInformation(NUTRITIONAL_2);
         fish.setRestaurant(restaurantObject);
         fish = this.mealRepository.save(fish);
 
         Meal diet = new Meal();
         diet.setDescription("Cozido simples de frango com batata e couve branca cozida");
         diet.setMealType(MealTypeEnum.DIET);
-        diet.setNutritionalInformation("Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2");
+        diet.setNutritionalInformation(NUTRITIONAL_3);
         diet.setRestaurant(restaurantObject);
         diet = this.mealRepository.save(diet);
 
         Meal vegetarian = new Meal();
         vegetarian.setDescription("Rancho vegan (grão-de-bico, macarrão, couve branca, cenoura)");
         vegetarian.setMealType(MealTypeEnum.VEGETARIAN);
-        vegetarian.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarian.setNutritionalInformation(NUTRITIONAL_4);
         vegetarian.setRestaurant(restaurantObject);
         vegetarian = this.mealRepository.save(vegetarian);
 
         Meal desert = new Meal();
         desert.setDescription("Mousse de chocolate");
         desert.setMealType(MealTypeEnum.DESERT);
-        desert.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desert.setNutritionalInformation(NUTRITIONAL_5);
         desert.setRestaurant(restaurantObject);
         desert = this.mealRepository.save(desert);
 
@@ -234,70 +240,70 @@ public class DatabaseRunner implements ApplicationRunner {
         Meal meat2 = new Meal();
         meat2.setDescription("Frango crocante com corn flakes com arroz de ervilhas");
         meat2.setMealType(MealTypeEnum.MEAT);
-        meat2.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meat2.setNutritionalInformation(NUTRITIONAL_1);
         meat2.setRestaurant(restaurantObject);
         meat2 = this.mealRepository.save(meat2);
         
         Meal fish2 = new Meal();
         fish2.setDescription("Cavala assada com cebolada e batata cozida");
         fish2.setMealType(MealTypeEnum.FISH);
-        fish2.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fish2.setNutritionalInformation(NUTRITIONAL_2);
         fish2.setRestaurant(restaurantObject);
         fish2 = this.mealRepository.save(fish2);
 
         Meal diet2 = new Meal();
         diet2.setDescription("Perna de frango grelhada com massa espiral");
         diet2.setMealType(MealTypeEnum.DIET);
-        diet2.setNutritionalInformation("Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2");
+        diet2.setNutritionalInformation(NUTRITIONAL_3);
         diet2.setRestaurant(restaurantObject);
         diet2 = this.mealRepository.save(diet2);
 
         Meal vegetarian2 = new Meal();
         vegetarian2.setDescription("Hambúrguer de grão com esmagada de batata");
         vegetarian2.setMealType(MealTypeEnum.VEGETARIAN);
-        vegetarian2.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarian2.setNutritionalInformation(NUTRITIONAL_4);
         vegetarian2.setRestaurant(restaurantObject);
         vegetarian2 = this.mealRepository.save(vegetarian2);
 
         Meal desert2 = new Meal();
         desert2.setDescription("Pêra assada");
         desert2.setMealType(MealTypeEnum.DESERT);
-        desert2.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desert2.setNutritionalInformation(NUTRITIONAL_5);
         desert2.setRestaurant(restaurantObject);
         desert2 = this.mealRepository.save(desert2);
 
         Meal meat3 = new Meal();
         meat3.setDescription("Canelones de carne de vaca");
         meat3.setMealType(MealTypeEnum.MEAT);
-        meat3.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meat3.setNutritionalInformation(NUTRITIONAL_1);
         meat3.setRestaurant(restaurantObject);
         meat3 = this.mealRepository.save(meat3);
         
         Meal fish3 = new Meal();
         fish3.setDescription("Red fish assado à portuguesa com arroz");
         fish3.setMealType(MealTypeEnum.FISH);
-        fish3.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fish3.setNutritionalInformation(NUTRITIONAL_2);
         fish3.setRestaurant(restaurantObject);
         fish3 = this.mealRepository.save(fish3);
 
         Meal diet3 = new Meal();
         diet3.setDescription("Carapau grelhado com arroz");
         diet3.setMealType(MealTypeEnum.DIET);
-        diet3.setNutritionalInformation("Kcal: 131; Lip(g): 3.2; HC(g): 14.2; Açucar(g): 0.9; Prot(g): 10.2; Sal(g): 0.2");
+        diet3.setNutritionalInformation(NUTRITIONAL_3);
         diet3.setRestaurant(restaurantObject);
         diet3 = this.mealRepository.save(diet3);
 
         Meal vegetarian3 = new Meal();
         vegetarian3.setDescription("Favas estufadas com coentros e batata cozida");
         vegetarian3.setMealType(MealTypeEnum.VEGETARIAN);
-        vegetarian3.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarian3.setNutritionalInformation(NUTRITIONAL_4);
         vegetarian3.setRestaurant(restaurantObject);
         vegetarian3 = this.mealRepository.save(vegetarian3);
 
         Meal desert3 = new Meal();
         desert3.setDescription("Ananás");
         desert3.setMealType(MealTypeEnum.DESERT);
-        desert3.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desert3.setNutritionalInformation(NUTRITIONAL_5);
         desert3.setRestaurant(restaurantObject);
         desert3 = this.mealRepository.save(desert3);
 
@@ -761,28 +767,28 @@ public class DatabaseRunner implements ApplicationRunner {
         Meal meatGrill = new Meal();
         meatGrill.setDescription("Novilho estufado com cenoura, ervilhas e esparguete salteado");
         meatGrill.setMealType(MealTypeEnum.MEAT);
-        meatGrill.setNutritionalInformation("Kcal: 217; Lip(g): 9.6; HC(g): 19.0; Açucar(g): 0.3; Prot(g): 13.0; Sal(g): 0.3");
+        meatGrill.setNutritionalInformation(NUTRITIONAL_1);
         meatGrill.setRestaurant(restaurantAdelaide);
         meatGrill = this.mealRepository.save(meatGrill);
         
         Meal fishGrill = new Meal();
         fishGrill.setDescription("Raia grelhada com molho verde e batata cozida");
         fishGrill.setMealType(MealTypeEnum.FISH);
-        fishGrill.setNutritionalInformation("Kcal: 100; Lip(g): 0.6; HC(g): 9.2; Açucar(g): 0.3; Prot(g): 13.2; Sal(g): 0.7");
+        fishGrill.setNutritionalInformation(NUTRITIONAL_2);
         fishGrill.setRestaurant(restaurantAdelaide);
         fishGrill = this.mealRepository.save(fishGrill);
 
         Meal vegetarianGrill = new Meal();
         vegetarianGrill.setDescription("Gratinado de couve em camadas com soja e arroz");
         vegetarianGrill.setMealType(MealTypeEnum.VEGETARIAN);
-        vegetarianGrill.setNutritionalInformation("Kcal: 164; Lip(g): 2.2; HC(g): 27.2; Açucar(g): 2.9; Prot(g): 6.2; Sal(g): 0.1");
+        vegetarianGrill.setNutritionalInformation(NUTRITIONAL_4);
         vegetarianGrill.setRestaurant(restaurantAdelaide);
         vegetarianGrill = this.mealRepository.save(vegetarianGrill);
 
         Meal desertGrill = new Meal();
         desertGrill.setDescription("Mousse de chocolate");
         desertGrill.setMealType(MealTypeEnum.DESERT);
-        desertGrill.setNutritionalInformation("Kcal: 365; Lip(g): 25.2; HC(g): 27.2; Açucar(g): 25.9; Prot(g): 7.2; Sal(g): 0.1");
+        desertGrill.setNutritionalInformation(NUTRITIONAL_5);
         desertGrill.setRestaurant(restaurantAdelaide);
         desertGrill = this.mealRepository.save(desertGrill);
 

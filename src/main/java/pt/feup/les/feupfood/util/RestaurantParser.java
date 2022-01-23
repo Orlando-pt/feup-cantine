@@ -165,7 +165,7 @@ public class RestaurantParser {
             if (meal.getMealType() == mealType)
                 return meal;
 
-        return null;
+        return new Meal();
     }
 
     private void addMeals(GetPutMenuDto menuDto, List<Meal> meals) {

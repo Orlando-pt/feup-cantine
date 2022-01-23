@@ -183,7 +183,7 @@ public class ClientController_RestTemplateIT {
                 GetClientReviewDto[].class);
         
         GetClientReviewDto expectedReview = new GetClientReviewDto();
-        expectedReview.setComment("Who does not like a meal of rice with potato sauce");
+        expectedReview.setComment("Lamentável! Hoje o prato era arroz com molho de tomate.");
 
         Assertions.assertThat(getReviewsByRestaurantId.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -220,12 +220,12 @@ public class ClientController_RestTemplateIT {
         Assertions.assertThat(
             priceRange.getBody()
         ).extracting(PriceRangeDto::getMinimumPrice)
-            .isEqualTo(1.25);
+            .isEqualTo(2.75);
 
         Assertions.assertThat(
             priceRange.getBody()
         ).extracting(PriceRangeDto::getMaximumPrice)
-            .isEqualTo(5.4);
+            .isEqualTo(4.0);
     }
 
     @Test
@@ -430,8 +430,11 @@ public class ClientController_RestTemplateIT {
         ).isEqualTo(HttpStatus.BAD_REQUEST);
 
         intentionDto.setAssignmentId(assignments.getBody()[7].getId());
-        intentionDto.getMealsId().remove(200L);
-        intentionDto.getMealsId().add(assignments.getBody()[0].getMenu().getMeatMeal().getId());
+        meals.clear();
+        meals.add(assignments.getBody()[7].getMenu().getMeatMeal().getId());
+        meals.add(assignments.getBody()[7].getMenu().getFishMeal().getId());
+        meals.add(assignments.getBody()[7].getMenu().getDesertMeal().getId());
+        intentionDto.setMealsId(meals);
         var addIntention2 = this.restTemplate.exchange(
             "/api/client/intention",
             HttpMethod.POST,
@@ -469,7 +472,7 @@ public class ClientController_RestTemplateIT {
             intentions.getBody()
         ).hasSize(previousIntentions.getBody().length + 2);
 
-        intentionDto.getMealsId().remove(assignments.getBody()[0].getMenu().getMeatMeal().getId());
+        intentionDto.getMealsId().remove(assignments.getBody()[7].getMenu().getMeatMeal().getId());
         var updateIntentions = this.restTemplate.exchange(
             "/api/client/intention/" + addIntention2.getBody().getId(),
             HttpMethod.PUT,
@@ -485,8 +488,8 @@ public class ClientController_RestTemplateIT {
             updateIntentions.getBody().getMeals()
         ).extracting(GetPutMealDto::getId)
             .containsOnly(
-                assignments.getBody()[0].getMenu().getFishMeal().getId(),
-                assignments.getBody()[0].getMenu().getDesertMeal().getId()
+                assignments.getBody()[7].getMenu().getFishMeal().getId(),
+                assignments.getBody()[7].getMenu().getDesertMeal().getId()
             );
 
         var deleteIntention = this.restTemplate.exchange(
@@ -534,7 +537,7 @@ public class ClientController_RestTemplateIT {
         // test when client tries to add intention after the allowed time
         
         var intentionDtoError = new AddEatIntention();
-        intentionDtoError.setAssignmentId(11L);
+        intentionDtoError.setAssignmentId(23L);
         intentionDtoError.setMealsId(intentionDto.getMealsId());
 
         var addIntentionAddError = this.restTemplate.exchange(
@@ -549,9 +552,9 @@ public class ClientController_RestTemplateIT {
         ).isEqualTo(HttpStatus.BAD_REQUEST);
 
         // test client stats
-        AssignMenu assignment1 = this.assignMenuRepository.findById(13L).orElseThrow();
-        AssignMenu assignment2 = this.assignMenuRepository.findById(14L).orElseThrow();
-        AssignMenu assignment19 = this.assignMenuRepository.findById(19L).orElseThrow();
+        AssignMenu assignment1 = this.assignMenuRepository.findById(28L).orElseThrow();
+        AssignMenu assignment2 = this.assignMenuRepository.findById(29L).orElseThrow();
+        AssignMenu assignment19 = this.assignMenuRepository.findById(36L).orElseThrow();
 
         DAOUser client = this.userRepository.findByEmail(this.clientUser.getEmail()).orElseThrow();
 
@@ -586,7 +589,7 @@ public class ClientController_RestTemplateIT {
         Assertions.assertThat(
             getStatusOnMoneySaved.getBody()
         ).extracting(ClientStats::getIntentionsGiven)
-            .isEqualTo(1);
+            .isEqualTo(3);
 
         var getNextIntention = this.restTemplate.exchange(
             "/api/client/intention/next",
@@ -625,7 +628,7 @@ public class ClientController_RestTemplateIT {
 
         Assertions.assertThat(
             getNextIntention.getBody().getAssignment().getSchedule()
-        ).isEqualTo(ScheduleEnum.LUNCH);
+        ).isEqualTo(ScheduleEnum.DINNER);
 
         var getIntentionsToCome = this.restTemplate.exchange(
             "/api/client/intention/from-today",
@@ -640,7 +643,7 @@ public class ClientController_RestTemplateIT {
 
         Assertions.assertThat(
             getIntentionsToCome.getBody()
-        ).hasSize(2);
+        ).hasSize(4);
     }
 
     private void registerClient() {
