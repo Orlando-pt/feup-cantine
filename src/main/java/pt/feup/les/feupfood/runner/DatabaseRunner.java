@@ -28,7 +28,7 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
-// @Component
+@Component
 public class DatabaseRunner implements ApplicationRunner {
 
     @Autowired
@@ -739,7 +739,7 @@ public class DatabaseRunner implements ApplicationRunner {
         this.userRepository.save(client);
         this.userRepository.save(client2);
 
-        // add intention for today
+        // add intentions for today
         EatIntention eatIntentionForToday = new EatIntention();
         eatIntentionForToday.setAssignment(assignmentForToday);
         eatIntentionForToday.setClient(client);
@@ -752,7 +752,7 @@ public class DatabaseRunner implements ApplicationRunner {
         EatIntention eatIntentionForTodayDinner = new EatIntention();
         eatIntentionForTodayDinner.setAssignment(assignmentForTodayDinner);
         eatIntentionForTodayDinner.setClient(client);
-        eatIntentionForTodayDinner.setCode("231333432");
+        eatIntentionForTodayDinner.setCode("249856216");
         eatIntentionForTodayDinner.setMeals(Set.of(
             assignmentForTodayDinner.getMenu().getMeals().get(0)
         ));
