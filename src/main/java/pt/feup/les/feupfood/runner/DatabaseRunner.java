@@ -28,7 +28,7 @@ import pt.feup.les.feupfood.repository.RestaurantRepository;
 import pt.feup.les.feupfood.repository.ReviewRepository;
 import pt.feup.les.feupfood.repository.UserRepository;
 
-@Component
+// @Component
 public class DatabaseRunner implements ApplicationRunner {
 
     @Autowired
