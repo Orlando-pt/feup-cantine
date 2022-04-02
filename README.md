@@ -22,4 +22,4 @@ https://user-images.githubusercontent.com/60890452/161390612-89c8916b-646f-4563-
 
 ## Documentation
 
-You can check the documentation produced along the way at [link](https://github.com/Orlando-pt/feup-cantine/wiki)
+You can check the documentation produced along the way at [link](https://github.com/Orlando-pt/feup-cantine/wiki).
