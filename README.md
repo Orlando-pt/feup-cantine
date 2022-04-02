@@ -17,3 +17,5 @@ In terms of technologies, for the **api** development we used **SpringBoot**. **
 ## Demo
 
 In the following video we show the looks and functionalities of the system.
+
+https://user-images.githubusercontent.com/60890452/161390612-89c8916b-646f-4563-a237-3e5eb776566d.mp4
