@@ -1,0 +1,606 @@
+{
+  "id": "363af51e-138f-44cc-882b-397fd8024d8d",
+  "version": "2.0",
+  "name": "client",
+  "url": "https://feup-food-client.herokuapp.com/auth/login",
+  "tests": [{
+    "id": "1e649dea-5669-4102-bc06-8cd1a5a655b1",
+    "name": "dashboard",
+    "commands": [{
+      "id": "40b8ad13-8b52-4bae-8ceb-feacf23ae738",
+      "comment": "",
+      "command": "open",
+      "target": "https://feup-food-client.herokuapp.com/auth/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "80bc8d91-ad3f-45c1-a751-9a9812272777",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1920x1053",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f6ea5c9e-3cfa-45f4-a1c1-421483ec6440",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-email",
+      "targets": [
+        ["id=input-email", "id"],
+        ["name=email", "name"],
+        ["css=#input-email", "css:finder"],
+        ["xpath=//input[@id='input-email']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "francisco@gmail.com"
+    }, {
+      "id": "2c317a21-7668-41eb-8e35-490a7edf8f32",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-password",
+      "targets": [
+        ["id=input-password", "id"],
+        ["name=password", "name"],
+        ["css=#input-password", "css:finder"],
+        ["xpath=//input[@id='input-password']", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "password"
+    }, {
+      "id": "80778bab-4d76-41d0-868d-59d6cdbbb0c4",
+      "comment": "",
+      "command": "click",
+      "target": "css=.appearance-filled",
+      "targets": [
+        ["css=.appearance-filled", "css:finder"],
+        ["xpath=//button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ce336b55-8592-4128-8b39-6af19c60afc7",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=ngx-summary nb-card-header",
+      "targets": [
+        ["css=ngx-summary nb-card-header", "css:finder"],
+        ["xpath=//nb-card-header", "xpath:position"],
+        ["xpath=//nb-card-header[contains(.,'Summary')]", "xpath:innerText"]
+      ],
+      "value": "Summary"
+    }, {
+      "id": "f48213ea-31b2-4030-a68a-f11294f83011",
+      "comment": "",
+      "command": "click",
+      "target": "css=ngx-intentions nb-card-header",
+      "targets": [
+        ["css=ngx-intentions nb-card-header", "css:finder"],
+        ["xpath=//ngx-intentions/nb-card/nb-card-header", "xpath:position"],
+        ["xpath=//nb-card-header[contains(.,'Intentions')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "29d7d487-af9f-4fb4-bbfd-a521f9864117",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=ngx-intentions nb-card-header",
+      "targets": [
+        ["css=ngx-intentions nb-card-header", "css:finder"],
+        ["xpath=//ngx-intentions/nb-card/nb-card-header", "xpath:position"],
+        ["xpath=//nb-card-header[contains(.,'Intentions')]", "xpath:innerText"]
+      ],
+      "value": "Intentions"
+    }, {
+      "id": "3df3e22f-dd67-46fd-908d-ebf5d48e4fc9",
+      "comment": "",
+      "command": "click",
+      "target": "css=.user-name",
+      "targets": [
+        ["css=.user-name", "css:finder"],
+        ["xpath=//div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f5a17bb5-f19c-4311-8d18-459dd40d52e6",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-5 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-5 > .menu-title", "css:finder"],
+        ["xpath=//div[@id='cdk-overlay-0']/nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:idRelative"],
+        ["xpath=//nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Log out')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "a7fadba8-5e80-4a21-9b93-b97e1e7d6375",
+    "name": "favorites",
+    "commands": [{
+      "id": "d5185ed3-eaa2-4dc5-8436-11dfca2b92a9",
+      "comment": "",
+      "command": "open",
+      "target": "https://feup-food-client.herokuapp.com/auth/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b465293c-5ce7-40ed-9051-36f2704031da",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1920x1053",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6653fb11-7996-4397-bec8-c0dde778e1d2",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-email",
+      "targets": [
+        ["id=input-email", "id"],
+        ["name=email", "name"],
+        ["css=#input-email", "css:finder"],
+        ["xpath=//input[@id='input-email']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "francisco@gmail.com"
+    }, {
+      "id": "82899857-fb7f-48f9-ac70-4080e9b4682e",
+      "comment": "",
+      "command": "click",
+      "target": "id=input-password",
+      "targets": [
+        ["id=input-password", "id"],
+        ["name=password", "name"],
+        ["css=#input-password", "css:finder"],
+        ["xpath=//input[@id='input-password']", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "182dcc3f-9742-4cd6-bfc3-c4219aa56fd4",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-password",
+      "targets": [
+        ["id=input-password", "id"],
+        ["name=password", "name"],
+        ["css=#input-password", "css:finder"],
+        ["xpath=//input[@id='input-password']", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "password"
+    }, {
+      "id": "74a90126-4301-49ac-bb37-b5c1f80bc07e",
+      "comment": "",
+      "command": "click",
+      "target": "css=.appearance-filled",
+      "targets": [
+        ["css=.appearance-filled", "css:finder"],
+        ["xpath=//button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "fcbdbf6b-c55e-4e6f-be6e-d9a1c95566d4",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-1 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-1 > .menu-title", "css:finder"],
+        ["xpath=//li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Favorites')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "89eadd6f-c16c-4e5e-aefb-1b15c22ba6b5",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-2:nth-child(2)",
+      "targets": [
+        ["css=.ng-tns-c98-2:nth-child(2)", "css:finder"],
+        ["xpath=//li[3]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Restaurants')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "1aa861cf-d59e-4b2f-b082-43bb605174ba",
+      "comment": "",
+      "command": "click",
+      "target": "css=.col-4:nth-child(2) .w-100",
+      "targets": [
+        ["css=.col-4:nth-child(2) .w-100", "css:finder"],
+        ["xpath=//img[contains(@src,'https://sigarra.up.pt/sasup/pt/imagens/SC-alimentacao-grill-engenharia-renovado.jpg')]", "xpath:img"],
+        ["xpath=//div[2]/nb-card/nb-card-body/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "365fe7cc-2d3a-497e-9367-5d1a852fae66",
+      "comment": "",
+      "command": "click",
+      "target": "css=.status-success",
+      "targets": [
+        ["css=.status-success", "css:finder"],
+        ["xpath=//nb-card-header/button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "24d688d3-e94f-410c-be7e-929b5d71fdb2",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-1 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-1 > .menu-title", "css:finder"],
+        ["xpath=//li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Favorites')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7e0e6330-364f-4525-9339-9237b6ff5626",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.col-4:nth-child(2) .text-center",
+      "targets": [
+        ["css=.col-4:nth-child(2) .text-center", "css:finder"],
+        ["xpath=//div[2]/nb-card/nb-card-footer", "xpath:position"],
+        ["xpath=//nb-card-footer[contains(.,'Grill de Engenharia')]", "xpath:innerText"]
+      ],
+      "value": "Grill de Engenharia"
+    }, {
+      "id": "c32d86b8-0b13-4e4a-b383-8e333a687d86",
+      "comment": "",
+      "command": "click",
+      "target": "css=.col-4:nth-child(2) .w-100",
+      "targets": [
+        ["css=.col-4:nth-child(2) .w-100", "css:finder"],
+        ["xpath=//img[contains(@src,'https://sigarra.up.pt/sasup/pt/imagens/SC-alimentacao-grill-engenharia-renovado.jpg')]", "xpath:img"],
+        ["xpath=//div[2]/nb-card/nb-card-body/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c9d1ac0d-a491-4e37-966d-7728102d7e18",
+      "comment": "",
+      "command": "click",
+      "target": "css=.status-danger",
+      "targets": [
+        ["css=.status-danger", "css:finder"],
+        ["xpath=//nb-card-header/button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f86ce6f0-06ab-451a-9a01-34fde6a02a61",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-2:nth-child(2)",
+      "targets": [
+        ["css=.ng-tns-c98-2:nth-child(2)", "css:finder"],
+        ["xpath=//li[3]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Restaurants')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c01739d8-3d51-42cc-ae38-dbc638db643c",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-1 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-1 > .menu-title", "css:finder"],
+        ["xpath=//li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Favorites')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "693052f4-7c7f-49eb-825a-ad9938204d55",
+      "comment": "",
+      "command": "click",
+      "target": "css=.user-name",
+      "targets": [
+        ["css=.user-name", "css:finder"],
+        ["xpath=//div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "764a5684-a7db-4261-833a-cd6a97bafadf",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-20 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-20 > .menu-title", "css:finder"],
+        ["xpath=//div[@id='cdk-overlay-1']/nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:idRelative"],
+        ["xpath=//nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Log out')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "42864c99-af70-4ef5-ae63-f2b930d6500b",
+    "name": "intention",
+    "commands": [{
+      "id": "f6edb7f5-b10a-41e0-8df7-be146f4769b1",
+      "comment": "",
+      "command": "open",
+      "target": "https://feup-food-client.herokuapp.com/auth/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "e229ad99-d7ae-457a-9868-b220b835a00e",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1920x1053",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6469e7a3-95c3-4799-8a1d-ab9abc5fe463",
+      "comment": "",
+      "command": "click",
+      "target": "id=input-email",
+      "targets": [
+        ["id=input-email", "id"],
+        ["name=email", "name"],
+        ["css=#input-email", "css:finder"],
+        ["xpath=//input[@id='input-email']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "7b24280e-cd12-4d5f-8595-3fd4096db51d",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-email",
+      "targets": [
+        ["id=input-email", "id"],
+        ["name=email", "name"],
+        ["css=#input-email", "css:finder"],
+        ["xpath=//input[@id='input-email']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "francisco@gmail.com"
+    }, {
+      "id": "41646568-ed70-481c-a7d1-84a676485c13",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-password",
+      "targets": [
+        ["id=input-password", "id"],
+        ["name=password", "name"],
+        ["css=#input-password", "css:finder"],
+        ["xpath=//input[@id='input-password']", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "password"
+    }, {
+      "id": "e8494bde-0654-4998-b561-18c27be08dad",
+      "comment": "",
+      "command": "click",
+      "target": "css=.appearance-filled",
+      "targets": [
+        ["css=.appearance-filled", "css:finder"],
+        ["xpath=//button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "9a48ce15-3632-4f40-88e4-69698e158cf3",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//li[4]/a/span",
+      "targets": [
+        ["css=.ng-tns-c98-9:nth-child(2)", "css:finder"],
+        ["xpath=//li[4]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Promotional Codes')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "23a865fb-2a7a-4931-82b8-41a3180e1e98",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//nb-card-header[contains(.,'Promotion Codes')]",
+      "targets": [
+        ["css=nb-card-header", "css:finder"],
+        ["xpath=//nb-card-header", "xpath:position"],
+        ["xpath=//nb-card-header[contains(.,'Promotion Codes')]", "xpath:innerText"]
+      ],
+      "value": "Promotion Codes"
+    }, {
+      "id": "8666287f-43f0-4161-9ea8-32efbb6615fa",
+      "comment": "",
+      "command": "click",
+      "target": "css=.user-name",
+      "targets": [
+        ["css=.user-name", "css:finder"],
+        ["xpath=//div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "116a4701-9c37-45e5-ab8b-62ef4dc6ddf7",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-12 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-12 > .menu-title", "css:finder"],
+        ["xpath=//div[@id='cdk-overlay-2']/nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:idRelative"],
+        ["xpath=//nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Log out')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "e752043e-841f-44f6-977b-2672e5a69d15",
+    "name": "review",
+    "commands": [{
+      "id": "3146309a-ab9e-4dce-bdf7-e1ccaad5d75d",
+      "comment": "",
+      "command": "open",
+      "target": "https://feup-food-client.herokuapp.com/auth/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b2b10bb5-3618-4c8d-8a92-e164f251d915",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1920x1053",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1bddc7c2-24dc-4c43-856e-c8e9a07ee9e3",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-email",
+      "targets": [
+        ["id=input-email", "id"],
+        ["name=email", "name"],
+        ["css=#input-email", "css:finder"],
+        ["xpath=//input[@id='input-email']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "francisco@gmail.com"
+    }, {
+      "id": "3c8aa204-38ad-4294-884d-2084fbcc5398",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-password",
+      "targets": [
+        ["id=input-password", "id"],
+        ["name=password", "name"],
+        ["css=#input-password", "css:finder"],
+        ["xpath=//input[@id='input-password']", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "password"
+    }, {
+      "id": "6399c757-fd43-43dd-94b9-64d41e1a4d0c",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=input-password",
+      "targets": [
+        ["id=input-password", "id"],
+        ["name=password", "name"],
+        ["css=#input-password", "css:finder"],
+        ["xpath=//input[@id='input-password']", "xpath:attributes"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "fec76ad2-4f74-42cc-9f59-213adc784406",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-2:nth-child(2)",
+      "targets": [
+        ["css=.ng-tns-c98-2:nth-child(2)", "css:finder"],
+        ["xpath=//li[3]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Restaurants')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7dd45f77-646e-47d0-9ee2-1b9ca0206a5f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.col-4:nth-child(1) .w-100",
+      "targets": [
+        ["css=.col-4:nth-child(1) .w-100", "css:finder"],
+        ["xpath=//img[contains(@src,'https://sigarra.up.pt/sasup/en/imagens/SC-alimentacao-cantina-engenharia.jpg')]", "xpath:img"],
+        ["xpath=//nb-card-body/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6830294f-0866-4ba5-ab60-d2799376bedf",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-6:nth-child(2)",
+      "targets": [
+        ["css=.ng-tns-c98-6:nth-child(2)", "css:finder"],
+        ["xpath=//nb-card/nb-menu/ul/li[3]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Reviews')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "94400ecd-9d43-4d53-92c0-fb63d4eb0a16",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.row:nth-child(1) > #review-information > p:nth-child(4)",
+      "targets": [
+        ["css=.row:nth-child(1) > #review-information > p:nth-child(4)", "css:finder"],
+        ["xpath=//div[@id='review-information']/p[4]", "xpath:idRelative"],
+        ["xpath=//p[4]", "xpath:position"],
+        ["xpath=//p[contains(.,'Lamentável! Hoje o prato era arroz com molho de tomate.')]", "xpath:innerText"]
+      ],
+      "value": "Lamentável! Hoje o prato era arroz com molho de tomate."
+    }, {
+      "id": "d157d980-7c8c-4d64-86f8-8815f7a24936",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btnToggle:nth-child(4)",
+      "targets": [
+        ["css=.btnToggle:nth-child(4)", "css:finder"],
+        ["xpath=//button[@value='4']", "xpath:attributes"],
+        ["xpath=//button[4]", "xpath:position"],
+        ["xpath=//button[contains(.,'4')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6d3f8e60-0db8-48eb-9636-79b492ec89f5",
+      "comment": "",
+      "command": "click",
+      "target": "id=input-comment",
+      "targets": [
+        ["id=input-comment", "id"],
+        ["name=comment", "name"],
+        ["css=#input-comment", "css:finder"],
+        ["xpath=//textarea[@id='input-comment']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "dd62ba0a-e6d3-4971-a4b4-898cccef48ae",
+      "comment": "",
+      "command": "type",
+      "target": "id=input-comment",
+      "targets": [
+        ["id=input-comment", "id"],
+        ["name=comment", "name"],
+        ["css=#input-comment", "css:finder"],
+        ["xpath=//textarea[@id='input-comment']", "xpath:attributes"],
+        ["xpath=//textarea", "xpath:position"]
+      ],
+      "value": "Boa perna de frango."
+    }, {
+      "id": "1740e2df-853c-4652-83d5-cc05d548c62f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.status-success",
+      "targets": [
+        ["css=.status-success", "css:finder"],
+        ["xpath=//div[2]/button", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ceba80af-dd90-433f-9b0f-9b2a793f2734",
+      "comment": "",
+      "command": "click",
+      "target": "css=.context-menu-host .user-name",
+      "targets": [
+        ["css=.context-menu-host .user-name", "css:finder"],
+        ["xpath=//div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "000801b8-7e14-4308-9a64-9d8bb16508cb",
+      "comment": "",
+      "command": "click",
+      "target": "css=.ng-tns-c98-9 > .menu-title",
+      "targets": [
+        ["css=.ng-tns-c98-9 > .menu-title", "css:finder"],
+        ["xpath=//div[@id='cdk-overlay-1']/nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:idRelative"],
+        ["xpath=//nb-context-menu/nb-menu/ul/li[2]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Log out')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "c77ac357-80e3-42e4-8046-8488670ec005",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["1e649dea-5669-4102-bc06-8cd1a5a655b1"]
+  }],
+  "urls": ["https://feup-food-client.herokuapp.com/auth/login"],
+  "plugins": []
+}

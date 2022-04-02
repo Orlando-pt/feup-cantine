@@ -1,0 +1,41 @@
+<nb-card>
+    <nb-card-header> Profile </nb-card-header>
+
+    <nb-card-body>
+        <div class="row">
+            <div class="col-md-4">
+                <nb-user size="giant" [name]="this.profile?.fullName" [picture]="this.profile?.profileImageUrl" title="Client" color="#cccccc" class="justify-content-center">
+                </nb-user>
+            </div>
+            <div class="col-md-8">
+                <form (ngSubmit)="save()" #form="ngForm">
+                    <div class="form-control-group mb-3">
+                        <label class="label" for="input-fullName">Full Name:</label>
+                        <input nbInput fullWidth [(ngModel)]="profile.fullName" name="fullName" id="input-fullName" placeholder="Full name" type="text" autofocus />
+                    </div>
+
+                    <div class="form-control-group mb-3">
+                        <label class="label" for="input-biography">Biography:</label>
+                        <textarea nbInput fullWidth [(ngModel)]="profile.biography" name="biography" id="input-biography" placeholder="Biography" type="text"></textarea>
+                    </div>
+
+                    <div class="div form-control-group mb-3" *ngIf="!this.changeProfileImage">
+                        <button nbButton status="primary" (click)="updateChangeProfileImage()" [disabled]="loading" [class.btn-pulse]="loading">
+                          Change Profile Image
+                        </button>
+                    </div>
+                    <div *ngIf="this.changeProfileImage" class="form-control-group mb-3">
+                        <label class="label" for="input-profile-image">Profile Image:</label>
+                        <textarea nbInput fullWidth [(ngModel)]="profile.profileImageUrl" name="profileImageUrl" id="input-profile-image" placeholder="Profile Image Url" type="text"></textarea>
+                    </div>
+
+                    <div class="div text-center">
+                        <button nbButton status="success" [disabled]="loading || !form.valid" [class.btn-pulse]="loading">
+              Save
+            </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nb-card-body>
+</nb-card>

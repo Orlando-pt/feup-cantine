@@ -1,0 +1,26 @@
+<nb-card class="intention-card" [nbSpinner]="loading">
+    <nb-card-header> Next Intention </nb-card-header>
+    <nb-card-body class="d-flex flex-column align-items-center">
+        <p class="font-weight-bold">
+            {{ intention?.assignment.date }}
+        </p>
+
+        <p class="w-100 border-bottom text-center pb-2">
+            <strong>{{ intention?.assignment.schedule | titlecase }}</strong> at <strong>{{ intention?.restaurant }}</strong>
+        </p>
+
+        <p>Reserved meals:</p>
+
+        <div *ngFor="let meal of intention?.meals">
+            <div class="text-center">
+                <p>
+                    {{ meal.mealType | titlecase }}
+                </p>
+            </div>
+        </div>
+    </nb-card-body>
+    <nb-card-footer class="text-center font-weight-bold" (click)="this.copyCodeToClipboard(intention.code)" nbTooltip="Click to copy your code!">
+        <nb-icon icon="clipboard-outline"></nb-icon>
+        {{ intention?.code }}
+    </nb-card-footer>
+</nb-card>

@@ -1,0 +1,156 @@
+<div class="row">
+  <nb-card class="col-md-12">
+    <nb-card-header class="d-flex align-items-center justify-content-between">
+      Profile
+      <button
+        nbButton
+        [status]="this.favorite ? 'danger' : 'success'"
+        (click)="this.handleFavoriteClick()"
+      >
+        Favorite<nb-icon icon="star"></nb-icon>
+      </button>
+    </nb-card-header>
+
+    <nb-card-body>
+      <div class="row">
+        <div class="col-md-4">
+          <img
+            [src]="restaurant?.profileImageUrl"
+            alt="image"
+            class="w-100 h-100"
+          />
+        </div>
+        <div class="col-md-8">
+          <p class="font-weight-bold" style="font-size: 1.15rem">Information</p>
+          <p class="font-weight-bold">Full name</p>
+          <p>{{ restaurant?.fullName }}</p>
+          <p class="font-weight-bold">Location</p>
+          <p>
+            <nb-icon icon="pin-outline" pack="eva"></nb-icon>
+            {{ restaurant?.location }}
+          </p>
+        </div>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <nb-card class="col-md-5">
+    <nb-card-header> Schedule </nb-card-header>
+
+    <nb-card-body>
+      <angularx-timeline [dataSource]="dataSource"></angularx-timeline>
+    </nb-card-body>
+  </nb-card>
+  <div class="col-md-1"></div>
+  <nb-card class="col-md-6">
+    <nb-card-header> Details </nb-card-header>
+
+    <nb-card-body>
+      <p class="font-weight-bold">Price range</p>
+      <p *ngIf="priceRange?.minimumPrice != 0 && priceRange?.maximumPrice != 0">
+        {{ priceRange?.minimumPrice }}€ - {{ priceRange?.maximumPrice }}€
+      </p>
+      <p *ngIf="priceRange?.minimumPrice == 0 && priceRange?.maximumPrice == 0">
+        No information available
+      </p>
+
+      <p class="font-weight-bold">Cuisines</p>
+      <p>{{ restaurant?.cuisines }}</p>
+
+      <p class="font-weight-bold">Meals</p>
+      <p>{{ restaurant?.typeMeals }}</p>
+    </nb-card-body>
+  </nb-card>
+
+  <nb-card class="col-md-12" [nbSpinner]="loadingIntention">
+    <nb-card-header> Next Intention </nb-card-header>
+
+    <nb-card-body>
+      <div class="row">
+        <div class="col-md-12 text-center border-bottom mb-5">
+          <p class="font-weight-bold">
+            {{ this.assignment?.date }} - {{ this.assignment?.schedule }}
+          </p>
+
+          <p class="font-weight-bold text-info" nbTooltip="Discount you will receive if you intent!">
+            <nb-icon icon="flash-outline"></nb-icon>
+            -{{ assignment?.menu?.discount?.toFixed(2).toString() }} €
+          </p>
+        </div>
+        <div
+          class="col-md-12 d-flex justify-content-center"
+          *ngIf="
+            this.assignment?.available === true &&
+            this.assignment?.purchased === false
+          "
+        >
+          <button nbButton status="primary" (click)="setIntent(assignment)">
+            Intent
+          </button>
+        </div>
+        <div
+          *ngFor="let key of this.keys"
+          class="col-md-4 d-flex flex-column align-items-center justify-content-center mt-5"
+        >
+          <div class="text-center" *ngIf="this.assignment?.menu[key] != null">
+            <p class="font-weight-bold">
+              {{ this.assignment.menu[key].mealType | titlecase }}
+            </p>
+            <p>{{ this.assignment.menu[key].description }}</p>
+            <p class="font-weight-light">
+              {{ this.assignment.menu[key].nutritionalInformation }}
+            </p>
+
+            <nb-toggle
+              *ngIf="
+                this.assignment?.available === true &&
+                this.assignment?.purchased === false
+              "
+              [(ngModel)]="this.assignment.menu[key].intent"
+              status="primary"
+            ></nb-toggle>
+
+            <nb-icon
+              *ngIf="
+                (this.assignment?.available === false ||
+                  this.assignment?.purchased === true) &&
+                this.assignment?.menu[key]?.choosen === true
+              "
+              icon="heart-outline"
+              status="success"
+              style="cursor: auto"
+            ></nb-icon>
+            <nb-icon
+              *ngIf="
+                (this.assignment?.available === false ||
+                  this.assignment?.purchased === true) &&
+                this.assignment?.menu[key]?.choosen === false
+              "
+              icon="slash-outline"
+              status="warning"
+              style="cursor: auto"
+            ></nb-icon>
+          </div>
+        </div>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <ng-template #dialog let-data let-ref="dialogRef">
+    <nb-card>
+      <nb-card-header>Intention Code</nb-card-header>
+      <nb-card-body>
+        <h3 class="text-center">Thank you!!!!</h3>
+
+        <p class="mt-2">
+          You keep your mission on preventing food waste here goes another code:
+        </p>
+
+        <p class="font-weight-bold p-4 text-center">{{ data }}</p>
+      </nb-card-body>
+      <nb-card-footer>
+        <button nbButton (click)="ref.close()">Close</button>
+      </nb-card-footer>
+    </nb-card>
+  </ng-template>
+</div>

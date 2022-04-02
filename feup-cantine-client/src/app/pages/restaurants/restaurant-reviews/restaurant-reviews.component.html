@@ -1,0 +1,61 @@
+<nb-card *ngIf="reviewDone === false">
+    <nb-card-header> Make Review </nb-card-header>
+
+    <nb-card-body>
+        <div class="form-control-group mb-3">
+            <p class="label">Classification:</p>
+            <nb-button-group (valueChange)="updateSingleSelectGroupValue($event)">
+                <button class="btnToggle" nbButtonToggle value="1">1</button>
+                <button class="btnToggle" nbButtonToggle value="2">2</button>
+                <button class="btnToggle" nbButtonToggle value="3">3</button>
+                <button class="btnToggle" nbButtonToggle value="4">4</button>
+                <button class="btnToggle" nbButtonToggle value="5">5</button>
+            </nb-button-group>
+        </div>
+        <form (ngSubmit)="save()" #form="ngForm">
+            <div class="form-control-group mb-3">
+                <label class="label" for="input-comment">Comment:</label>
+                <textarea nbInput fullWidth [(ngModel)]="comment" name="comment" id="input-comment" placeholder="Comment" type="text"></textarea>
+            </div>
+
+            <div class="div text-center">
+                <button nbButton status="success" [disabled]="loading || !form.valid" [class.btn-pulse]="loading">
+          Save
+        </button>
+            </div>
+        </form>
+    </nb-card-body>
+</nb-card>
+
+<nb-card>
+    <nb-card-header> Clients Reviews </nb-card-header>
+
+    <nb-card-body [style]="
+      this.reviewDone === false ? 'max-height: 40vh' : 'max-height: 80vh'
+    ">
+        <nb-list style="overflow-x: hidden">
+            <nb-list-item class="row review" *ngFor="let review of this.userReviews">
+                <div class="col-md-4" id="review-client">
+                    <nb-user [name]="review.clientFullName" [title]="review.timestamp | date" [picture]="review.clientProfileImageUrl">
+                    </nb-user>
+                </div>
+                <div class="col-md-8" id="review-information">
+                    <p class="font-weight-bold">Classification:</p>
+                    <p>
+                        {{ review.classificationGrade }}
+                        <nb-icon icon="star" pack="eva"></nb-icon>
+                    </p>
+                    <p class="font-weight-bold">Comment:</p>
+                    <p>{{ review.comment || "User didn't add a comment..." }}</p>
+
+                    <p class="font-weight-bold">Answer:</p>
+                    <p>{{ review.answer || "Restaurant didn't respond yet..." }}</p>
+                </div>
+            </nb-list-item>
+        </nb-list>
+
+        <p class="font-weight-bold text-center" *ngIf="this.userReviews.length === 0">
+            We have no reviews to show. Make one yourself!
+        </p>
+    </nb-card-body>
+</nb-card>

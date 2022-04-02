@@ -1,0 +1,32 @@
+<nb-card>
+  <nb-card-header> Restaurants </nb-card-header>
+
+  <nb-card-body>
+    <div class="row">
+      <div class="col-4" *ngFor="let restaurant of this.restaurants">
+        <nb-card
+          class="restaurant-card"
+          [routerLink]="['/pages/restaurants/' + restaurant.id]"
+        >
+          <nb-card-body class="p-0">
+            <img src="{{ restaurant.profileImageUrl }}" class="w-100 h-100" />
+          </nb-card-body>
+          <nb-card-footer class="text-center"
+            >{{ restaurant.fullName }}
+          </nb-card-footer>
+        </nb-card>
+      </div>
+
+      <div class="col-12 text-center" *ngIf="this.restaurants.length === 0">
+        <p *ngIf="this.favorites === false">
+          No restaurants were found, we will notify you when something new
+          appears!
+        </p>
+        <p *ngIf="this.favorites === true">
+          You don't have any favorites, you can add them on
+          <strong>Restaurants</strong> page!
+        </p>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>

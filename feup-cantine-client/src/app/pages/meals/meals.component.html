@@ -1,0 +1,16 @@
+<nb-card>
+  <nb-card-header> Restaurants </nb-card-header>
+
+  <nb-card-body>
+    <div class="row">
+      <div class="col-4" *ngFor="let restaurant of this.fakeRestaurants">
+        <nb-card>
+          <nb-card-body>
+            <img src="../../../assets/images/cover1.jpg" class="w-100 h-100" />
+          </nb-card-body>
+          <nb-card-footer>{{ restaurant.name }}</nb-card-footer>
+        </nb-card>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>

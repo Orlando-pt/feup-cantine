@@ -1,0 +1,17 @@
+.codes-card {
+  &:hover {
+    nb-card-body {
+      overflow: hidden;
+    }
+
+    nb-card-footer {
+      background-color: rgb(231, 231, 231);
+      color: black;
+      transition: all 0.5s;
+    }
+  }
+
+  nb-card-footer {
+    cursor: pointer;
+  }
+}
