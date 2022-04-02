@@ -1,0 +1,6 @@
+<nb-card [nbSpinner]="loading">
+  <nb-card-header>Popularity</nb-card-header>
+  <nb-card-body>
+    <div echarts [options]="options" class="echart" [merge]="dynamicData"></div>
+  </nb-card-body>
+</nb-card>

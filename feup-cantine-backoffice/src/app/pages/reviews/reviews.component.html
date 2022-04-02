@@ -1,0 +1,54 @@
+<ng-template #answer let-data let-ref="answerRef">
+    <nb-card>
+        <nb-card-header>Answer to {{ data }}</nb-card-header>
+        <nb-card-body>
+            <form (ngSubmit)="closeModal()" #form="ngForm">
+                <div class="form-control-group mb-3">
+                    <label class="label" for="input-comment">Answer:</label>
+                    <textarea nbInput fullWidth [(ngModel)]="reviewAnswer" name="answer" id="input-answer" placeholder="Answer" type="text"></textarea>
+                </div>
+
+                <div class="div text-center">
+                    <button nbButton status="success">
+                        Save Answer
+                    </button>
+                </div>
+            </form>
+
+        </nb-card-body>
+    </nb-card>
+</ng-template>
+
+<nb-card>
+    <nb-card-header> Client Reviews </nb-card-header>
+
+    <nb-card-body [style]="
+      'max-height: 80vh'
+    ">
+        <nb-list style="overflow-x: hidden">
+            <nb-list-item class="row review" *ngFor="let review of this.restaurantReviews">
+                <div class="col-md-4" id="review-client">
+                    <nb-user [name]="review.clientFullName" [title]="review.timestamp | date" [picture]="review.clientProfileImageUrl">
+                    </nb-user>
+                </div>
+                <div class="col-md-8" id="review-information">
+                    <p class="font-weight-bold">Classification:</p>
+                    <p>
+                        {{ review.classificationGrade }}
+                        <nb-icon icon="star" pack="eva"></nb-icon>
+                    </p>
+                    <p class="font-weight-bold">Comment:</p>
+                    <p>{{ review.comment || "User didn't add a comment..." }}</p>
+                    <p class="font-weight-bold">Answer:</p>
+                    <p>{{ review.answer || "Restaurant didn't respond yet..." }}</p>
+                    <button nbButton *ngIf="!review.answer" (click)="openModal(review.id, review.clientFullName, answer)" status="primary">Answer To This Review</button>
+                    <button nbButton *ngIf="review.answer" (click)="updateReviewModal(review.id, review.clientFullName, review.answer, answer)" status="primary">Update Answer</button>
+                </div>
+            </nb-list-item>
+        </nb-list>
+
+        <p class="font-weight-bold text-center" *ngIf="this.restaurantReviews.length === 0">
+            We have no reviews to show.
+        </p>
+    </nb-card-body>
+</nb-card>

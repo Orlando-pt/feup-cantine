@@ -1,0 +1,122 @@
+<nb-card>
+    <nb-card-header> Profile </nb-card-header>
+
+    <nb-card-body>
+        <div class="row">
+            <div class="col-md-4">
+                <nb-user size="giant" [name]="this.profile?.fullName" title="Restaurant" color="#cccccc" class="justify-content-center" [picture]="this.profile?.profileImageUrl">
+                </nb-user>
+            </div>
+            <div class="col-md-8">
+                <form (ngSubmit)="save()" #form="ngForm">
+                    <div class="form-control-group mb-3">
+                        <label class="label" for="input-fullName">Full Name:</label>
+                        <input nbInput fullWidth [(ngModel)]="profile.fullName" name="fullName" id="input-fullName" placeholder="Full name" type="text" autofocus />
+                    </div>
+
+                    <div class="form-control-group mb-3">
+                        <label class="label" for="input-location">Location:</label>
+                        <input nbInput fullWidth [(ngModel)]="profile.location" name="location" id="input-location" placeholder="Location" type="text" />
+                    </div>
+
+                    <div class="form-control-group mb-3">
+                        <label class="label" for="input-cuisines">Cuisines:</label>
+                        <input nbInput fullWidth [(ngModel)]="profile.cuisines" name="cuisines" id="input-cuisines" placeholder="Cuisines" type="text" />
+                    </div>
+
+                    <div class="form-control-group mb-3">
+                        <label class="label" for="input-type-meals">Type Of Meals:</label>
+                        <input nbInput fullWidth [(ngModel)]="profile.typeMeals" name="type-meals" id="input-type-meals" placeholder="Meal Types" type="text" />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12 mb-2">Morning schedule</div>
+                        <div class="form-control-group mb-3 col-md-6">
+                            <label class="label" for="morningOpeningSchedule">Opening Schedule:</label
+                >
+                <input
+                nbInput
+                [(ngModel)]="morningOpeningSchedule"
+                [nbTimepicker]="morningOpeningTimepicker"
+                id="morningOpeningSchedule"
+                name="morningOpeningSchedule"
+                />
+                <nb-timepicker
+                #morningOpeningTimepicker
+                withSeconds
+                ></nb-timepicker>
+              </div>
+              <div class="form-control-group mb-3 col-md-6">
+                <label class="label" for="morningClosingSchedule"
+                >Closing Schedule:</label
+                >
+                <input
+                nbInput
+                [(ngModel)]="morningClosingSchedule"
+                [nbTimepicker]="morningClosingTimepicker"
+                id="morningClosingSchedule"
+                name="morningClosingSchedule"
+                />
+                <nb-timepicker
+                #morningClosingTimepicker
+                withSeconds
+                ></nb-timepicker>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-12 mb-2">Afternoon schedule</div>
+              <div class="form-control-group mb-3 col-md-6">
+                <label class="label" for="afternoonOpeningSchedule"
+                >Opening Schedule:</label
+                >
+                <input
+                nbInput
+                [(ngModel)]="afternoonOpeningSchedule"
+                [nbTimepicker]="afternoonOpeningTimepicker"
+                id="afternoonOpeningSchedule"
+                name="afternoonOpeningSchedule"
+                />
+                <nb-timepicker
+                #afternoonOpeningTimepicker
+                withSeconds
+                ></nb-timepicker>
+              </div>
+              <div class="form-control-group mb-3 col-md-6">
+                <label class="label" for="afternoonClosingSchedule"
+                >Closing Schedule:</label
+                >
+                <input
+                nbInput
+                [(ngModel)]="afternoonClosingSchedule"
+                [nbTimepicker]="afternoonClosingTimepicker"
+                id="afternoonClosingSchedule"
+                name="afternoonClosingSchedule"
+                />
+                <nb-timepicker
+                #afternoonClosingTimepicker
+                withSeconds
+                ></nb-timepicker>
+              </div>
+            </div>
+            
+            <div class="div form-control-group mb-3" *ngIf="!this.changeProfileImage">
+              <button nbButton status="primary" (click)="updateChangeProfileImage()" [disabled]="loading" [class.btn-pulse]="loading">
+                Change Profile Image
+              </button>
+            </div>
+            <div *ngIf="this.changeProfileImage" class="form-control-group mb-3">
+              <label class="label" for="input-profile-image">Profile Image:</label>
+                            <textarea nbInput fullWidth [(ngModel)]="profile.profileImageUrl" name="profileImageUrl" id="input-profile-image" placeholder="Profile Image Url" type="text"></textarea>
+                        </div>
+
+                        <div class="div text-center">
+                            <button nbButton status="success" [disabled]="loading || !form.valid" [class.btn-pulse]="loading">
+                Save
+              </button>
+                        </div>
+                </form>
+                </div>
+            </div>
+    </nb-card-body>
+</nb-card>

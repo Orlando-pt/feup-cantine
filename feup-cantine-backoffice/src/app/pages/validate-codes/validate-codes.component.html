@@ -1,0 +1,187 @@
+<nb-card>
+  <nb-card-header> Validate Codes </nb-card-header>
+
+  <nb-card-body>
+    <div class="row">
+      <div
+        class="col-6 d-flex flex-column align-items-center justify-content-center"
+      >
+        <form (ngSubmit)="save()" #form="ngForm" id="form">
+          <div class="form-control-group mb-3">
+            <label class="label" for="input-code">Promotion code:</label>
+            <input
+              nbInput
+              fullWidth
+              [status]="code.length === 0 || code.length > 9 ? 'danger' : ''"
+              [(ngModel)]="code"
+              name="code"
+              id="input-code"
+              placeholder="Insert the code to verify"
+              type="text"
+              autofocus
+            />
+          </div>
+        </form>
+        <div>
+          <button
+            nbButton
+            status="primary"
+            [disabled]="loading || !form.valid"
+            [class.btn-pulse]="loading"
+            form="form"
+          >
+            Check
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="col-6 d-flex flex-column align-items-center justify-content-center"
+        *ngIf="this.verifiedUser != null"
+      >
+        <img
+          [src]="this.verifiedUser.profileImageUrl"
+          style="max-width: 100px; max-height: 100px"
+          class="mb-3"
+        />
+
+        <p class="font-weight-bold">{{ this.verifiedUser.fullName }}</p>
+
+        <nb-tag status="success" appearance="filled" text="Valid"></nb-tag>
+
+        <div
+          class="div d-flex flex-column align-items-center justify-content-center mt-4 border-top p-2"
+          *ngFor="let meal of this.verifiedUser.meals"
+        >
+          <p class="font-weight-bold">
+            {{ meal.mealType | titlecase }}
+          </p>
+          <p>{{ meal.description }}</p>
+          <p class="font-weight-light">
+            {{ meal.nutritionalInformation }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>
+
+<nb-card *ngIf="this.assignment != null">
+  <nb-card-header> Today's Menu </nb-card-header>
+
+  <nb-card-body>
+    <div class="row">
+      <div
+        class="col-md-4 d-flex flex-column align-items-center justify-content-center"
+        *ngIf="this.assignment.menu.meatMeal != null"
+      >
+        <p class="font-weight-bold">
+          {{ this.assignment.menu.meatMeal.mealType | titlecase }}
+        </p>
+        <p>{{ this.assignment.menu.meatMeal.description }}</p>
+        <p class="font-weight-light">
+          {{ this.assignment.menu.meatMeal.nutritionalInformation }}
+        </p>
+
+        <nb-tag
+          status="info"
+          appearance="outline"
+          [text]="
+            this.assignment.menu.meatMeal.numberOfIntentions + ' intentations'
+          "
+          class="mt-2"
+        ></nb-tag>
+      </div>
+
+      <div
+        class="col-md-4 d-flex flex-column align-items-center justify-content-center"
+        *ngIf="this.assignment.menu.fishMeal != null"
+      >
+        <p class="font-weight-bold">
+          {{ this.assignment.menu.fishMeal.mealType | titlecase }}
+        </p>
+        <p>{{ this.assignment.menu.fishMeal.description }}</p>
+        <p class="font-weight-light">
+          {{ this.assignment.menu.fishMeal.nutritionalInformation }}
+        </p>
+
+        <nb-tag
+          status="info"
+          appearance="outline"
+          [text]="
+            this.assignment.menu.fishMeal.numberOfIntentions + ' intentations'
+          "
+          class="mt-2"
+        ></nb-tag>
+      </div>
+
+      <div
+        class="col-md-4 d-flex flex-column align-items-center justify-content-center"
+        *ngIf="this.assignment.menu.dietMeal != null"
+      >
+        <p class="font-weight-bold">
+          {{ this.assignment.menu.dietMeal.mealType | titlecase }}
+        </p>
+        <p>{{ this.assignment.menu.dietMeal.description }}</p>
+        <p class="font-weight-light">
+          {{ this.assignment.menu.dietMeal.nutritionalInformation }}
+        </p>
+
+        <nb-tag
+          status="info"
+          appearance="outline"
+          [text]="
+            this.assignment.menu.dietMeal.numberOfIntentions + ' intentations'
+          "
+          class="mt-2"
+        ></nb-tag>
+      </div>
+
+      <div
+        class="col-md-4 d-flex flex-column align-items-center justify-content-center mt-5"
+        *ngIf="this.assignment.menu.vegetarianMeal != null"
+      >
+        <p class="font-weight-bold">
+          {{ this.assignment.menu.vegetarianMeal.mealType | titlecase }}
+        </p>
+        <p>{{ this.assignment.menu.vegetarianMeal.description }}</p>
+        <p class="font-weight-light">
+          {{ this.assignment.menu.vegetarianMeal.nutritionalInformation }}
+        </p>
+
+        <nb-tag
+          status="info"
+          appearance="outline"
+          [text]="
+            this.assignment.menu.vegetarianMeal.numberOfIntentions +
+            ' intentations'
+          "
+          class="mt-2"
+        ></nb-tag>
+      </div>
+
+      <div
+        class="col-md-4 d-flex flex-column align-items-center justify-content-center mt-5"
+        *ngIf="this.assignment.menu.desertMeal != null"
+      >
+        <p class="font-weight-bold">
+          {{ this.assignment.menu.desertMeal.mealType | titlecase }}
+        </p>
+        <p>{{ this.assignment.menu.desertMeal.description }}</p>
+        <p class="font-weight-light">
+          {{ this.assignment.menu.desertMeal.nutritionalInformation }}
+        </p>
+
+        <nb-tag
+          status="info"
+          appearance="outline"
+          [text]="
+            this.assignment.menu.vegetarianMeal.numberOfIntentions +
+            ' intentations'
+          "
+          class="mt-2"
+        ></nb-tag>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>
